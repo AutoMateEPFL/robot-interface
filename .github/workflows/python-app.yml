@@ -68,8 +68,8 @@ jobs:
       - run: poetry install --no-interaction
 
       - name: Run tests with coverage
-        run: poetry run coverage run -m pytest
-
+        run: poetry run coverage run -m pytest --codeclimate
+        
       - name: Generate coverage report
         run: poetry run coverage xml -o coverage.xml
 
