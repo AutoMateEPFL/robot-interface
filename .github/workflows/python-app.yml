@@ -69,6 +69,10 @@ jobs:
 
       - name: Run tests with coverage
         run: poetry run coverage run -m pytest
+        
+      - name: Debug
+        run: |
+            echo "CC_TEST_REPORTER_ID: $CC_TEST_REPORTER_ID"
 
       - uses: paambaati/codeclimate-action@v2.5.2
         env:
