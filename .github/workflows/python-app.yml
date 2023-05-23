@@ -81,6 +81,6 @@ jobs:
 
       - uses: paambaati/codeclimate-action@v2.5.2
         env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_TEST_REPORTER_ID }}
+          CC_TEST_REPORTER_ID: test #${{ secrets.CODECLIMATE_TEST_REPORTER_ID }}
         with:
           coverageCommand: coverage xml
