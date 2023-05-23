@@ -1,3 +1,4 @@
 # Interface-Robot
 
-![example workflow](https://github.com/github/docs/actions/workflows/python-app.yml/badge.svg)
+![example workflow](https://github.com/AutoMateEPFL/robot-interface/actions/workflows/python-app.yml/badge.svg)
+
