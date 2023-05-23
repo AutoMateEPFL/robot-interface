@@ -72,7 +72,7 @@ jobs:
         
       - name: Debug
         run: |
-            echo "CC_TEST_REPORTER_ID: $CC_TEST_REPORTER_ID"
+            echo "CODECLIMATE_TEST_REPORTER_ID: $CODECLIMATE_TEST_REPORTER_ID"
 
       - uses: paambaati/codeclimate-action@v2.5.2
         env:
