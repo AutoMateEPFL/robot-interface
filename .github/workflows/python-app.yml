@@ -67,6 +67,14 @@ jobs:
       # they'll be installed and working.
       - run: poetry install --no-interaction
 
-      # And finally run tests. I'm using pytest and all my pytest config is in my `pyproject.toml`
-      # so this line is super-simple. But it could be as complex as you need.
-      - run: poetry run pytest
+      - name: Run tests with coverage
+        run: poetry run coverage run -m pytest
+
+      - name: Generate coverage report
+        run: poetry run coverage xml -o coverage.xml
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report
+          path: coverage.xml
