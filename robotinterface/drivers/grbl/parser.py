@@ -1,5 +1,5 @@
 import logging
-from src.tasks.drivers.grbl import constants
+from robotinterface.drivers.grbl import constants
 
 log = logging.getLogger(__name__)
 
