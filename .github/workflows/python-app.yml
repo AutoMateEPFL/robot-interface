@@ -70,15 +70,8 @@ jobs:
       - name: Run tests with coverage
         run: poetry run coverage run -m pytest
         
-        
-      - name: view the secrets context
-        shell: bash
-        run: echo "$SECRETS_CONTEXT"
-        
-      - name: Debug
-        run: |
-            echo "CODECLIMATE_TEST_REPORTER_ID: $CODECLIMATE_TEST_REPORTER_ID"
-
+      
+      # This doesent work yet. The secrect is so far not resolved. 
       - uses: paambaati/codeclimate-action@v2.5.2
         env:
           CC_TEST_REPORTER_ID: test #${{ secrets.CODECLIMATE_TEST_REPORTER_ID }}
