@@ -1,4 +1,4 @@
-[![test](https://github.com/AutoMateEPFL/robot-interface/actions/workflows/python-app.yml/badge.svg)](https://github.com/AutoMateEPFL/robot-interface/actions/workflows/python-app.yml)
+[![Maintainability](https://api.codeclimate.com/v1/badges/755d3fbdd32b369d58ae/maintainability)](https://codeclimate.com/github/AutoMateEPFL/robot-interface/maintainability)[![Test Coverage](https://api.codeclimate.com/v1/badges/755d3fbdd32b369d58ae/test_coverage)](https://codeclimate.com/github/AutoMateEPFL/robot-interface/test_coverage)
 
 # Interface-Robot
 
