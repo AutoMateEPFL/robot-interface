@@ -899,5 +899,5 @@ six = "*"
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.10"
-content-hash = "581c8077e8eddc93e5dd09fe1bd2a6bc58054c94814553d030a61c5deefc52d5"
+python-versions = "^3.9"
+content-hash = "6474e9a0dff580361cbbbb97251a22079084da40dedd15d9d65c47a256f03d4a"
