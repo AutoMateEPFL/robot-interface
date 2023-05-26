@@ -38,8 +38,8 @@ class GrblDriver:
         logging.debug("Robot is idle again")
         return
 
-    async def move(self, x: int, y: int, feedrate: int) -> None:
-        answer = await self._connection.send(f"G01 X{x} Y{y} F{feedrate}")
+    async def move(self, x: int, y: int, z:int, feedrate: int) -> None:
+        answer = await self._connection.send(f"G01 X{x} Y{y} Z{z} F{feedrate}")
         parser.move_parser(answer)
         await self._wait_till_idle()
         return
