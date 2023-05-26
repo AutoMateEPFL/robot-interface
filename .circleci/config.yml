@@ -10,7 +10,7 @@ orbs:
   # so you dont have to copy and paste it everywhere.
   # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/python
   python: circleci/python@1.5.0
-  poetry: talkiq/poetry@4.0.1
+
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/configuration-reference/#jobs
@@ -30,6 +30,26 @@ jobs:
     # CircleCI will report the results back to your VCS provider.
     steps:
       - checkout
+      - run: 
+          name: Install Poetry
+          command: |
+            curl -sSL https://install.python-poetry.org | python -
+      - run:
+          name: Configure Poetry
+          command: |
+            python -m poetry config virtualenvs.create false
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "pyproject.toml" }}
+            - v1-dependencies-
+      - run:
+          name: Install dependencies
+          command: |
+            python -m poetry install
+      - save_cache:
+          paths:
+            - ~/.cache/pip
+          key: v1-dependencies-{{ checksum "pyproject.toml" }}
       - run:
           name: Run tests
           command: poetry run pytest
