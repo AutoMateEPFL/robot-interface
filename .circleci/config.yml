@@ -37,7 +37,7 @@ jobs:
       - run:
           name: Configure Poetry
           command: |
-            python -m poetry config virtualenvs.create false
+            poetry config virtualenvs.create false
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "pyproject.toml" }}
@@ -45,7 +45,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            python -m poetry install
+            poetry install
       - save_cache:
           paths:
             - ~/.cache/pip
