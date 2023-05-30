@@ -1,6 +1,9 @@
-import sys
 from dynamixel_sdk import *
 from robotinterface.drivers.dynamixel.address_book import *
+
+import logging
+
+log = logging.getLogger(__name__)
 
 
 class Dynamixel:
@@ -23,14 +26,14 @@ class Dynamixel:
                 for i in range(len(self.ID)):
                     self.series_name[self.ID[i]] = series_name[i]
             else:
-                print("Provide correct series name type / length")
-                sys.exit()
+                raise ValueError("Provide correct series name type / length")
+
 
         else:
             if type(series_name) == str:
                 self.series_name = {self.ID: series_name}
             else:
-                print("Provide correct series name type")
+                raise ValueError("Provide correct series name type")
 
         for id, series in self.series_name.items():
             # Check for series name
@@ -43,97 +46,64 @@ class Dynamixel:
         self.port_handler = PortHandler(self.port_name)
         self.packet_handler = PacketHandler(2)
 
+        self.port_handler.openPort()
+        logging.debug(f"Port open successfully for: {self.descriptive_device_name}")
+
+        # Set port baudrate
+        self.port_handler.setBaudRate(self.baudrate)
+        logging.debug(f"Baudrate set successfully for: {self.descriptive_device_name}")
+
     def fetch_and_check_ID(self, ID):
         if self.multiple_motors:
-            if ID is None:
-                print(
-                    "You specified multiple dynamixels on this port. But did not specify which motor to operate upon. Please specify ID.")
-                sys.exit()
-            elif ID == "all":
-                return self.ID
-            elif type(ID) == list:
-                for id in ID:
-                    if id not in self.ID:
-                        print("The ID you specified:", id, "in the list", ID,
-                              "does not exist in the list of IDs you initialized.")
-                        sys.exit()
-                return ID
-            else:
-                if ID in self.ID:
-                    return [ID]
-                else:
-                    print("The ID you specified:", ID, "does not exist in the list of IDs you initialized.")
-                    sys.exit()
+            match ID:
+                case None:
+                    raise ValueError(
+                        "You specified multiple dynamixels on this port. But did not specify which motor to operate "
+                        "upon. Please specify ID.")
+                case "all":
+                    return self.ID
+                case _ if isinstance(ID, list):
+                    for id in ID:
+                        if id not in self.ID:
+                            raise ValueError(
+                                f"The ID you specified: {id} in the list {ID} does not exist in the list of IDs you "
+                                f"initialized.")
+                    return ID
+                case _:
+                    if ID in self.ID:
+                        return [ID]
+                    else:
+                        raise ValueError(
+                            f"The ID you specified: {ID} does not exist in the list of IDs you initialized.")
         else:
             return [self.ID]
 
-    def begin_communication(self, enable_torque=True):
-        # Open port
-        try:
-            self.port_handler.openPort()
-            print("Port open successfully for:", self.descriptive_device_name)
-        except:
-            print("!! Failed to open port for:", self.descriptive_device_name)
-            print("Check: \n1. If correct port name is specified\n2. If dynamixel wizard isn't connected")
-            sys.exit()
-
-        # Set port baudrate
-        try:
-            self.port_handler.setBaudRate(self.baudrate)
-            print("Baudrate set successfully for:", self.descriptive_device_name)
-        except:
-            print("!! Failed to set baudrate for:", self.descriptive_device_name)
-            sys.exit()
-
-        if enable_torque:
-            if self.multiple_motors:
-                for ID in self.ID:
-                    self.enable_torque(ID=ID)
-            else:
-                self.enable_torque()
-
-    def end_communication(self, disable_torque=True):
-        if disable_torque:
-            if self.multiple_motors:
-                for ID in self.ID:
-                    self.disable_torque(ID=ID)
-            else:
-                self.disable_torque()
-
-        # Close port
-        try:
-            self.port_handler.closePort()
-            print("Port closed successfully for:", self.descriptive_device_name)
-        except:
-            print("!! Failed to close port for:", self.descriptive_device_name)
-            sys.exit()
-
-    def _print_error_msg(self, process_name, dxl_comm_result, dxl_error, selected_ID, print_only_if_error=False):
+    def _print_error_msg(self, process_name, dxl_comm_result, dxl_error, selected_IDs):
         if dxl_comm_result != COMM_SUCCESS:
-            print("!!", process_name, "failed for:", self.descriptive_device_name)
-            print("Communication error:", self.packet_handler.getTxRxResult(dxl_comm_result))
+            logging.error("!!", process_name, "failed for:", self.descriptive_device_name)
+            logging.error("Communication error:", self.packet_handler.getTxRxResult(dxl_comm_result))
+            raise ValueError(f"!! {process_name} failed for: {self.descriptive_device_name}")
+
         elif dxl_error != 0:
-            print("!!", process_name, "failed for:", self.descriptive_device_name)
-            print("Dynamixel error:", self.packet_handler.getRxPacketError(dxl_error))
+            logging.error("!!", process_name, "failed for:", self.descriptive_device_name)
+            logging.error(f"Dynamixel error: {self.packet_handler.getRxPacketError(dxl_error)}")
+            raise ValueError(f"!! {process_name} failed for: {self.descriptive_device_name}")
+
         else:
-            if not print_only_if_error:
-                print(process_name, "successful for:", self.descriptive_device_name, "ID:", selected_ID)
+            logging.debug(f"{process_name} successful for: {self.descriptive_device_name} ID: {selected_IDs}")
+
+    def toggle_torque(self, enable, process_name, print_only_if_error=False, ID=None):
+        selected_IDs = self.fetch_and_check_ID(ID)
+        for selected_ID in selected_IDs:
+            dxl_comm_result, dxl_error = self.packet_handler.write1ByteTxRx(self.port_handler, selected_ID,
+                                                                            ADDR_TORQUE_ENABLE, int(enable))
+            self._print_error_msg(process_name, dxl_comm_result, dxl_error, selected_ID)
 
     def enable_torque(self, print_only_if_error=False, ID=None):
-        selected_IDs = self.fetch_and_check_ID(ID)
-        for selected_ID in selected_IDs:
-            dxl_comm_result, dxl_error = self.packet_handler.write1ByteTxRx(self.port_handler, selected_ID,
-                                                                            ADDR_TORQUE_ENABLE, 1)
-            self._print_error_msg("Torque enable", dxl_comm_result=dxl_comm_result, dxl_error=dxl_error,
-                                  selected_ID=selected_ID, print_only_if_error=print_only_if_error)
+        self.toggle_torque(True, "Torque enable", print_only_if_error, ID)
 
     def disable_torque(self, print_only_if_error=False, ID=None):
-        selected_IDs = self.fetch_and_check_ID(ID)
-        for selected_ID in selected_IDs:
-            dxl_comm_result, dxl_error = self.packet_handler.write1ByteTxRx(self.port_handler, selected_ID,
-                                                                            ADDR_TORQUE_ENABLE, 0)
-            self._print_error_msg("Torque disable", dxl_comm_result=dxl_comm_result, dxl_error=dxl_error,
-                                  selected_ID=selected_ID, print_only_if_error=print_only_if_error)
+        self.toggle_torque(False, "Torque disable", print_only_if_error, ID)
 
     def is_torque_on(self, print_only_if_error=False, ID=None):
         selected_IDs = self.fetch_and_check_ID(ID)
@@ -141,8 +111,7 @@ class Dynamixel:
             torque_status, dxl_comm_result, dxl_error = self.packet_handler.read1ByteTxRx(self.port_handler,
                                                                                           selected_ID,
                                                                                           ADDR_TORQUE_ENABLE)
-            self._print_error_msg("Read torque status", dxl_comm_result=dxl_comm_result, dxl_error=dxl_error,
-                                  selected_ID=selected_ID, print_only_if_error=print_only_if_error)
+            self._print_error_msg("Read torque status", dxl_comm_result, dxl_error, selected_ID)
 
             if torque_status == False:
                 return False
@@ -153,7 +122,7 @@ class Dynamixel:
         selected_IDs = self.fetch_and_check_ID(ID)
         for selected_ID in selected_IDs:
             _, dxl_comm_result, dxl_error = self.packet_handler.ping(self.port_handler, selected_ID)
-            self._print_error_msg("Ping", dxl_comm_result=dxl_comm_result, dxl_error=dxl_error, selected_ID=selected_ID)
+            self._print_error_msg("Ping", dxl_comm_result, dxl_error, selected_ID)
 
     def set_operating_mode(self, mode, ID=None, print_only_if_error=False):
         selected_IDs = self.fetch_and_check_ID(ID)
@@ -175,16 +144,15 @@ class Dynamixel:
                 mode_id = operating_modes[mode]
                 dxl_comm_result, dxl_error = self.packet_handler.write1ByteTxRx(self.port_handler, selected_ID,
                                                                                 ADDR_OPERATING_MODE, mode_id)
-                self._print_error_msg("Mode set to " + mode + " control", dxl_comm_result=dxl_comm_result,
-                                      dxl_error=dxl_error, selected_ID=selected_ID,
-                                      print_only_if_error=print_only_if_error)
+                self._print_error_msg("Mode set to " + mode + " control", dxl_comm_result, dxl_error, selected_ID)
 
                 if was_torque_on:
                     self.enable_torque(print_only_if_error=True, ID=selected_ID)
             else:
-                print("Enter valid operating mode. Select one of:\n" + str(list(operating_modes.keys())))
+                raise ValueError("Enter valid operating mode. Select one of:\n" + str(list(operating_modes.keys())))
 
-    def compensate_twos_complement(self, value, quantity):
+    @staticmethod
+    def compensate_twos_complement(value, quantity):
         if quantity in max_register_value:
             max_value = max_register_value[quantity]
 
@@ -193,157 +161,78 @@ class Dynamixel:
             else:
                 return value - max_value
         else:
-            print("Enter valid operating mode. Select one of:\n" + str(list(max_register_value.keys())))
+            raise ValueError("Enter valid operating mode. Select one of:\n" + str(list(max_register_value.keys())))
+
+    def read_data(self, method, address, twos_complement_key, ID=None):
+        selected_IDs = self.fetch_and_check_ID(ID)
+        reading = []
+        for selected_ID in selected_IDs:
+            data, dxl_comm_result, dxl_error = method(self.port_handler, selected_ID, address)
+            self._print_error_msg(f"Read {twos_complement_key}", dxl_comm_result, dxl_error, selected_ID)
+            reading.append(self.compensate_twos_complement(data, twos_complement_key))
+
+        if len(selected_IDs) == 1:
+            return reading[0]
+        else:
+            return reading
 
     def read_position(self, ID=None):
-        selected_IDs = self.fetch_and_check_ID(ID)
-        reading = []
-        for selected_ID in selected_IDs:
-            position, dxl_comm_result, dxl_error = self.packet_handler.read4ByteTxRx(self.port_handler, selected_ID,
-                                                                                     ADDR_PRESENT_POSITION)
-            self._print_error_msg("Read position", dxl_comm_result=dxl_comm_result, dxl_error=dxl_error,
-                                  selected_ID=selected_ID, print_only_if_error=True)
-            reading.append(self.compensate_twos_complement(position, "position"))
-
-        if len(selected_IDs) == 1:
-            return reading[0]
-        else:
-            return reading
+        return self.read_data(self.packet_handler.read4ByteTxRx, ADDR_PRESENT_POSITION, "position", ID)
 
     def read_velocity(self, ID=None):
-        selected_IDs = self.fetch_and_check_ID(ID)
-        reading = []
-        for selected_ID in selected_IDs:
-            velocity, dxl_comm_result, dxl_error = self.packet_handler.read4ByteTxRx(self.port_handler, selected_ID,
-                                                                                     ADDR_PRESENT_VELOCITY)
-            self._print_error_msg("Read velocity", dxl_comm_result=dxl_comm_result, dxl_error=dxl_error,
-                                  selected_ID=selected_ID, print_only_if_error=True)
-            reading.append(self.compensate_twos_complement(velocity, "velocity"))
-
-        if len(selected_IDs) == 1:
-            return reading[0]
-        else:
-            return reading
+        return self.read_data(self.packet_handler.read4ByteTxRx, ADDR_PRESENT_VELOCITY, "velocity", ID)
 
     def read_current(self, ID=None):
-        selected_IDs = self.fetch_and_check_ID(ID)
-        reading = []
-        for selected_ID in selected_IDs:
-            current, dxl_comm_result, dxl_error = self.packet_handler.read2ByteTxRx(self.port_handler, selected_ID,
-                                                                                    ADDR_PRESENT_CURRENT)
-            self._print_error_msg("Read cuurent", dxl_comm_result=dxl_comm_result, dxl_error=dxl_error,
-                                  selected_ID=selected_ID, print_only_if_error=True)
-            reading.append(self.compensate_twos_complement(current, "current"))
-
-        if len(selected_IDs) == 1:
-            return reading[0]
-        else:
-            return reading
+        return self.read_data(self.packet_handler.read2ByteTxRx, ADDR_PRESENT_CURRENT, "current", ID)
 
     def read_pwm(self, ID=None):
-        selected_IDs = self.fetch_and_check_ID(ID)
-        reading = []
-        for selected_ID in selected_IDs:
-            pwm, dxl_comm_result, dxl_error = self.packet_handler.read2ByteTxRx(self.port_handler, selected_ID,
-                                                                                ADDR_PRESENT_PWM)
-            self._print_error_msg("Read pwm", dxl_comm_result=dxl_comm_result, dxl_error=dxl_error,
-                                  selected_ID=selected_ID, print_only_if_error=True)
-            reading.append(self.compensate_twos_complement(pwm, "pwm"))
-
-        if len(selected_IDs) == 1:
-            return reading[0]
-        else:
-            return reading
+        return self.read_data(self.packet_handler.read2ByteTxRx, ADDR_PRESENT_PWM, "pwm", ID)
 
     def read_from_address(self, number_of_bytes, ADDR, ID=None):
-        selected_IDs = self.fetch_and_check_ID(ID)
-        reading = []
-        for selected_ID in selected_IDs:
-
-            twos_complement_key = ""
-            if number_of_bytes == 1:
-                value, dxl_comm_result, dxl_error = self.packet_handler.read1ByteTxRx(self.port_handler, selected_ID,
-                                                                                      ADDR)
-                twos_complement_key = "1 byte"
-            elif number_of_bytes == 2:
-                value, dxl_comm_result, dxl_error = self.packet_handler.read2ByteTxRx(self.port_handler, selected_ID,
-                                                                                      ADDR)
-                twos_complement_key = "2 bytes"
-            else:
-                value, dxl_comm_result, dxl_error = self.packet_handler.read4ByteTxRx(self.port_handler, selected_ID,
-                                                                                      ADDR)
-                twos_complement_key = "4 bytes"
-
-            self._print_error_msg("Read address", dxl_comm_result=dxl_comm_result, dxl_error=dxl_error,
-                                  selected_ID=selected_ID, print_only_if_error=True)
-            reading.append(self.compensate_twos_complement(value, twos_complement_key))
-
-        if len(selected_IDs) == 1:
-            return reading[0]
+        method = None
+        twos_complement_key = ""
+        if number_of_bytes == 1:
+            method = self.packet_handler.read1ByteTxRx
+            twos_complement_key = "1 byte"
+        elif number_of_bytes == 2:
+            method = self.packet_handler.read2ByteTxRx
+            twos_complement_key = "2 bytes"
         else:
-            return reading
+            method = self.packet_handler.read4ByteTxRx
+            twos_complement_key = "4 bytes"
+        return self.read_data(method, ADDR, twos_complement_key, ID)
+
+    def write_data(self, method, address, data, log_key, ID=None):
+        selected_IDs = self.fetch_and_check_ID(ID)
+        for selected_ID in selected_IDs:
+            dxl_comm_result, dxl_error = method(self.port_handler, selected_ID, address, int(data))
+            self._print_error_msg(f"Write {log_key}", dxl_comm_result, dxl_error, selected_ID)
 
     def write_position(self, pos, ID=None):
-        selected_IDs = self.fetch_and_check_ID(ID)
-        for selected_ID in selected_IDs:
-            dxl_comm_result, dxl_error = self.packet_handler.write4ByteTxRx(self.port_handler, selected_ID,
-                                                                            ADDR_GOAL_POSITION, int(pos))
-            self._print_error_msg("Write position", dxl_comm_result=dxl_comm_result, dxl_error=dxl_error,
-                                  selected_ID=selected_ID, print_only_if_error=True)
+        self.write_data(self.packet_handler.write4ByteTxRx, ADDR_GOAL_POSITION, pos, "position", ID)
 
     def write_velocity(self, vel, ID=None):
-        selected_IDs = self.fetch_and_check_ID(ID)
-        for selected_ID in selected_IDs:
-            dxl_comm_result, dxl_error = self.packet_handler.write4ByteTxRx(self.port_handler, selected_ID,
-                                                                            ADDR_GOAL_VELOCITY, int(vel))
-            self._print_error_msg("Write velocity", dxl_comm_result=dxl_comm_result, dxl_error=dxl_error,
-                                  selected_ID=selected_ID, print_only_if_error=True)
+        self.write_data(self.packet_handler.write4ByteTxRx, ADDR_GOAL_VELOCITY, vel, "velocity", ID)
 
     def write_current(self, current, ID=None):
-        selected_IDs = self.fetch_and_check_ID(ID)
-        for selected_ID in selected_IDs:
-            dxl_comm_result, dxl_error = self.packet_handler.write2ByteTxRx(self.port_handler, selected_ID,
-                                                                            ADDR_GOAL_CURRENT, int(current))
-            self._print_error_msg("Write current", dxl_comm_result=dxl_comm_result, dxl_error=dxl_error,
-                                  selected_ID=selected_ID, print_only_if_error=True)
+        self.write_data(self.packet_handler.write2ByteTxRx, ADDR_GOAL_CURRENT, current, "current", ID)
 
     def write_pwm(self, pwm, ID=None):
-        selected_IDs = self.fetch_and_check_ID(ID)
-        for selected_ID in selected_IDs:
-            dxl_comm_result, dxl_error = self.packet_handler.write2ByteTxRx(self.port_handler, selected_ID,
-                                                                            ADDR_GOAL_PWM, int(pwm))
-            self._print_error_msg("Write pwm", dxl_comm_result=dxl_comm_result, dxl_error=dxl_error,
-                                  selected_ID=selected_ID, print_only_if_error=True)
+        self.write_data(self.packet_handler.write2ByteTxRx, ADDR_GOAL_PWM, pwm, "pwm", ID)
 
     def write_profile_velocity(self, profile_vel, ID=None):
-        selected_IDs = self.fetch_and_check_ID(ID)
-        for selected_ID in selected_IDs:
-            dxl_comm_result, dxl_error = self.packet_handler.write4ByteTxRx(self.port_handler, selected_ID,
-                                                                            ADDR_PROFILE_VELOCITY, int(profile_vel))
-            self._print_error_msg("Write profile velocity", dxl_comm_result=dxl_comm_result, dxl_error=dxl_error,
-                                  selected_ID=selected_ID, print_only_if_error=True)
+        self.write_data(self.packet_handler.write4ByteTxRx, ADDR_PROFILE_VELOCITY, profile_vel, "profile velocity", ID)
 
     def write_profile_acceleration(self, profile_acc, ID=None):
-        selected_IDs = self.fetch_and_check_ID(ID)
-        for selected_ID in selected_IDs:
-            dxl_comm_result, dxl_error = self.packet_handler.write4ByteTxRx(self.port_handler, selected_ID,
-                                                                            ADDR_PROFILE_ACCELERATION, int(profile_acc))
-            self._print_error_msg("Write profile acceleration", dxl_comm_result=dxl_comm_result, dxl_error=dxl_error,
-                                  selected_ID=selected_ID, print_only_if_error=True)
+        self.write_data(self.packet_handler.write4ByteTxRx, ADDR_PROFILE_ACCELERATION, profile_acc,
+                        "profile acceleration", ID)
 
     def write_to_address(self, value, number_of_bytes, ADDR, ID=None):
-        selected_IDs = self.fetch_and_check_ID(ID)
-        for selected_ID in selected_IDs:
-
-            if number_of_bytes == 1:
-                dxl_comm_result, dxl_error = self.packet_handler.write1ByteTxRx(self.port_handler, selected_ID, ADDR,
-                                                                                int(value))
-            elif number_of_bytes == 2:
-                dxl_comm_result, dxl_error = self.packet_handler.write2ByteTxRx(self.port_handler, selected_ID, ADDR,
-                                                                                int(value))
-            else:
-                dxl_comm_result, dxl_error = self.packet_handler.write4ByteTxRx(self.port_handler, selected_ID, ADDR,
-                                                                                int(value))
-
-            self._print_error_msg("Write to address", dxl_comm_result=dxl_comm_result, dxl_error=dxl_error,
-                                  selected_ID=selected_ID, print_only_if_error=True)
+        method = None
+        if number_of_bytes == 1:
+            method = self.packet_handler.write1ByteTxRx
+        elif number_of_bytes == 2:
+            method = self.packet_handler.write2ByteTxRx
+        else:
+            method = self.packet_handler.write4ByteTxRx
+        self.write_data(method, ADDR, value, "to address", ID)
