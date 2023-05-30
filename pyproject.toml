@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.9"
 pyserial-asyncio = "0.6"
 dynamixel-sdk = "^3.7.31"
+numpy = "^1.20.0"
 
 
 [tool.poetry.group.dev.dependencies]

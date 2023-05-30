@@ -12,5 +12,6 @@ logging.basicConfig(
 async def main():
     robot = await Robot.build()
     await robot.grbl_connection.home()
+    robot.
 
 asyncio.run(main())

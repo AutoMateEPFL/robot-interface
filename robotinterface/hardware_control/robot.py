@@ -1,6 +1,8 @@
 import json
 from robotinterface.drivers.dynamixel.controller import Dynamixel
 from robotinterface.drivers.grbl.controller import GrblDriver
+from robotinterface.logistics.pickable import Pickable
+from robotinterface.logistics.pickable import GridPosition
 import logging
 
 log = logging.getLogger(__name__)
@@ -13,12 +15,13 @@ class Robot:
         dyna_connection = None
         camera_connection = None
 
-        file_path = "hardware_control/FirmwareSettings/port-settings.json"  # replace this with your actual file path
+        file_path = "hardware_control/FirmwareSettings/port-settings-raspi.json"  # replace this with your actual file path
         with open(file_path, 'r') as f:
             data = json.load(f)
 
         for setting in data["ComSettings"]:
             if setting["name"] == "dyna":
+                
                 ids = []
                 for motor in setting['motors']:
                     ids.append(motor['id'])
@@ -27,6 +30,7 @@ class Robot:
                                             ['xl' for _ in range(len(ids))])
                 dyna_connection.begin_communication()
                 # TODO: activate mode of motors
+                
 
             elif setting["name"] == "grbl":
                 grbl_connection = await GrblDriver.build(setting["port"], setting["bauderate"])
@@ -37,10 +41,13 @@ class Robot:
         self.grbl_connection = grbl_connection
         self.camera_connection = camera_connection
 
-    def pick_plate(self, plate_id):
+    def pick(self, object: Pickable):
+        self.grbl_connection.move(5, 5, 0 , 1000)
+        
+
         pass
 
-    def place_plate(self, plate_id, grid_position):
+    def place(self, object: Pickable, postion: GridPosition):
         pass
 
     def take_photo(self, plate_id):
