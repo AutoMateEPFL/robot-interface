@@ -1,18 +1,16 @@
 import logging
 import asyncio
 
-from robotinterface.drivers.grbl.controller import GrblDriver
-
+from robotinterface.hardware_control.robot import Robot
 
 logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
-    level=logging.INFO,
+    level=logging.DEBUG,
     datefmt='%Y-%m-%d %H:%M:%S')
 
-async def main():
-    grbl_driver = await GrblDriver.build("/dev/ttyUSB0", 115200)
-    await grbl_driver.home()
-    await grbl_driver.move(-0, -0, -498.93, 500)
 
+async def main():
+    robot = await Robot.build()
+    await robot.grbl_connection.home()
 
 asyncio.run(main())

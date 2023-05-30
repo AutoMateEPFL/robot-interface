@@ -19,7 +19,7 @@ def handle_error_alarm(answer: str) -> str:
 def welcome_parser(answer: str) -> None:
     handle_error_alarm(answer)
     if not constants.WELCOME_MSG == answer:
-        raise ValueError
+        raise ValueError(f"Message recived: {answer}")
     logging.debug(f"Sucessfully connected to GRBL controller")
     return
 

@@ -1,6 +1,6 @@
 import sys
 from dynamixel_sdk import *
-from address_book import *
+from robotinterface.drivers.dynamixel.address_book import *
 
 
 class Dynamixel:

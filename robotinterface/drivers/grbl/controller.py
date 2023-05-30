@@ -1,4 +1,4 @@
-from robotinterface.drivers.async_serial.communication import SerialConnection
+from robotinterface.drivers.grbl.communication import SerialConnection
 from robotinterface.drivers.grbl import parser
 from robotinterface.drivers.grbl.constants import (
     System
