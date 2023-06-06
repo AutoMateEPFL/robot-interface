@@ -69,27 +69,29 @@ class Robot:
         self.camera_connection = camera_connection
         self.grid = grid
 
-    async def _move_and_act(self, position, action, action_after=lambda: None):
-        coordinates = self.grid.get_coordinates(position)
+    async def _move_and_act(self, coordinates, action, action_after=lambda: None):
         await self.grbl_connection.move(coordinates[0], coordinates[1], constants.CLERANCE, constants.FEEDRATE)
         await self.grbl_connection.move(coordinates[0], coordinates[1], coordinates[2], constants.FEEDRATE)
         action()
         await self.grbl_connection.move(coordinates[0], coordinates[1], constants.CLERANCE, constants.FEEDRATE)
         action_after()
 
-    async def move(self, position: GridPosition):
-        coordinates = self.grid.get_coordinates(position)
-        await self.grbl_connection.move(coordinates[0], coordinates[1], coordinates[2], constants.FEEDRATE)
+    async def move(self, position: GridPosition, height=0):
+        coordinates = self.grid.get_cooridnates_from_grid(position)
+        await self.grbl_connection.move(coordinates[0], coordinates[1], height, constants.FEEDRATE)
 
     async def pick(self, object: Pickable):
-        await self._move_and_act(object.position, self.gripper.close)
+        coordinates = self.grid.remove_object(object)
+        await self._move_and_act(coordinates, self.gripper.close)
 
-    async def place(self, position: GridPosition, object: Pickable):
-        await self._move_and_act(position, self.gripper.open, lambda: setattr(object, 'position', position))
+    async def place(self, object: Pickable, position: GridPosition):
+        coordinates = self.grid.add_object(object, position)
+        await self._move_and_act(coordinates, self.gripper.open)
 
-    async def pick_and_place(self, position: GridPosition, object: Pickable):
-        await self._move_and_act(object.position, self.gripper.close)
-        await self._move_and_act(position, self.gripper.open, lambda: setattr(object, 'position', position))
+    async def pick_and_place(self, object: Pickable, position: GridPosition,):
+        await self.pick(object)
+        await self.place(object, position)
+
 
     async def shutdown(self):
         await self.grbl_connection.send_command("G54")
