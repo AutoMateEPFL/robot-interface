@@ -32,6 +32,10 @@ class Robot:
                                             ['xl' for _ in range(len(ids))])
 
                 # set correct operating mode
+                id_gripper = None
+                id_rotation = None
+                zero = None
+
                 for motor in setting['motors']:
                     id = motor["id"]
                     name = motor["name"]
@@ -41,17 +45,21 @@ class Robot:
                             dyna_connection.set_operating_mode("pwm", id_gripper)
                         case "rot":
                             id_rotation = id
+                            zero = motor["zero_pos"]
                             dyna_connection.set_operating_mode("position", id_rotation)
                         case _:
                             log.error(f"Unknown motor name: {name}")
                 dyna_connection.enable_torque("all")
 
-                gripper = Gripper(dyna_connection, id_gripper, id_rotation, 0)
+                gripper = Gripper(dyna_connection, id_gripper, id_rotation, zero)
+                gripper.open()
+                #gripper.rotate(0)
 
             elif setting["name"] == "grbl":
                 grbl_connection = await GrblDriver.build(setting["port"], setting["bauderate"])
-
-            ## TODO: set the correct corrdinate system centered a sthe first grid position
+                await grbl_connection.home()
+                await grbl_connection.send_command(f"G10 L2 P2 X0 Y0 Z{constants.Z_OFFSET}")
+                await grbl_connection.send_command("G55")
 
         return cls(grbl_connection, gripper, camera_connection, grid)
 
@@ -61,18 +69,28 @@ class Robot:
         self.camera_connection = camera_connection
         self.grid = grid
 
+    async def _move_and_act(self, position, action, action_after=lambda: None):
+        coordinates = self.grid.get_coordinates(position)
+        await self.grbl_connection.move(coordinates[0], coordinates[1], constants.CLERANCE, constants.FEEDRATE)
+        await self.grbl_connection.move(coordinates[0], coordinates[1], coordinates[2], constants.FEEDRATE)
+        action()
+        await self.grbl_connection.move(coordinates[0], coordinates[1], constants.CLERANCE, constants.FEEDRATE)
+        action_after()
+
+    async def move(self, position: GridPosition):
+        coordinates = self.grid.get_coordinates(position)
+        await self.grbl_connection.move(coordinates[0], coordinates[1], coordinates[2], constants.FEEDRATE)
+
     async def pick(self, object: Pickable):
-        await self.move_to(object.position)
-        self.gripper.close()
-        pass
+        await self._move_and_act(object.position, self.gripper.close)
 
-    async def place(self, position: GridPosition,  object: Pickable):
-        await self.move_to(position)
-        self.gripper.open()
-        object.position = position
-        pass
+    async def place(self, position: GridPosition, object: Pickable):
+        await self._move_and_act(position, self.gripper.open, lambda: setattr(object, 'position', position))
 
-    async def move_to(self, position: GridPosition):
-        cooridnates = self.grid.get_coordinates(position)
-        await self.grbl_connection.move(cooridnates[0], cooridnates[1], cooridnates[2], constants.FEEDRATE)
-        pass
+    async def pick_and_place(self, position: GridPosition, object: Pickable):
+        await self._move_and_act(object.position, self.gripper.close)
+        await self._move_and_act(position, self.gripper.open, lambda: setattr(object, 'position', position))
+
+    async def shutdown(self):
+        await self.grbl_connection.send_command("G54")
+        await self.grbl_connection.move(0, 0, 0, constants.FEEDRATE)

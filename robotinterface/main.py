@@ -13,17 +13,14 @@ logging.basicConfig(
 
 
 async def main():
-    grid = Grid(-200, 10, -200, 10, -100, 5)
-    plate = Pickable("plate", 0, GridPosition(3, 3, 3), 5)
+    grid = Grid(x_max=-800, x_dist=-120, y_max=-610, y_dist=-180, z_max=100, object_height=16)
+    plate1 = Pickable("plate", 0, GridPosition(0, grid.y_num_interval, 0))
     robot = await Robot.build(grid)
-    await robot.grbl_connection.home()
-    await robot.pick(plate)
-    await robot.place(GridPosition(0, 0, 0), plate)
 
-
-
-
-
+    for i in range(0, grid.x_num_interval):
+        await robot.move(GridPosition(i, grid.y_num_interval, 0))
+        input("Press Enter to continue...")
+    await robot.shutdown()
 
 
 asyncio.run(main())

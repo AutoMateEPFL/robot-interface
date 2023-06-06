@@ -11,5 +11,10 @@ opening_time = 1.5
 # Ratio between dynamixel and degree
 ratio = 4095 / 360
 
-#feedrate robot
-FEEDRATE = 2000
+# feedrate robot
+FEEDRATE = 15000
+
+# clerance while moving
+CLERANCE = 200
+
+Z_OFFSET = -330

@@ -14,13 +14,29 @@ class GrblDriver:
     async def build(cls, port: str, bauderate: int):
         connection = await SerialConnection.create(port, bauderate)
         answer = await connection.send_bytes(System.RESET, True)
-        parser.welcome_parser(answer)
+
+        tries = 0
+        while True:
+            try:
+                parser.welcome_parser(answer)
+                break  # If the code block executed successfully, break the loop.
+            except Exception as e:
+                print(f"An error occurred: {e}")
+                answer = await connection.send_bytes(System.RESET, True)
+                parser.welcome_parser(answer)
+                tries += 1
+                if tries > 10:
+                    raise e
+                pass  # If the code block failed, ignore the error and repeat the loop.
+
         return cls(connection)
 
     def __init__(self, connection: SerialConnection):
         self._connection = connection
 
     async def home(self):
+        #try homing again even if it fails the first time. There is a communication error sometimes
+
         answer = await self._connection.send("$H")
         parser.homing_start_parser(answer)
         ack_homing_1 = await self._connection.get_answer()
@@ -42,6 +58,11 @@ class GrblDriver:
         answer = await self._connection.send(f"G01 X{x} Y{y} Z{z} F{feedrate}")
         parser.move_parser(answer)
         await self._wait_till_idle()
+        return
+
+    async def send_command(self, command: str) -> None:
+        answer = await self._connection.send(command)
+        #parser.move_parser(answer)
         return
 
 

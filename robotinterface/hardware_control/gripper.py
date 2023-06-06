@@ -16,7 +16,7 @@ class Gripper:
 
     """
 
-    def __init__(self, dynamixel: Dynamixel, id_gripper: int, id_rotation: int, zero_position_rotation: int) -> None:
+    def __init__(self, dynamixel: Dynamixel, id_gripper: int, id_rotation: int | None, zero_position_rotation: None | int) -> None:
         """
         Initializing with the diffrent dynamixels and the zero position for rotation
 
@@ -31,16 +31,17 @@ class Gripper:
         self.zero_pos = zero_position_rotation
 
     @staticmethod
-    def __degree_to_dynamixel(self, angle: float) -> float:
+    def __degree_to_dynamixel(angle: float) -> float:
         """Translates degree to the angle measurment dynamixels use"""
         return angle * constants.ratio
 
     def rotate(self, angle: float) -> None:
+        if self.id_rotation is None:
+            raise ValueError("No rotation dynamixel connected")
+
         dyna_angle = self.__degree_to_dynamixel(angle)
-        print(angle)
         self.dynamixel.write_position(
             self.zero_pos + dyna_angle, self.id_rotation)
-        print(self.zero_pos + dyna_angle)
         return
 
     def close(self) -> None:
@@ -56,4 +57,5 @@ class Gripper:
         time.sleep(constants.opening_time)
         self.dynamixel.write_pwm(-constants.pwm, self.id_gripper)
         return
+
 

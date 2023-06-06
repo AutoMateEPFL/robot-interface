@@ -6,10 +6,6 @@
       "bauderate": 57600,
       "motors": [
         {
-          "name": "rot",
-          "id": 13
-        },
-        {
           "name": "grip",
           "id": 14
         }
