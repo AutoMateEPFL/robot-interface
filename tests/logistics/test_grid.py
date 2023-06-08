@@ -2,19 +2,19 @@ import pytest
 import pytest
 import numpy as np
 from robotinterface.logistics.grid import Grid
-from robotinterface.logistics.grid_position import GridPosition
+from robotinterface.logistics.positions import GridPosition, CartesianPosition
 
 
 # Define a mock Pickable class
 class Pickable:
     def __init__(self, value):
         self.value = value
-        self.height = 16
+        self.height = 10
 
 
 @pytest.fixture
 def grid():
-    test_grid = Grid(20, 2, 10, 2, 10)
+    test_grid = Grid(20, 2, 10, 2)
     yield test_grid
 
 
@@ -32,27 +32,39 @@ def test_grid_init(grid, obj):
 
 
 def test_add_object(grid, obj):
-    grid.add_object(obj, GridPosition(2, 4))
+    grid.add_object([obj], GridPosition(2, 4))
     assert grid.object_grid[4][2][0] is obj
-    assert grid.height_grid[4][2] == 16
+    assert grid.height_grid[4][2] == 10
+
+def test_add_object_multiple(grid, obj):
+    grid.add_object([obj, obj], GridPosition(2, 4))
+    assert grid.object_grid[4][2][0] is obj
+    assert grid.object_grid[4][2][1] is obj
+    assert grid.height_grid[4][2] == 20
 
 
 def test_remove_object(grid, obj):
-    grid.add_object(obj, GridPosition(2, 4))
+    grid.add_object([obj], GridPosition(2, 4))
+    grid.remove_object([obj])
+    assert grid.object_grid[4][2] == []
+    assert grid.height_grid[4][2] == 0
 
-    grid.remove_object(obj)
+def test_remove_object_multiple(grid, obj):
+    grid.add_object([obj, obj], GridPosition(2, 4))
+    grid.remove_object([obj, obj])
     assert grid.object_grid[4][2] == []
     assert grid.height_grid[4][2] == 0
 
 
 def test_find_object(grid, obj):
-    grid.object_grid[2][4].append(obj)
+    grid.add_object([obj], GridPosition(4, 2))
     assert grid.find_object(obj) == GridPosition(4, 2)
 
 
 def test_find_object_max_position(grid, obj):
-    grid.object_grid[4][9].append(obj)
-    assert grid.find_object(obj) == GridPosition(9, 4)
+    pos = GridPosition(grid.x_num_interval - 1, grid.y_num_interval -1 )
+    grid.add_object([obj], pos)
+    assert grid.find_object(obj) == pos
 
 
 def test_find_None_Object(grid, obj):
@@ -60,25 +72,22 @@ def test_find_None_Object(grid, obj):
 
 
 def test_find_stack_position(grid, obj):
-    grid.object_grid[2][4].append(obj)
-    grid.height_grid[2][4] = 10
+    grid.add_object([obj], GridPosition(4, 2))
     assert grid.find_stack_position(obj, GridPosition(4, 2)) == 10
 
 
 def test_find_stack_position_None(grid, obj):
     obj2 = Pickable(2)
-    grid.object_grid[2][4].append(obj)
-    grid.object_grid[2][4].append(obj2)
+    grid.add_object([obj], GridPosition(4, 2))
+    grid.add_object([obj2], GridPosition(4, 2))
     assert grid.find_stack_position(obj, GridPosition(4, 2)) is None
 
 
 def test_get_coordinates(grid, obj):
-    grid.object_grid[2][2].append(obj)
-    grid.height_grid[2][2] = 10
-    assert grid.get_coordinates(obj) == (4, 4, 10)
+    grid.add_object([obj], GridPosition(2, 2))
+    assert grid.get_coordinates(obj) == CartesianPosition(4, 4, 10)
 
 
 def test_get_coordinates_from_grid(grid, obj):
-    grid.object_grid[2][4].append(obj)
-    grid.height_grid[2][4] = 10
+    grid.add_object([obj], GridPosition(2, 4))
     assert grid.get_cooridnates_from_grid(GridPosition(4, 2)) == (8, 4)

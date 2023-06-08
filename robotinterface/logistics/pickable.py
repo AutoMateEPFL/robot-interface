@@ -1,8 +1,23 @@
+import itertools
+
+
 class Pickable:
-    def __init__(self, name: str, id: int, height: float) -> None:
-        self.name = name
-        self.id = id
-        self.height = height
+    id_iter = itertools.count()
 
+    def __init__(self) -> None:
+        self.id = next(self.id_iter)
 
+class PlateHolder(Pickable):
+    height = 5
+    def __init__(self):
+        super().__init__()
 
+class SmallPetriBottom(Pickable):
+    height = 7.5
+    def __init__(self):
+        super().__init__()
+
+class SmallPetriTop(Pickable):
+    height = 8.5
+    def __init__(self):
+        super().__init__()

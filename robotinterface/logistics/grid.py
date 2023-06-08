@@ -2,7 +2,7 @@ from typing import Tuple
 
 import numpy as np
 from robotinterface.logistics.pickable import Pickable
-from robotinterface.logistics.grid_position import GridPosition
+from robotinterface.logistics.positions import GridPosition, CartesianPosition
 
 class Grid:
     def __init__(self, x_max: float, x_dist: float, y_max: float, y_dist: float) -> None:
@@ -16,7 +16,7 @@ class Grid:
         self.object_grid = [[[] for _ in range(self.x_num_interval)] for _ in range(self.y_num_interval)]
         self.height_grid = [[0.0 for _ in range(self.x_num_interval)] for _ in range(self.y_num_interval)]
 
-    def get_coordinates(self, object: Pickable) -> tuple[float, float, float]:
+    def get_coordinates(self, object: Pickable) -> CartesianPosition:
         position = self.find_object(object)
         z = self.find_stack_position(object, position)
         if z is None:
@@ -24,21 +24,26 @@ class Grid:
 
         x_coord, y_coord = self.get_cooridnates_from_grid(position)
 
-        return (x_coord, y_coord, z)
+        return CartesianPosition(x_coord, y_coord, z)
 
-    def add_object(self, object: Pickable, position: GridPosition) -> tuple[float, float, float]:
-        self.object_grid[position.y_id][position.x_id].append(object)
+
+    def add_object(self, object_list: list[Pickable], position: GridPosition) -> CartesianPosition:
         old_height = self.height_grid[position.y_id][position.x_id]
-        self.height_grid[position.y_id][position.x_id] += object.height
+        for object in object_list:
+            self.object_grid[position.y_id][position.x_id].append(object)
+            self.height_grid[position.y_id][position.x_id] += object.height
         x_coord, y_coord = self.get_cooridnates_from_grid(position)
-        return (x_coord, y_coord, old_height)
+        return CartesianPosition(x_coord, y_coord, old_height)
 
-    def remove_object(self, object: Pickable) -> tuple[float, float, float]:
-        position = self.find_object(object)
-        self.object_grid[position.y_id][position.x_id].pop()
-        self.height_grid[position.y_id][position.x_id] -= object.height
+
+    def remove_object(self, object_list: list[Pickable]) -> CartesianPosition:
+        position = self.find_object(object_list[0])
+        for object in object_list:
+            self.object_grid[position.y_id][position.x_id].pop()
+            self.height_grid[position.y_id][position.x_id] -= object.height
+
         x_coord, y_coord = self.get_cooridnates_from_grid(position)
-        return (x_coord, y_coord, self.height_grid[position.y_id][position.x_id])
+        return CartesianPosition(x_coord, y_coord, self.height_grid[position.y_id][position.x_id])
 
     def find_object(self, object: Pickable) -> GridPosition:
         for y_idx in range(self.y_num_interval):
@@ -54,4 +59,6 @@ class Grid:
 
     def get_cooridnates_from_grid(self, position: GridPosition) -> tuple[float, float]:
         return self.xx[position.x_id], self.yy[position.y_id]
+
+
 
