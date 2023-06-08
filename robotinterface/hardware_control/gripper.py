@@ -30,6 +30,12 @@ class Gripper:
         self.id_rotation = id_rotation
         self.zero_pos = zero_position_rotation
 
+        self.open()
+        if self.id_rotation is not None:
+            self.rotate(0)
+
+        self.dynamixel.enable_torque("all")
+
     @staticmethod
     def __degree_to_dynamixel(angle: float) -> float:
         """Translates degree to the angle measurment dynamixels use"""
@@ -58,4 +64,7 @@ class Gripper:
         self.dynamixel.write_pwm(-constants.pwm, self.id_gripper)
         return
 
+    def shutdown(self) -> None:
+        self.dynamixel.disable_torque("all")
+        return
 
