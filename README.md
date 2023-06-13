@@ -2,5 +2,12 @@
 
 # Interface-Robot
 
+# Possible Improvments Software
+
+- [ ] Make a motion planner to reduce unnecessary movements
+- [ ] 
+
+# Ideas for the future
+
 
 
