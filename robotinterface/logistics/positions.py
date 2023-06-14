@@ -2,16 +2,16 @@ class GridPosition:
     """This class defines a 2D position on the fixed grid of the robot
 
     Attributes:
-        x_id (int): The x index on the grid
-        y_id (int): The y index on the grid
+        x_id The x index on the grid
+        y_id The y index on the grid
     """
 
     def __init__(self, x_id: int, y_id: int) -> None:
         """ Initializes a new instance of the GridPosition class
 
         Attributes:
-            x_id (int): The x index on the grid
-            y_id (int): The y index on the grid
+            x_id: The x index on the grid
+            y_id: The y index on the grid
         """
         self.x_id = x_id
         self.y_id = y_id
@@ -28,18 +28,18 @@ class CartesianPosition:
     """This class defines a 2D position on the fixed grid of the robot
 
     Attributes:
-        x (float): The x position in cartesian coordinates
-        y (float): The y position in cartesian coordinates
-        z (float): The z position in cartesian coordinates
+        x: The x position in cartesian coordinates
+        y: The y position in cartesian coordinates
+        z: The z position in cartesian coordinates
     """
     
     def __init__(self, x: float, y: float, z: float):
         """ Initializes a new instance of the GridPosition class
 
         Attributes:
-                x (float): The x position in cartesian coordinates
-                y (float): The y position in cartesian coordinates
-                z (float): The z position in cartesian coordinates
+                x: The x position in cartesian coordinates
+                y: The y position in cartesian coordinates
+                z: The z position in cartesian coordinates
         """    
         self.x = x
         self.y = y
