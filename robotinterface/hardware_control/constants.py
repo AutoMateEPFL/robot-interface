@@ -1,3 +1,4 @@
+#TODO: Rename all constants to be Uppercase
 # holding pwm without overheating
 pwm = 100
 
