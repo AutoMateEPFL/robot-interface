@@ -21,7 +21,7 @@ class Dynamixel:
         self.port_name = port_name
         self.baudrate = baudrate
 
-        self.executor = ThreadPoolExecutor(max_workers=1)
+        self.executor = ThreadPoolExecutor(max_workers=2)
         self.loop = asyncio.get_event_loop()
 
         # Set series name
@@ -44,7 +44,6 @@ class Dynamixel:
             all_series_names = ["xm", "xl"]
             if series not in all_series_names:
                 print("Series name invalid for motor with id,", id, "Choose one of:", all_series_names)
-
 
         # Communication settings
         self.port_handler = dsdk.PortHandler(self.port_name)
@@ -100,21 +99,21 @@ class Dynamixel:
         selected_ids = self.fetch_and_check_id(id)
         for selected_ID in selected_ids:
             dxl_comm_result, dxl_error = await self._write1ByteTxRx(self.port_handler, selected_ID,
-                                                                            ADDR_TORQUE_ENABLE, int(enable))
+                                                                    ADDR_TORQUE_ENABLE, int(enable))
             self._print_error_msg(process_name, dxl_comm_result, dxl_error, selected_ID)
 
     async def enable_torque(self, id=None):
-        await self.toggle_torque(True, "Torque enable",  id)
+        await self.toggle_torque(True, "Torque enable", id)
 
     async def disable_torque(self, id=None):
-        await self.toggle_torque(False, "Torque disable",  id)
+        await self.toggle_torque(False, "Torque disable", id)
 
     async def is_torque_on(self, id=None):
         selected_ids = self.fetch_and_check_id(id)
         for selected_ID in selected_ids:
             torque_status, dxl_comm_result, dxl_error = await self._read1ByteTxRx(self.port_handler,
-                                                                                          selected_ID,
-                                                                                          ADDR_TORQUE_ENABLE)
+                                                                                  selected_ID,
+                                                                                  ADDR_TORQUE_ENABLE)
             self._print_error_msg("Read torque status", dxl_comm_result, dxl_error, selected_ID)
 
             if torque_status == False:
@@ -147,7 +146,7 @@ class Dynamixel:
 
                 mode_id = operating_modes[mode]
                 dxl_comm_result, dxl_error = await self._write1ByteTxRx(self.port_handler, selected_ID,
-                                                                                ADDR_OPERATING_MODE, mode_id)
+                                                                        ADDR_OPERATING_MODE, mode_id)
                 self._print_error_msg("Mode set to " + mode + " control", dxl_comm_result, dxl_error, selected_ID)
 
                 if was_torque_on:
@@ -181,16 +180,16 @@ class Dynamixel:
             return reading
 
     async def read_position(self, id=None):
-        return await self.read_data(self._write4ByteTxRx, ADDR_PRESENT_POSITION, "position", id)
+        return await self.read_data(self._read4ByteTxRx, ADDR_PRESENT_POSITION, "position", id)
 
     async def read_velocity(self, id=None):
-        return await self.read_data(self._write4ByteTxRx, ADDR_PRESENT_VELOCITY, "velocity", id)
+        return await self.read_data(self._read4ByteTxRx, ADDR_PRESENT_VELOCITY, "velocity", id)
 
     async def read_current(self, id=None):
-        return await self.read_data(self._write2ByteTxRx, ADDR_PRESENT_CURRENT, "current", id)
+        return await self.read_data(self._read2ByteTxRx, ADDR_PRESENT_CURRENT, "current", id)
 
     async def read_pwm(self, id=None):
-        return await self.read_data(self._write2ByteTxRx, ADDR_PRESENT_PWM, "pwm", id)
+        return await self.read_data(self._read2ByteTxRx, ADDR_PRESENT_PWM, "pwm", id)
 
     def read_from_address(self, number_of_bytes, ADDR, id=None):
         method = None
@@ -229,7 +228,7 @@ class Dynamixel:
 
     async def write_profile_acceleration(self, profile_acc, id=None):
         await self.write_data(self._write4ByteTxRx, ADDR_PROFILE_ACCELERATION, profile_acc,
-                        "profile acceleration", id)
+                              "profile acceleration", id)
 
     def write_to_address(self, value, number_of_bytes, ADDR, id=None):
         method = None
@@ -241,15 +240,36 @@ class Dynamixel:
             method = self._write4ByteTxRx
         self.write_data(method, ADDR, value, "to address", id)
 
-
     async def _write4ByteTxRx(self, port_handler, selected_ID, address, data):
-        return await self.loop.run_in_executor(self.executor, partial(self.packet_handler.write4ByteTxRx, port_handler, selected_ID, address, data))
-    
+        return await self.loop.run_in_executor(self.executor,
+                                               partial(self.packet_handler.write4ByteTxRx, port_handler, selected_ID,
+                                                       address, data))
+
     async def _write2ByteTxRx(self, port_handler, selected_ID, address, data):
-        return await self.loop.run_in_executor(self.executor, partial(self.packet_handler.write4ByteTxRx, port_handler, selected_ID, address, data))
-    
+        return await self.loop.run_in_executor(self.executor,
+                                               partial(self.packet_handler.write2ByteTxRx, port_handler, selected_ID,
+                                                       address, data))
+
     async def _write1ByteTxRx(self, port_handler, selected_ID, address, data):
-        return await self.loop.run_in_executor(self.executor, partial(self.packet_handler.write4ByteTxRx, port_handler, selected_ID, address, data))
-    
+        return await self.loop.run_in_executor(self.executor,
+                                               partial(self.packet_handler.write1ByteTxRx, port_handler, selected_ID,
+                                                       address, data))
+
+    async def _read4ByteTxRx(self, port_handler, selected_ID, address):
+        return await self.loop.run_in_executor(self.executor,
+                                               partial(self.packet_handler.read4ByteTxRx, port_handler, selected_ID,
+                                                       address))
+
+    async def _read2ByteTxRx(self, port_handler, selected_ID, address):
+        return await self.loop.run_in_executor(self.executor,
+                                               partial(self.packet_handler.read2ByteTxRx, port_handler, selected_ID,
+                                                       address))
+
+    async def _read1ByteTxRx(self, port_handler, selected_ID, address):
+        return await self.loop.run_in_executor(self.executor,
+                                               partial(self.packet_handler.read1ByteTxRx, port_handler, selected_ID,
+                                                       address))
+
     async def _ping(self, port_handler, selected_ID):
-        return await self.loop.run_in_executor(self.executor, partial(self.packet_handler.ping, port_handler, selected_ID))
+        return await self.loop.run_in_executor(self.executor,
+                                               partial(self.packet_handler.ping, port_handler, selected_ID))
