@@ -90,4 +90,4 @@ def test_get_coordinates(grid, obj):
 
 def test_get_coordinates_from_grid(grid, obj):
     grid.add_object([obj], GridPosition(2, 4))
-    assert grid.get_cooridnates_from_grid(GridPosition(4, 2)) == (8, 4)
+    assert grid.get_coordinates_from_grid(GridPosition(4, 2)) == (8, 4)

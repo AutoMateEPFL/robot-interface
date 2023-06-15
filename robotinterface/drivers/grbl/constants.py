@@ -15,6 +15,7 @@ class Gcode:
     CS2 = "G55"
     CS3 = "G56"
     CS4 = "G57"
+    
 class System:
     #Homing
     HOME = "$H"

@@ -9,20 +9,22 @@ log = logging.getLogger(__name__)
 
 class Gripper:
     """
-    Encapsulating acutation of a gripper. The gripper has dynamixel motor for rotation and one for gripping.
+    This class represents the gripper of the robot. The gripper has the option to rotate around one axis
 
-    Attributes:
-        self.pwm: Is the speed the grippers use to be opened or closed
+    Args:
+                self.id_gripper: The id of the dynamixel for gripping
+                self.id_rotation: The id of the dynamixel for rotating
+                sefl.zero_position_rotation: The zero position of the rotation dynamixel
 
     """
 
     def __init__(self, dynamixel: Dynamixel, id_gripper: int, id_rotation: int | None, zero_position_rotation: None | int) -> None:
         """
-        Initializing with the diffrent dynamixels and the zero position for rotation
+        Initializes a gripper object
 
         Args:
-            self.id_gripper: The dynamixel for gripping
-            self.id_rotation: The dynamixel for rotating
+            self.id_gripper: The id of the dynamixel for gripping
+            self.id_rotation: The id of the dynamixel for rotating
             sefl.zero_position_rotation: The zero position of the rotation dynamixel
         """
         self.dynamixel = dynamixel
@@ -37,9 +39,16 @@ class Gripper:
         self.dynamixel.enable_torque("all")
 
     @staticmethod
-    def __degree_to_dynamixel(angle: float) -> float:
-        """Translates degree to the angle measurment dynamixels use"""
-        return angle * constants.ratio
+    def __degree_to_dynamixel(angle: float) -> int:
+        """Translates degree to the the range 0 - 4095 used by the dynamixel
+        
+        Args:
+            angle: The angle in degree to translate
+
+        Returns:
+            The discretized angle for the dynamixel
+        """
+        return int(angle * constants.ratio)
 
     def rotate(self, angle: float) -> None:
         if self.id_rotation is None:
@@ -65,6 +74,7 @@ class Gripper:
         return
 
     def shutdown(self) -> None:
+        "Disables the Torque for all motors"
         self.dynamixel.disable_torque("all")
         return
 
