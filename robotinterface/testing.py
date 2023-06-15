@@ -14,17 +14,10 @@ logging.basicConfig(
 
 async def main():
     grid = Grid(x_max=-800, x_dist=-200, y_max=-610, y_dist=-120)
-    bottom = Pickable(name="bottom petri", id=0, height=12)
-    top = Pickable(name="bottom petri", id=0, height=9)
-
-
-
-
-
     robot = await Robot.build(grid)
-    for i in range(0, 1):
-        await robot.move(GridPosition(i, grid.y_num_interval - 1))
-        input("Press Enter to continue...")
-    await robot.shutdown()
+    await robot.gripper.close()
+    await robot.gripper.open()
+    await robot.gripper.rotate(90)
+    await robot.gripper.shutdown()
 
 asyncio.run(main())
