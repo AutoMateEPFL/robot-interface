@@ -1,11 +1,7 @@
 version: 2.1
 
-orbs:
-  python: circleci/python@1.5.0
-  docker: circleci/docker@1.7.0
-
 jobs:
-  build-and-test: 
+  test: 
     docker:
       - image: cimg/python:3.11
 
@@ -64,7 +60,7 @@ jobs:
 workflows:
   sample:
     jobs:
-      - build-and-test
+      - test
       - build-and-push-docker:
           requires:
             - build-and-test
