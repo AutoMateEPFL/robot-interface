@@ -56,7 +56,7 @@ class Gripper:
                 case _:
                     log.error(f"Unknown motor name: {name}")
 
-        dynamixel = Dynamixel(ids, setting["port"], setting["bauderate"],
+        dynamixel = await Dynamixel.build(ids, setting["port"], setting["bauderate"],
                                          ['xl' for _ in range(len(ids))])
 
 

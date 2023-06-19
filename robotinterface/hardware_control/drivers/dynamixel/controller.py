@@ -10,7 +10,26 @@ log = logging.getLogger(__name__)
 
 
 class Dynamixel:
-    def __init__(self, id, port_name, baudrate, series_name="xm"):
+    @classmethod
+    async def build(cls, id, port_name, baudrate, series_name="xm"):
+
+        executor = ThreadPoolExecutor(max_workers=2)
+        loop = asyncio.get_event_loop()
+
+        port_handler = dsdk.PortHandler(port_name)
+        packet_handler = dsdk.PacketHandler(2)
+
+        port_handler.openPort()
+        logging.debug(f"Port open successfully for Dynamixel controller")
+
+        # Set port baudrate
+        port_handler.setBaudRate(baudrate)
+        logging.debug(f"Baudrate set successfully for Dynamixel controller")
+
+        return cls(id, port_handler, packet_handler, executor, loop, series_name)
+
+    def __init__(self, id, port_handler, packet_handler, executor, loop, series_name="xm", ):
+
         # Communication inputs
         if type(id) == list:
             self.multiple_motors = True
@@ -18,11 +37,10 @@ class Dynamixel:
             self.multiple_motors = False
 
         self.id = id
-        self.port_name = port_name
-        self.baudrate = baudrate
-
-        self.executor = ThreadPoolExecutor(max_workers=2)
-        self.loop = asyncio.get_event_loop()
+        self.port_handler = port_handler
+        self.packet_handler = packet_handler
+        self.executor = executor
+        self.loop = loop
 
         # Set series name
         if type(self.id) == list:
@@ -44,17 +62,6 @@ class Dynamixel:
             all_series_names = ["xm", "xl"]
             if series not in all_series_names:
                 print("Series name invalid for motor with id,", id, "Choose one of:", all_series_names)
-
-        # Communication settings
-        self.port_handler = dsdk.PortHandler(self.port_name)
-        self.packet_handler = dsdk.PacketHandler(2)
-
-        self.port_handler.openPort()
-        logging.debug(f"Port open successfully for Dynamixel controller")
-
-        # Set port baudrate
-        self.port_handler.setBaudRate(self.baudrate)
-        logging.debug(f"Baudrate set successfully for Dynamixel controller")
 
     def fetch_and_check_id(self, id):
         if self.multiple_motors:
