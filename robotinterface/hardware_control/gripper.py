@@ -63,6 +63,7 @@ class Gripper:
         await dynamixel.set_operating_mode("position", id_rotation)
 
         gripper = cls(dynamixel, id_gripper, id_rotation, zero)
+        await gripper.dynamixel.enable_torque("all")
 
         await gripper.open()
         await gripper.rotate(0)

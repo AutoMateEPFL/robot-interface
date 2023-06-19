@@ -1,12 +1,14 @@
 import json
 import time
 import types
+import asyncio
 from robotinterface.logistics.grid import Grid
 from robotinterface.logistics.positions import GridPosition, CartesianPosition
 from robotinterface.logistics.pickable import Pickable
 from robotinterface.hardware_control import constants
 from robotinterface.hardware_control.gripper import Gripper
-from robotinterface.hardware_control.platform import Platfrom
+from robotinterface.hardware_control.platform import Platform
+from robotinterface.hardware_control.vision import Vision
 import logging
 
 log = logging.getLogger(__name__)
@@ -16,9 +18,9 @@ class Robot:
     Represents a Robot for labautomation with a gripper and a camera.
 
     Attributes:
-        platfrom: The connection to the GRBL controller.
+        platform: The connection to the GRBL controller.
         gripper: The connection to the gripper
-        camera_connection: The connection to the camera (if any).
+        camera: The connection to the camera (if any).
         grid: The grid object representing the workspace of the robot.
     """
 
@@ -34,36 +36,51 @@ class Robot:
             Robot: The built Robot instance.
         """
 
-        platfrom = None
-        camera_connection = None
-        gripper = None
-
         file_path = "hardware_control/FirmwareSettings/port-settings-laptop-silvio.json"
         with open(file_path, 'r') as f:
             data = json.load(f)
 
+        gripper_task = None
+        platform_task = None
         for setting in data["ComSettings"]:
             if setting["name"] == "dyna":
-                gripper = await Gripper.build(setting)
-
+                gripper_task = asyncio.create_task(Gripper.build(setting))
             elif setting["name"] == "grbl":
-                platfrom = await Platfrom.build(setting)
+                platform_task = asyncio.create_task(Platform.build(setting))
 
-        return cls(platfrom, gripper, camera_connection, grid)
+        camera_connection_task = asyncio.create_task(Vision.build())
+        
+        platform = None
+        gripper = None
+        camera = None
 
-    def __init__(self, platfrom: Platfrom, gripper: Gripper, camera_connection, grid: Grid):
+        # Excuting all the build tasks in parallel to reduce time
+        if gripper_task and platform_task:
+            gripper, platform, camera = await asyncio.gather(gripper_task, platform_task,
+                                                                        camera_connection_task)
+        elif gripper_task:
+            gripper, camera = await asyncio.gather(gripper_task, camera_connection_task)
+        elif platform_task:
+            platform, camera = await asyncio.gather(platform_task, camera_connection_task)
+        else:
+            camera = await camera_connection_task
+
+
+        return cls(platform, gripper, camera, grid)
+
+    def __init__(self, platform: Platform, gripper: Gripper, camera, grid: Grid):
         """
         Initializes a new instance of the Robot class.
 
         Args:
-            platfrom: The connection to the GRBL controller.
+            platform: The connection to the GRBL controller.
             gripper: The gripper of the robot.
-            camera_connection: The connection to the camera (if any).
+            camera: The connection to the camera (if any).
             grid: The grid object representing the workspace of the robot.
         """
         self.gripper = gripper
-        self.platfrom = platfrom
-        self.camera_connection = camera_connection
+        self.platform = platform
+        self.camera = camera
         self.grid = grid
 
     async def _move_and_act(self, coordinates: CartesianPosition, action: types.FunctionType, action_after=lambda: None):
@@ -75,10 +92,10 @@ class Robot:
             action: The action to perform at the target coordinates.
             action_after: The action to perform after returning to the clearance position (default: lambda: None).
         """
-        await self.platfrom.move(coordinates.x, coordinates.y, constants.CLERANCE, constants.FEEDRATE)
-        await self.platfrom.move(coordinates.x, coordinates.y, coordinates.z, constants.FEEDRATE)
-        action()
-        await self.platfrom.move(coordinates.x, coordinates.y, constants.CLERANCE, constants.FEEDRATE)
+        await self.platform.move(coordinates.x, coordinates.y, constants.CLERANCE, constants.FEEDRATE)
+        await self.platform.move(coordinates.x, coordinates.y, coordinates.z, constants.FEEDRATE)
+        await action()
+        await self.platform.move(coordinates.x, coordinates.y, constants.CLERANCE, constants.FEEDRATE)
         action_after()
 
     async def move(self, position: GridPosition, height=0):
@@ -90,7 +107,7 @@ class Robot:
             height: The desired height (default: 0).
         """
         coordinates = self.grid.get_coordinates_from_grid(position)
-        await self.platfrom.move(coordinates[0], coordinates[1], height, constants.FEEDRATE)
+        await self.platform.move(coordinates[0], coordinates[1], height, constants.FEEDRATE)
 
     async def pick(self, objects: list[Pickable]):
         """
@@ -124,29 +141,24 @@ class Robot:
         await self.pick(objects)
         await self.place(objects, position)
 
-    async def take_picture(self, obj: Pickable):
+    async def save_picture(self, obj: Pickable):
         """
         Takes a picture of a specified object.
 
         Args:
             obj: The object to take a picture of.
         """
-        await self.platfrom.send_command("G56")
+        await self.platform.send_command("G56")
         await self.gripper.rotate(90)
-        await self._move_and_act(self.grid.get_coordinates(obj), self._take_picture)
+        await self._move_and_act(self.grid.get_coordinates(obj), self.camera.save_picture)
         await self.gripper.rotate(0)
-        await self.platfrom.send_command("G55")
+        await self.platform.send_command("G55")
 
-    def _take_picture(self):
-        """
-        Private method to simulate taking a picture.
-        """
-        time.sleep(2)
 
     async def shutdown(self):
         """
         Shuts down the robot by moving to the home position and shutting down the gripper.
         """
-        await self.platfrom.send_command("G54")
-        await self.platfrom.move(0.0, 0.0, 0.0, constants.FEEDRATE)
+        await self.platform.send_command("G54")
+        await self.platform.move(0.0, 0.0, 0.0, constants.FEEDRATE)
         await self.gripper.shutdown()
