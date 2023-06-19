@@ -1,4 +1,4 @@
-from robotinterface.drivers.camera.controller import CameraInterface
+from robotinterface.hardware_control.drivers.camera.controller import CameraInterface
 import cv2
 import asyncio
 import datetime

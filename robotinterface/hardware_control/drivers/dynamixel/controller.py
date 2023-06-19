@@ -1,7 +1,7 @@
 import dynamixel_sdk as dsdk
 import asyncio
 from functools import partial
-from robotinterface.drivers.dynamixel.address_book import *
+from robotinterface.hardware_control.drivers.dynamixel.address_book import *
 from concurrent.futures import ThreadPoolExecutor
 
 import logging

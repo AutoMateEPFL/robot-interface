@@ -1,4 +1,4 @@
-from robotinterface.drivers.dynamixel.controller import Dynamixel
+from robotinterface.hardware_control.drivers.dynamixel.controller import Dynamixel
 from robotinterface.hardware_control import constants
 
 import logging

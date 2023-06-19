@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import serial_asyncio
-from robotinterface.drivers.grbl.constants import TIMEOUT
+from robotinterface.hardware_control.drivers.grbl.constants import TIMEOUT
 
 log = logging.getLogger(__name__)
 
