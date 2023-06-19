@@ -17,6 +17,7 @@ class PlateHolder(Pickable):
     This class represents a plate holder with a certain floor thickness
     """
     height = 5
+    name = "Plate Holder"
     def __init__(self):
         super().__init__()
 
@@ -24,6 +25,7 @@ class SmallPetriBottom(Pickable):
     """
     This class defines the bottom part of a petri dish
     """
+    name = "Small Petri Bottom"
     height = 7.5
     def __init__(self):
         super().__init__()
@@ -33,5 +35,6 @@ class SmallPetriTop(Pickable):
     This class defines the top part of a small petri dish
     """
     height = 8.5
+    name = "Small Petri Top"
     def __init__(self):
         super().__init__()

@@ -92,6 +92,7 @@ class Robot:
             action: The action to perform at the target coordinates.
             action_after: The action to perform after returning to the clearance position (default: lambda: None).
         """
+        logging.info(f"Moving to x:{coordinates.x}, y:{coordinates.y}, z:{coordinates.z}")
         await self.platform.move(coordinates.x, coordinates.y, constants.CLERANCE, constants.FEEDRATE)
         await self.platform.move(coordinates.x, coordinates.y, coordinates.z, constants.FEEDRATE)
         await action()
@@ -159,6 +160,8 @@ class Robot:
         """
         Shuts down the robot by moving to the home position and shutting down the gripper.
         """
+        logging.info("Shutting down robot")
         await self.platform.send_command("G54")
         await self.platform.move(0.0, 0.0, 0.0, constants.FEEDRATE)
         await self.gripper.shutdown()
+        await self.camera.shutdown()

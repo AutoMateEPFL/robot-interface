@@ -3,7 +3,9 @@ import cv2
 import asyncio
 import datetime
 import os
+import logging
 
+log = logging.getLogger(__name__)
 
 class Vision:
     @classmethod
@@ -17,7 +19,9 @@ class Vision:
         Returns:
             Vision: The built CV instance.
         """
+        logging.info("Building CV")
         camera = await CameraInterface.build()
+        logging.info("CV built")
         return cls(camera)
 
     def __init__(self, camera: CameraInterface):
@@ -50,6 +54,16 @@ class Vision:
 
         # Save the frame to a file
         cv2.imwrite(filename, frame)
+        logging.info(f"Saved image to {filename}")
+
+
+    async def shutdown(self):
+        """
+        Shuts down the camera.
+        """
+        logging.info("Shutting down camera")
+        await self.camera.shutdown()
+
 
 if __name__ == "__main__":
     async def main():

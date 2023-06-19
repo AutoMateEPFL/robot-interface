@@ -180,18 +180,26 @@ class Dynamixel:
             return reading
 
     async def read_position(self, id=None):
-        return await self.read_data(self._read4ByteTxRx, ADDR_PRESENT_POSITION, "position", id)
+        value = await self.read_data(self._read4ByteTxRx, ADDR_PRESENT_POSITION, "position", id)
+        logging.debug(f"Dynamixel Read position: {value}")
+        return value
 
     async def read_velocity(self, id=None):
-        return await self.read_data(self._read4ByteTxRx, ADDR_PRESENT_VELOCITY, "velocity", id)
+        value = await self.read_data(self._read4ByteTxRx, ADDR_PRESENT_VELOCITY, "velocity", id)
+        logging.debug(f"Dynamixel Read velocity: {value}")
+        return value
 
     async def read_current(self, id=None):
-        return await self.read_data(self._read2ByteTxRx, ADDR_PRESENT_CURRENT, "current", id)
+        value = await self.read_data(self._read2ByteTxRx, ADDR_PRESENT_CURRENT, "current", id)
+        logging.debug(f"Dynamixel Read current: {value}")
+        return value
 
     async def read_pwm(self, id=None):
-        return await self.read_data(self._read2ByteTxRx, ADDR_PRESENT_PWM, "pwm", id)
+        value = await self.read_data(self._read2ByteTxRx, ADDR_PRESENT_PWM, "pwm", id)
+        logging.debug(f"Dynamixel Read pwm: {value}")
+        return value
 
-    def read_from_address(self, number_of_bytes, ADDR, id=None):
+    async def read_from_address(self, number_of_bytes, ADDR, id=None):
         method = None
         twos_complement_key = ""
         if number_of_bytes == 1:
@@ -203,7 +211,9 @@ class Dynamixel:
         else:
             method = self._write4ByteTxRx
             twos_complement_key = "4 bytes"
-        return self.read_data(method, ADDR, twos_complement_key, id)
+        value = await self.read_data(method, ADDR, twos_complement_key, id)
+        logging.debug(f"Dynamixel Read from address {ADDR}: {value}")
+        return value
 
     async def write_data(self, method, address, data, log_key, id=None):
         selected_ids = self.fetch_and_check_id(id)
@@ -212,25 +222,32 @@ class Dynamixel:
             self._print_error_msg(f"Write {log_key}", dxl_comm_result, dxl_error, selected_ID)
 
     async def write_position(self, pos, id=None):
+        logging.debug("Dynamixel writing position: " + str(pos))
         await self.write_data(self._write4ByteTxRx, ADDR_GOAL_POSITION, pos, "position", id)
 
     async def write_velocity(self, vel, id=None):
+        logging.debug("Dynamixel writing velocity: " + str(vel))
         await self.write_data(self._write4ByteTxRx, ADDR_GOAL_VELOCITY, vel, "velocity", id)
 
     async def write_current(self, current, id=None):
+        logging.debug("Dynamixel writing current: " + str(current))
         await self.write_data(self._write2ByteTxRx, ADDR_GOAL_CURRENT, current, "current", id)
 
     async def write_pwm(self, pwm, id=None):
+        logging.debug("Dynamixel writing pwm: " + str(pwm))
         await self.write_data(self._write2ByteTxRx, ADDR_GOAL_PWM, pwm, "pwm", id)
 
     async def write_profile_velocity(self, profile_vel, id=None):
+        logging.debug("Dynamixel writing profile velocity: " + str(profile_vel))
         await self.write_data(self._write4ByteTxRx, ADDR_PROFILE_VELOCITY, profile_vel, "profile velocity", id)
 
     async def write_profile_acceleration(self, profile_acc, id=None):
+        logging.debug("Dynamixel writing profile acceleration: " + str(profile_acc))
         await self.write_data(self._write4ByteTxRx, ADDR_PROFILE_ACCELERATION, profile_acc,
                               "profile acceleration", id)
 
     def write_to_address(self, value, number_of_bytes, ADDR, id=None):
+        logging.debug("Dynamixel writing value: " + str(value) + " to address: " + str(ADDR))
         method = None
         if number_of_bytes == 1:
             method = self._write1ByteTxRx
