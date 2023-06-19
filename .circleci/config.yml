@@ -63,4 +63,4 @@ workflows:
       - test
       - build-and-push-docker:
           requires:
-            - build-and-test
+            - test
