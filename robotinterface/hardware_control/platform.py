@@ -1,11 +1,11 @@
 from robotinterface.drivers.grbl.controller import GrblDriver
 
 
-class Platfrom(GrblDriver):
+class Platform(GrblDriver):
 
     @classmethod
     async def build(cls, setting: dict[str, any]):
-        grbl = await super(Platfrom, cls).build(setting["port"], setting["bauderate"])
+        grbl = await super(Platform, cls).build(setting["port"], setting["bauderate"])
 
         await grbl.home()
         # Set the origin of the G55 coordinate system to the workplane and shift so the camera still could
@@ -18,3 +18,4 @@ class Platfrom(GrblDriver):
         await grbl.send_command("G55")
 
         return grbl
+

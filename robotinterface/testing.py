@@ -4,7 +4,7 @@ import asyncio
 from robotinterface.hardware_control.robot import Robot
 
 from robotinterface.logistics.grid import Grid, GridPosition
-from robotinterface.logistics.pickable import Pickable
+from robotinterface.logistics.pickable import Pickable, SmallPetriBottom
 
 logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
@@ -14,10 +14,10 @@ logging.basicConfig(
 
 async def main():
     grid = Grid(x_max=-800, x_dist=-200, y_max=-610, y_dist=-120)
+    bottom1 = SmallPetriBottom()
+    grid.add_object([bottom1], GridPosition(0, 0))
     robot = await Robot.build(grid)
-    await robot.gripper.close()
-    await robot.gripper.open()
-    await robot.gripper.rotate(90)
+    await robot.save_picture(bottom1)
     await robot.gripper.shutdown()
 
 asyncio.run(main())

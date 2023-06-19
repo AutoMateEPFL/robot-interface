@@ -33,14 +33,17 @@ class CameraInterface:
 
         return self
 
-    async def capture_frame(self):
+    async def capture_frame(self, discarded_frames=2):
         """
         Capture a frame from the camera asynchronously.
 
-        Returns:
-            frame: The captured frame.
+        Returns: frame: The captured frame.
+                 discarded_frames: The number of frames to discard before returning the
+                 frame. As otherwise the image could be black.
         """
-        ret, frame = await self.loop.run_in_executor(self.executor, self.cap.read)
+        for _ in range(discarded_frames):
+            ret, frame = await self.loop.run_in_executor(self.executor, self.cap.read)
+
         return frame
 
     async def show_video(self):

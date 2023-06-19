@@ -5,7 +5,7 @@ import datetime
 import os
 
 
-class CV:
+class Vision:
     @classmethod
     async def build(cls):
         """
@@ -15,7 +15,7 @@ class CV:
             setting: The settings for the camera.
 
         Returns:
-            CV: The built CV instance.
+            Vision: The built CV instance.
         """
         camera = await CameraInterface.build()
         return cls(camera)
@@ -39,7 +39,6 @@ class CV:
         """
         frame = await self.camera.capture_frame()
 
-
         # Get the current timestamp and convert it to a string
         timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
@@ -54,6 +53,6 @@ class CV:
 
 if __name__ == "__main__":
     async def main():
-        cv = await CV.build()
+        cv = await Vision.build()
         await cv.save_picture()
     asyncio.run(main())
