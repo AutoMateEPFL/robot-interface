@@ -9,6 +9,7 @@ class Pickable:
     # ensures that each object has unique ID
     id_iter = itertools.count()
 
+
     def __init__(self) -> None:
         self.id = next(self.id_iter)
 
