@@ -1,8 +1,10 @@
 import asyncio
 import cv2
+import logging
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 
+log = logging.getLogger(__name__)
 
 class CameraInterface:
     @classmethod
@@ -15,7 +17,7 @@ class CameraInterface:
         """
 
         self = cls()
-        self.executor = ThreadPoolExecutor(max_workers=1)
+        self.executor = ThreadPoolExecutor(max_workers=2)
         self.loop = asyncio.get_running_loop()
         self.cap = cv2.VideoCapture()
         fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
@@ -41,9 +43,9 @@ class CameraInterface:
                  discarded_frames: The number of frames to discard before returning the
                  frame. As otherwise the image could be black.
         """
+        logging.debug("Camera capturing frame")
         for _ in range(discarded_frames):
             ret, frame = await self.loop.run_in_executor(self.executor, self.cap.read)
-
         return frame
 
     async def show_video(self):
@@ -64,6 +66,7 @@ class CameraInterface:
         """
         Close the VideoCapture object asynchronously.
         """
+        logging.debug("Camera shutting down")
         await self.loop.run_in_executor(self.executor, self.cap.release)
 
 

@@ -32,6 +32,7 @@ class Gripper:
         Returns:
             Gripper: The built Gripper instance.
         """
+        logging.info("Building Gripper")
         ids = []
         for motor in setting['motors']:
             ids.append(motor['id'])
@@ -67,6 +68,7 @@ class Gripper:
 
         await gripper.open()
         await gripper.rotate(0)
+        logging.info("Gripper built")
         return gripper
 
     def __init__(self, dynamixel: Dynamixel, id_gripper: int, id_rotation: int, zero_position_rotation: int) -> None:
@@ -97,6 +99,8 @@ class Gripper:
         return int(angle * constants.ratio)
 
     async def rotate(self, angle: float) -> None:
+        """Rotates the gripper around the z-axis"""
+        logging.info(f"Rotating gripper to {angle} degree")
         if self.id_rotation is None:
             raise ValueError("No rotation dynamixel connected")
 
@@ -107,6 +111,7 @@ class Gripper:
 
     async def close(self) -> None:
         "closes the gripper with a fixed current"
+        logging.info("Closing gripper")
         await self.dynamixel.enable_torque("all")
         await self.dynamixel.write_pwm(constants.pwm_max, self.id_gripper)
         await asyncio.sleep(constants.closing_time)
@@ -115,6 +120,7 @@ class Gripper:
 
     async def open(self) -> None:
         "opens the gripper with a fixed current"
+        logging.info("Opening gripper")
         await self.dynamixel.write_pwm(-constants.pwm_max, self.id_gripper)
         await asyncio.sleep(constants.opening_time)
         await self.dynamixel.write_pwm(-constants.pwm, self.id_gripper)
@@ -122,5 +128,6 @@ class Gripper:
 
     async def shutdown(self) -> None:
         "Disables the Torque for all motors"
+        logging.info("Shutting down gripper")
         await self.dynamixel.disable_torque("all")
         return

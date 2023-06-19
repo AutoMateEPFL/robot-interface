@@ -1,8 +1,10 @@
 from typing import Tuple
-
+import logging
 import numpy as np
 from robotinterface.logistics.pickable import Pickable
 from robotinterface.logistics.positions import GridPosition, CartesianPosition
+
+log = logging.getLogger(__name__)
 
 class Grid:
     """
@@ -70,6 +72,7 @@ class Grid:
         for obj in obj_list:
             self.object_grid[position.y_id][position.x_id].append(obj)
             self.height_grid[position.y_id][position.x_id] += obj.height
+            logging.info(f"Added the {obj.name} with id {obj.id} to the grid position ({position.x_id}, {position.y_id})")
         x_coord, y_coord = self.get_coordinates_from_grid(position)
         return CartesianPosition(x_coord, y_coord, old_height)
 
@@ -87,6 +90,7 @@ class Grid:
         for obj in obj_list:
             self.object_grid[position.y_id][position.x_id].pop()
             self.height_grid[position.y_id][position.x_id] -= obj.height
+            logging.info(f"Removed the {obj.name} with id {obj.id} from the grid position ({position.x_id}, {position.y_id})")
 
         x_coord, y_coord = self.get_coordinates_from_grid(position)
         return CartesianPosition(x_coord, y_coord, self.height_grid[position.y_id][position.x_id])

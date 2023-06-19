@@ -7,9 +7,10 @@ from robotinterface.logistics.positions import GridPosition, CartesianPosition
 
 # Define a mock Pickable class
 class Pickable:
-    def __init__(self, value):
-        self.value = value
-        self.height = 10
+    name = "Pickable"
+    height = 10
+    def __init__(self):
+        self.id = 0
 
 
 @pytest.fixture
@@ -20,7 +21,7 @@ def grid():
 
 @pytest.fixture
 def obj():
-    obj = Pickable(1)
+    obj = Pickable()
     yield obj
 
 
@@ -77,7 +78,7 @@ def test_find_stack_position(grid, obj):
 
 
 def test_find_stack_position_None(grid, obj):
-    obj2 = Pickable(2)
+    obj2 = Pickable()
     grid.add_object([obj], GridPosition(4, 2))
     grid.add_object([obj2], GridPosition(4, 2))
     assert grid.find_stack_position(obj, GridPosition(4, 2)) is None

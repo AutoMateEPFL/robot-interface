@@ -1,10 +1,14 @@
+import logging
 from robotinterface.drivers.grbl.controller import GrblDriver
 
+log = logging.getLogger(__name__)
 
 class Platform(GrblDriver):
 
     @classmethod
     async def build(cls, setting: dict[str, any]):
+
+        logging.info("Building Platform")
         grbl = await super(Platform, cls).build(setting["port"], setting["bauderate"])
 
         await grbl.home()
@@ -16,6 +20,7 @@ class Platform(GrblDriver):
         # moving to X0 Y0 Z0
         await grbl.send_command(f"G10 L2 P3 X0 Y0 Z{setting['z_offset_camera']}")
         await grbl.send_command("G55")
+        logging.info("Platform built")
 
         return grbl
 
