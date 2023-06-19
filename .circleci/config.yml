@@ -54,8 +54,8 @@ jobs:
           name: Build and Push Docker image
           command: |
             echo "$GHCR_TOKEN" | docker login ghcr.io -u aladin6060 --password-stdin
-            docker build -t ghcr.io/AutoMateEPFL/robot-interface:latest .
-            docker push ghcr.io/AutoMateEPFL/robot-interface:latest
+            docker build -t ghcr.io/automateepfl/robot-interface:latest .
+            docker push ghcr.io/automateepfl/robot-interface:latest
 
 workflows:
   sample:
