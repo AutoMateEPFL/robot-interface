@@ -9,12 +9,24 @@
 
 AutoMate's Robot Interface is a backend control system for the robotic platform, OneMate. This interface manages all communication with the platform's peripherals, such as the gripper, camera, and the motion controller.
 
-## Overview
+## Concept
 
-### Concept
-The robot's workspace uses a grid system on the workplane, as illustrated below. Each grid location can store objects of varying heights, determined by the space requirements of the gripper.
+The robot's workspace uses a grid system on the workplane, as illustrated below. Each grid location can store objects of varying heights. The figure below, this is shown four petri dishes that are stacked on top of each other. The space requirements of the gripper determine the spacing of the grid. 
 
-*(Add image here)*
+<p align="center">
+ <img src="https://github.com/AutoMateEPFL/robot-interface/assets/16036727/85899569-fa89-488f-9008-7de8bfe0dd80" width="500">
+</p>
+
+### Locations
+
+
+### Manupilatable Objects
+
+A Python object represents all the objects the robot should be able to manipulate individually. All those objects are subclasses of the Pickable class. As the robot must be able to manipulate the upper and lower part of the petri dish separately they are individual objects:
+
+
+These objects must be added to the grid to represent the physical reality of the robot. For the example in picture one, it would look like this.
+
 
 ## Getting Started
 
