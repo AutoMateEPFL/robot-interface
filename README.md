@@ -3,13 +3,16 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/755d3fbdd32b369d58ae/test_coverage)](https://codeclimate.com/github/AutoMateEPFL/robot-interface/test_coverage)
 
 # AutoMate - Robot Interface
+<p align="center">
+<img src="https://github.com/AutoMateEPFL/robot-interface/assets/16036727/f08f9100-398f-4c9b-a025-1d1bf1a9efb5" width="500">
+</p>
 
-AutoMate's Robot Interface is a backend control system for the robotic platform, OneMate. This interface is responsible for managing all communication with the platform's peripherals, such as the gripper, camera, and the motion controller.
+AutoMate's Robot Interface is a backend control system for the robotic platform, OneMate. This interface manages all communication with the platform's peripherals, such as the gripper, camera, and the motion controller.
 
 ## Overview
 
 ### Concept
-The workspace of the robot uses a grid system on the workplane, as illustrated below. Each grid location can store objects of varying heights, determined by the space requirements of the gripper.
+The robot's workspace uses a grid system on the workplane, as illustrated below. Each grid location can store objects of varying heights, determined by the space requirements of the gripper.
 
 *(Add image here)*
 
