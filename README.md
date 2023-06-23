@@ -7,26 +7,39 @@
 <img src="https://github.com/AutoMateEPFL/robot-interface/assets/16036727/f08f9100-398f-4c9b-a025-1d1bf1a9efb5" width="500">
 </p>
 
-AutoMate's Robot Interface is a backend control system for the robotic platform, OneMate. This interface manages all communication with the platform's peripherals, such as the gripper, camera, and the motion controller.
+AutoMate's Robot Interface is a backend control system for the robotic platform, OneMate. This interface manages all communication with the platform's peripherals, such as the gripper, camera, and motion controller.
 
-## Concept
+## Overview
 
-The robot's workspace uses a grid system on the workplane, as illustrated below. Each grid location can store objects of varying heights. The figure below, this is shown four petri dishes that are stacked on top of each other. The space requirements of the gripper determine the spacing of the grid. 
+The robot's workspace is built around a grid system on the workplane, as demonstrated below. Each grid cell can store objects of varied heights, akin to stacking four Petri dishes atop each other, as illustrated in the figure below. The size and requirements of the gripper determine the grid's spacing.
 
 <p align="center">
  <img src="https://github.com/AutoMateEPFL/robot-interface/assets/16036727/85899569-fa89-488f-9008-7de8bfe0dd80" width="500">
 </p>
 
-### Locations
+### Positional Classes
 
+We use two classes to denote the physical positions of objects. The `GridPosition` class represents a 2D location on the discretized grid. In contrast, the `CartesianPosition` class denotes the 3D location of an object within the motion controller's coordinates.
 
-### Manupilatable Objects
+### Manipulatable Objects
 
-A Python object represents all the objects the robot should be able to manipulate individually. All those objects are subclasses of the Pickable class. As the robot must be able to manipulate the upper and lower part of the petri dish separately they are individual objects:
+Python objects represent all objects the robot should interact with and are subclasses of the `Pickable` class. For example, as the robot must manipulate the upper and lower parts of a petri dish separately, they are modeled as individual objects.
 
+Objects are added to the grid to mirror the robot's physical reality. For instance, in the above image, the grid representation would look like this:
 
-These objects must be added to the grid to represent the physical reality of the robot. For the example in picture one, it would look like this.
+```python
+bottom = SmallPetriBottom()
+top = SmallPetriTop()
 
+grid.add_object([bottom, top], GridPosition(1, 1))
+```
+### Basic Operations
+The Robot Interface provides four fundamental operations for the objects placed within the robot's workspace:
+
+* Pick: This operation allows the robot to pick up an object from a grid position, retaining it in the gripper.
+* Place: The robot can place an object the gripper holds at a designated grid location. The backend system then determines the current position of the stack where the object will be placed.
+* Pick & Place: This operation involves picking up an object and placing it at a new location.
+* Taking Picture: This operation positions the end effector so that a picture of a grid position can be captured.
 
 ## Getting Started
 
@@ -52,8 +65,13 @@ poetry run python -m robotinterface\protocol.py
 ```
 
 ## Docker
-As an alternative to the direct installation, you can use the provided Docker image to avoid any direct installation on your machine.
+As an alternative to the direct installation, you can use the provided Docker image to avoid any direct installation on your machine. For this, you need to pull the latest docker image from the docker repository of ***AutoMateEPFL*** .
+```bash
+docker pull ghcr.io/automateepfl/robot-interface:latest
+```
+The correct serial ports for the controllers and the camera must be passed to the docker image with the following command to run it.
 
-## Motioncontroller Firmware
+XXX
 
+This currently only works on Linux machines. 
 
