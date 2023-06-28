@@ -90,12 +90,12 @@ class Dynamixel:
 
     def _print_error_msg(self, process_name, dxl_comm_result, dxl_error, selected_ids):
         if dxl_comm_result != dsdk.COMM_SUCCESS:
-            logging.error("!!", process_name, "failed for: Dynamixel Controller")
-            logging.error("Communication error:", self.packet_handler.getTxRxResult(dxl_comm_result))
+            logging.error(f"!! {process_name} failed for: Dynamixel Controller")
+            logging.error(f"Communication error: {self.packet_handler.getTxRxResult(dxl_comm_result)}")
             raise ValueError(f"!! {process_name} failed for: Dynamixel Controller")
 
         elif dxl_error != 0:
-            logging.error("!!", process_name, "failed for: Dynamixel Controller")
+            logging.error(f"!! {process_name} failed for: Dynamixel Controller")
             logging.error(f"Dynamixel error: {self.packet_handler.getRxPacketError(dxl_error)}")
             raise ValueError(f"!! {process_name} failed for: Dynamixel Controller")
 
