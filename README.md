@@ -65,13 +65,18 @@ poetry run python -m robotinterface\protocol.py
 ```
 
 ## Docker
-As an alternative to the direct installation, you can use the provided Docker image to avoid any direct installation on your machine. For this, you need to pull the latest docker image from the docker repository of ***AutoMateEPFL*** .
+As an alternative to the direct installation, you can use the provided Docker image to avoid any direct installation on your machine. For this, you need to pull the latest docker image from the docker repository of ***AutoMateEPFL*** . For this, you first have to log in to the docker registry. Where you have to replace the [ACCESSTOKEN](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) and the USERNAME. The personal access token only needs the rights write:packages / read:packages.
+```bash
+echo ACESSTOKEN | docker login ghcr.io -u USERNAME --password-stdin
+```
+Then you can pull the docker image.
+
 ```bash
 docker pull ghcr.io/automateepfl/robot-interface:latest
 ```
 The correct serial ports for the controllers and the camera must be passed to the docker image with the following command to run it.
 
-XXX
+coming soon
 
 This currently only works on Linux machines. 
 
