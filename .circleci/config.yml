@@ -1,5 +1,14 @@
 version: 2.1
 
+executors:
+  docker-executor:
+    docker:
+      - image: docker:20.10.7-git
+        environment:
+          DOCKER_BUILDKIT: 1
+          DOCKER_CLI_EXPERIMENTAL: enabled
+    resource_class: medium
+
 jobs:
   test: 
     docker:
@@ -44,18 +53,28 @@ jobs:
       - run:
           command: |
             ./cc-test-reporter after-build --exit-code $?
+
   build-and-push-docker:
-    docker:
-      - image: cimg/python:3.11
+    executor: docker-executor
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 20.10.7
+      - run:
+          name: Install Docker Buildx
+          command: |
+            BUILDX_VERSION="v0.5.1"
+            wget https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.linux-amd64
+            chmod a+x buildx-${BUILDX_VERSION}.linux-amd64
+            mkdir -p ~/.docker/cli-plugins
+            mv buildx-${BUILDX_VERSION}.linux-amd64 ~/.docker/cli-plugins/docker-buildx
       - run:
           name: Build and Push Docker image
           command: |
+            apk add --no-cache git
             echo "$GHCR_TOKEN" | docker login ghcr.io -u aladin6060 --password-stdin
-            docker build -t ghcr.io/automateepfl/robot-interface:latest .
-            docker push ghcr.io/automateepfl/robot-interface:latest
+            docker buildx create --use
+            docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/automateepfl/robot-interface:latest . --push
 
 workflows:
   sample:
