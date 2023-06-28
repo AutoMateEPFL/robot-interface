@@ -1,5 +1,14 @@
 version: 2.1
 
+orbs:
+  docker: circleci/docker@1.5.0
+
+executors:
+  docker-executor:
+    machine:
+      image: ubuntu-2004:202101-01
+      docker_layer_caching: true
+
 jobs:
   test: 
     docker:
@@ -44,18 +53,28 @@ jobs:
       - run:
           command: |
             ./cc-test-reporter after-build --exit-code $?
+
   build-and-push-docker:
-    docker:
-      - image: cimg/python:3.11
+    executor: docker-executor
     steps:
       - checkout
       - setup_remote_docker
       - run:
+          name: Setup QEMU
+          command: docker run --privileged --rm tonistiigi/binfmt --install all
+      - run:
+          name: Setup Docker Buildx
+          command: |
+            version="$(wget -qO- https://github.com/docker/buildx/releases/latest | grep -Po 'v\d+\.\d+\.\d+' | head -n 1)"
+            mkdir -p ~/.docker/cli-plugins/
+            wget -O ~/.docker/cli-plugins/docker-buildx https://github.com/docker/buildx/releases/download/$version/buildx-$version.linux-amd64
+            chmod a+x ~/.docker/cli-plugins/docker-buildx
+            docker buildx create --use
+      - run:
           name: Build and Push Docker image
           command: |
             echo "$GHCR_TOKEN" | docker login ghcr.io -u aladin6060 --password-stdin
-            docker build -t ghcr.io/automateepfl/robot-interface:latest .
-            docker push ghcr.io/automateepfl/robot-interface:latest
+            docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/automateepfl/robot-interface:latest . --push
 
 workflows:
   sample:
@@ -64,6 +83,4 @@ workflows:
       - build-and-push-docker:
           requires:
             - test
-          filters:
-            branches:
-              only: main
+
