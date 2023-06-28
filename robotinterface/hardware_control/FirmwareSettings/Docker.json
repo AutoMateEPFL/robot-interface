@@ -1,0 +1,28 @@
+{
+  "ComSettings": [
+    {
+      "name": "dyna",
+      "port": "/dev/ttyUSB0",
+      "bauderate": 57600,
+      "motors": [
+        {
+          "name": "grip",
+          "id": 14
+        },
+           {
+          "name": "rot",
+          "id": 13,
+           "zero_pos": 2960
+        }
+      ]
+    },
+    {
+      "name": "grbl",
+      "port": "/dev/ttyUSB1",
+      "bauderate": 115600,
+      "z_offset": -288,
+      "x_offset_camera": 83.5,
+      "z_offset_camera": -240
+    }
+  ]
+}

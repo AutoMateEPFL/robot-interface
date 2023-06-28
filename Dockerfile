@@ -19,6 +19,14 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi
 
+
+# Install nano text editor
+RUN apt-get update && apt-get install -y \
+    nano \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV AM_I_IN_A_DOCKER_CONTAINER Yes
+
 # Copy the entire project
 COPY . .
 

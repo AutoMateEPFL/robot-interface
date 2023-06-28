@@ -43,7 +43,7 @@ async def main():
     await robot.pick_and_place([bottom4, top4],
                                GridPosition(1, 3))
     await robot.pick_and_place([top4], GridPosition(1, 4))
-    await robot.take_picture(bottom4)
+
     await robot.pick_and_place([top4], GridPosition(1, 3))
     await robot.pick_and_place([bottom4, top4],
                                end_pos)

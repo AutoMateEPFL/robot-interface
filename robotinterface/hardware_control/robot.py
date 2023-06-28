@@ -2,6 +2,7 @@ import json
 import time
 import types
 import asyncio
+import os
 from robotinterface.logistics.grid import Grid
 from robotinterface.logistics.positions import GridPosition, CartesianPosition
 from robotinterface.logistics.pickable import Pickable
@@ -36,34 +37,49 @@ class Robot:
             Robot: The built Robot instance.
         """
 
-        file_path = "hardware_control/FirmwareSettings/port-settings-laptop-silvio.json"
+
+        SECRET_KEY = os.environ.get('AM_I_IN_A_DOCKER_CONTAINER', False)
+
+        # Load the settings from the json file
+        if SECRET_KEY:
+            file_path = "robotinterface/hardware_control/FirmwareSettings/Docker.json"
+        else:
+            file_path = "robotinterface/hardware_control/FirmwareSettings/windows.json"
         with open(file_path, 'r') as f:
             data = json.load(f)
 
         gripper_task = None
         platform_task = None
+        camera_connection_task = None
         for setting in data["ComSettings"]:
             if setting["name"] == "dyna":
                 gripper_task = asyncio.create_task(Gripper.build(setting))
             elif setting["name"] == "grbl":
                 platform_task = asyncio.create_task(Platform.build(setting))
+            elif setting["name"] == "camera":
+                camera_connection_task = asyncio.create_task(Vision.build())
 
-        camera_connection_task = asyncio.create_task(Vision.build())
-        
-        platform = None
-        gripper = None
-        camera = None
+        # Initialize the tasks to None
+        gripper, platform, camera = None, None, None
 
-        # Excuting all the build tasks in parallel to reduce time
-        if gripper_task and platform_task:
-            gripper, platform, camera = await asyncio.gather(gripper_task, platform_task,
-                                                                        camera_connection_task)
-        elif gripper_task:
-            gripper, camera = await asyncio.gather(gripper_task, camera_connection_task)
-        elif platform_task:
-            platform, camera = await asyncio.gather(platform_task, camera_connection_task)
-        else:
-            camera = await camera_connection_task
+        # Collect all available tasks
+        tasks = [(task, name) for task, name in ((gripper_task, 'gripper'),
+                                                 (platform_task, 'platform'),
+                                                 (camera_connection_task, 'camera')) if task]
+
+        # If there are tasks to perform
+        if tasks:
+            # Perform all available tasks in parallel
+            results = await asyncio.gather(*(task for task, _ in tasks))
+
+            # Assign the results to the corresponding variables
+            for (task, name), result in zip(tasks, results):
+                if name == 'gripper':
+                    gripper = result
+                elif name == 'platform':
+                    platform = result
+                elif name == 'camera':
+                    camera = result
 
 
         return cls(platform, gripper, camera, grid)
