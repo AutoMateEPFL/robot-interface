@@ -43,12 +43,6 @@ The Robot Interface provides four fundamental operations for the objects placed 
 
 ## Getting Started
 
-### Prerequisites
-Before installation, you need to update the `robotinterface/hardware_control/FirmwareSettings/hardware_settings.json` file with the correct settings for your serial ports. 
-
-You can identify the correct ports using different tools. For the gripper, consider using the [DYNAMIXEL Wizard](https://emanual.robotis.com/docs/en/software/dynamixel/dynamixel_wizard2/). For the motion controller, [OpenBuilds CONTROL](https://software.openbuilds.com/) is recommended.
-
-### Installation
 
 This project uses [Poetry](https://python-poetry.org/docs/), a Python dependency management tool. If you haven't installed Poetry yet, please follow the [official installation guide](https://python-poetry.org/docs/).
 
@@ -58,7 +52,11 @@ Once you have Poetry installed, you can install the project using the following 
 poetry install
 ```
 
-You can then run the standard protocol with:
+
+Before running the project, you need to update the `robotinterface/hardware_control/FirmwareSettings/hardware_settings.json` file with the correct settings for your serial ports. 
+
+You can identify the correct ports using different tools. For the gripper, consider using the [DYNAMIXEL Wizard](https://emanual.robotis.com/docs/en/software/dynamixel/dynamixel_wizard2/). For the motion controller, [OpenBuilds CONTROL](https://software.openbuilds.com/) is recommended.
+
 
 ```bash
 poetry run python -m robotinterface\protocol.py
@@ -69,14 +67,22 @@ As an alternative to the direct installation, you can use the provided Docker im
 ```bash
 echo ACESSTOKEN | docker login ghcr.io -u USERNAME --password-stdin
 ```
-Then you can pull the docker image.
+Then you can pull the docker image. The docker image is built for two versions for arm64 and amd64 to so that the image can also be run on a Raspberry Pi. 
 
 ```bash
 docker pull ghcr.io/automateepfl/robot-interface:latest
 ```
-The correct serial ports for the controllers and the camera must be passed to the docker image with the following command to run it.
+The correct serial ports for the controllers and the camera must be passed to the docker image with the following command to run it. This passthrough only works on linux machines currently. If Vision is used the camera must be passed through as well.
 
-coming soon
 
-This currently only works on Linux machines. 
+```bash
+docker run -it --device=/dev/ttyUSB0 --device=/dev/ttyUSB1 IMAGEID bash
+```
+
+Then inside the docker container, the main protocol can be run by calling. 
+
+```bash
+python -m robotinterface.protocol.py
+```
+
 

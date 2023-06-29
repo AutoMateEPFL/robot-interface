@@ -20,9 +20,9 @@ RUN poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi
 
 
-# Install nano text editor
+# Install nano text editor and libgl1-mesa-glx for openCV
 RUN apt-get update && apt-get install -y \
-    nano \
+    nano  && apt-get install -y libgl1-mesa-glx \
     && rm -rf /var/lib/apt/lists/*
 
 ENV AM_I_IN_A_DOCKER_CONTAINER Yes
