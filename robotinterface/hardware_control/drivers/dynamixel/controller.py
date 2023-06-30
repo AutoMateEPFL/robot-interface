@@ -19,6 +19,8 @@ class Dynamixel:
         port_handler = dsdk.PortHandler(port_name)
         packet_handler = dsdk.PacketHandler(2)
 
+        await asyncio.sleep(1)
+
         port_handler.openPort()
         logging.debug(f"Port open successfully for Dynamixel controller")
 
