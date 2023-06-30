@@ -72,7 +72,7 @@ jobs:
           name: Build and Push Docker image
           command: |
             apk add --no-cache git
-            echo "$GHCR_TOKEN" | docker login ghcr.io -u aladin6060 --password-stdin
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u APraplan --password-stdin
             docker buildx create --use
             docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/automateepfl/robot-interface:latest . --push
 
