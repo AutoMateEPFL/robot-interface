@@ -47,6 +47,15 @@ class Robot:
             file_path = "robotinterface/hardware_control/FirmwareSettings/windows.json"
         with open(file_path, 'r') as f:
             data = json.load(f)
+            
+        #  Load the tools settings from the json file
+        file_path = "robotinterface/hardware_control/FirmwareSettings/tools_configuration.json"
+        with open(file_path, 'r') as f:
+            tools_settings = json.load(f)
+            
+        tools_list = {}
+        for tool in tools_settings["Tools"]:
+            tools_list[tool["name"]] = tool["id"]
 
         gripper_task = None
         platform_task = None
@@ -55,9 +64,9 @@ class Robot:
             if setting["name"] == "dyna":
                 gripper_task = asyncio.create_task(Gripper.build(setting))
             elif setting["name"] == "grbl":
-                platform_task = asyncio.create_task(Platform.build(setting))
+                platform_task = asyncio.create_task(Platform.build(setting, tools_settings["Tools"]))
             elif setting["name"] == "camera":
-                camera_connection_task = asyncio.create_task(Vision.build())
+                camera_connection_task = asyncio.create_task(Vision.build(setting))
 
         # Initialize the tasks to None
         gripper, platform, camera = None, None, None
@@ -81,10 +90,9 @@ class Robot:
                 elif name == 'camera':
                     camera = result
 
+        return cls(platform, gripper, camera, grid, tools_list)
 
-        return cls(platform, gripper, camera, grid)
-
-    def __init__(self, platform: Platform, gripper: Gripper, camera, grid: Grid):
+    def __init__(self, platform: Platform, gripper: Gripper, camera, grid: Grid, tools_list: dict[str, int]):
         """
         Initializes a new instance of the Robot class.
 
@@ -93,11 +101,14 @@ class Robot:
             gripper: The gripper of the robot.
             camera: The connection to the camera (if any).
             grid: The grid object representing the workspace of the robot.
+            tools_list: The list of tools available to the robot.
         """
         self.gripper = gripper
         self.platform = platform
         self.camera = camera
         self.grid = grid
+        self.tools_list = tools_list
+        self.robot_position = GridPosition(0, 0)
 
     async def _move_and_act(self, coordinates: CartesianPosition, action: types.FunctionType, action_after=lambda: None):
         """
@@ -114,6 +125,40 @@ class Robot:
         await action()
         await self.platform.move(coordinates.x, coordinates.y, constants.CLERANCE, constants.FEEDRATE)
         action_after()
+        
+    
+    async def _move_and_act_fast(self, coordinates: CartesianPosition, action: types.FunctionType, need_clearance: bool = True, action_after=lambda: None):
+        """
+        Moves the robot to the specified coordinates and performs an action.
+
+        Args:
+            coordinates: The target Cartesian coordinates.
+            action: The action to perform at the target coordinates.
+            action_after: The action to perform after returning to the clearance position (default: lambda: None).
+        """
+        logging.info(f"Moving to x:{coordinates.x}, y:{coordinates.y}, z:{coordinates.z}")
+        
+        if need_clearance:
+            await self.platform.vertical_move(constants.CLERANCE, constants.FEEDRATE)
+            await self.platform.move(coordinates.x, coordinates.y, constants.CLERANCE, constants.FEEDRATE)
+            
+        await self.platform.vertical_move(coordinates.z, constants.FEEDRATE)
+        await action()
+        action_after()
+        
+    async def change_tool(self, tool: str):
+        """
+        Changes the tool of the robot.
+
+        Args:
+            tool (str): The name of the tool to be changed to.
+        """
+        
+        try:
+            id = self.tools_list[tool]
+            await self.platform.set_space(id)
+        except KeyError:
+            logging.debug(f"Tool {tool} not found")
 
     async def move(self, position: GridPosition, height=0):
         """
@@ -133,8 +178,15 @@ class Robot:
         Args:
             objects: The objects to be picked up.
         """
+        position = self.grid.find_object(objects[0])
+        if self.robot_position != position:
+            need_clearance = True
+        else:
+            need_clearance = False
+
         coordinates = self.grid.remove_object(objects)
-        await self._move_and_act(coordinates, self.gripper.close)
+        await self._move_and_act_fast(coordinates, self.gripper.close, need_clearance)
+        self.robot_position = position
 
     async def place(self, objects: list[Pickable], position: GridPosition):
         """
@@ -144,8 +196,14 @@ class Robot:
             objects: The objects to be placed.
             position: The target grid position.
         """
+        if position != self.robot_position:
+            need_clearance = True
+        else:
+            need_clearance = False
+            
         coordinates = self.grid.add_object(objects, position)
-        await self._move_and_act(coordinates, self.gripper.open)
+        await self._move_and_act_fast(coordinates, self.gripper.open, need_clearance)
+        self.robot_position = position
 
     async def pick_and_place(self, objects: list[Pickable], position: GridPosition):
         """

@@ -1,5 +1,6 @@
 from robotinterface.hardware_control.drivers.dynamixel.controller import Dynamixel
 from robotinterface.hardware_control import constants
+from robotinterface.hardware_control.drivers.serial.serial_port_detection import get_com_port
 
 import logging
 import asyncio
@@ -55,8 +56,13 @@ class Gripper:
                     zero = motor["zero_pos"]
                 case _:
                     log.error(f"Unknown motor name: {name}")
+                    
+        if setting["port"] == "auto":
+            port = get_com_port("0403", "6014")
+        else:
+            port = setting["port"]
 
-        dynamixel = await Dynamixel.build(ids, setting["port"], setting["bauderate"],
+        dynamixel = await Dynamixel.build(ids, port, setting["bauderate"],
                                          ['xl' for _ in range(len(ids))])
 
 
@@ -113,17 +119,22 @@ class Gripper:
         "closes the gripper with a fixed current"
         logging.info("Closing gripper")
         await self.dynamixel.enable_torque("all")
-        await self.dynamixel.write_pwm(constants.pwm_max, self.id_gripper)
-        await asyncio.sleep(constants.closing_time)
-        await self.dynamixel.write_pwm(constants.pwm, self.id_gripper)
+        await self.dynamixel.write_pwm(-constants.PWM_MAX, self.id_gripper)
+        await self.position_smaller_than(constants.POSITION_CLOSE_TO_PD)
+        await self.dynamixel.write_pwm(-constants.PWM_SOFT, self.id_gripper)
+        await self.object_reached()
+        await self.dynamixel.write_pwm(-constants.PWM_RETAIN, self.id_gripper)
+        
+        # await asyncio.sleep(constants.closing_time)
+        # await self.dynamixel.write_pwm(-constants.pwm, self.id_gripper)
         return
 
     async def open(self) -> None:
         "opens the gripper with a fixed current"
         logging.info("Opening gripper")
-        await self.dynamixel.write_pwm(-constants.pwm_max, self.id_gripper)
-        await asyncio.sleep(constants.opening_time)
-        await self.dynamixel.write_pwm(-constants.pwm, self.id_gripper)
+        await self.dynamixel.write_pwm(constants.PWM_MAX, self.id_gripper)
+        await self.position_greater_than(constants.POSITION_OPEN)
+        await self.dynamixel.write_pwm(constants.PWM_RETAIN, self.id_gripper)
         return
 
     async def shutdown(self) -> None:
@@ -131,3 +142,62 @@ class Gripper:
         logging.info("Shutting down gripper")
         await self.dynamixel.disable_torque("all")
         return
+            
+    async def position_greater_than(self, limit) -> None:
+        "Checks if the gripper as reached a position greater than the limit"
+        start_time = asyncio.get_event_loop().time()
+                
+        while True:
+            real_position = await self.dynamixel.read_position(self.id_gripper)
+            if real_position > limit:
+                return 
+            
+            elapsed_time = asyncio.get_event_loop().time() - start_time
+            if elapsed_time > constants.TIMEOUT_POSITION_REACHED:
+                raise TimeoutError("Time limit exceeded while waiting for the position to be reached.")
+            
+            await asyncio.sleep(0.01)
+            
+    async def position_smaller_than(self, limit) -> None:
+        "Checks if the gripper as reached a position smaller than the limit"
+        start_time = asyncio.get_event_loop().time()
+                
+        while True:
+            real_position = await self.dynamixel.read_position(self.id_gripper)
+            if real_position < limit:
+                return 
+            
+            elapsed_time = asyncio.get_event_loop().time() - start_time
+            if elapsed_time > constants.TIMEOUT_POSITION_REACHED:
+                raise TimeoutError("Time limit exceeded while waiting for the position to be reached.")
+            
+            await asyncio.sleep(0.01)
+
+    async def object_reached(self) -> None:
+        "Checks if the gripper has an object"
+        start_time = asyncio.get_event_loop().time()
+        
+        while True:
+            real_current = await self.dynamixel.read_current(self.id_gripper)
+            if abs(real_current) > constants.CURRENT_VIRTUAL_ENDSTOP:
+                return
+            
+            elapsed_time = asyncio.get_event_loop().time() - start_time
+            if elapsed_time > constants.TIMEOUT_OBJECT_REACHED:
+                raise TimeoutError("Time limit exceeded while waiting for the object to be reached.")
+            
+            await asyncio.sleep(0.01)
+            
+    # async def diameter_to_position(self, diameter: float) -> float:
+    #     """Translates a diameter to a position for the gripper
+        
+    #     Args:
+    #         diameter: The diameter of the object to grip
+
+    #     Returns:
+    #         The position for the gripper
+    #     """
+    #     diameter_range = constants.DIAMETER_OPEN-constants.DIAMETER_CLOSED
+    #     position_range = constants.POSITION_OPEN-constants.POSITION_CLOSED
+    
+    #     return int((diameter-constants.DIAMETER_CLOSED)/diameter_range*position_range)+constants.POSITION_CLOSED

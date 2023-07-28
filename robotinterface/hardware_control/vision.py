@@ -1,4 +1,5 @@
 from robotinterface.hardware_control.drivers.camera.controller import CameraInterface
+from robotinterface.hardware_control.drivers.serial.serial_port_detection import get_cam_index
 import cv2
 import asyncio
 import datetime
@@ -9,7 +10,7 @@ log = logging.getLogger(__name__)
 
 class Vision:
     @classmethod
-    async def build(cls):
+    async def build(cls, setting: dict[str, any]):
         """
         Asynchronously builds a CV instance.
 
@@ -20,7 +21,16 @@ class Vision:
             Vision: The built CV instance.
         """
         logging.info("Building CV")
-        camera = await CameraInterface.build()
+        
+        if setting["index"] == "auto":
+            index = get_cam_index("Logitech BRIO")
+        elif setting["index"] == "off":
+            index = 0
+            logging.warning("Camera is off, need to be implemented")
+        else:
+            index = setting["index"]
+            
+        camera = await CameraInterface.build(index)
         logging.info("CV built")
         return cls(camera)
 

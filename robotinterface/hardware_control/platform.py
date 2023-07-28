@@ -1,25 +1,30 @@
 import logging
 from robotinterface.hardware_control.drivers.grbl.controller import GrblDriver
+from robotinterface.hardware_control.drivers.serial.serial_port_detection import get_com_port
 
 log = logging.getLogger(__name__)
 
 class Platform(GrblDriver):
 
     @classmethod
-    async def build(cls, setting: dict[str, any]):
+    async def build(cls, setting: dict[str, any], tools_settings: list[dict[str, any]]):
 
         logging.info("Building Platform")
-        grbl = await super(Platform, cls).build(setting["port"], setting["bauderate"])
+        
+        if setting["port"] == "auto":
+            port = get_com_port("0403", "6001")
+        else:
+            port = setting["port"]
+            
+        grbl = await super(Platform, cls).build(port, setting["bauderate"])
 
         await grbl.home()
-        # Set the origin of the G55 coordinate system to the workplane and shift so the camera still could
-        # still take a picture of the origin
-        await grbl.send_command(f"G10 L2 P2 X-{setting['x_offset_camera']} Y0 Z{setting['z_offset']}")
-
-        # Set the origin of the G56 coordinate system such that the camera can take a picture of the origin when
-        # moving to X0 Y0 Z0
-        await grbl.send_command(f"G10 L2 P3 X0 Y0 Z{setting['z_offset_camera']}")
-        await grbl.send_command("G55")
+    
+        # Offset configurations
+        for tool in tools_settings:
+            await grbl.configure_space(tool['id'], tool['x_offset'], tool['y_offset'], tool['z_offset'])
+        
+        await grbl.set_space(1)
         logging.info("Platform built")
 
         return grbl

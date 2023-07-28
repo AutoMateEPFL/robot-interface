@@ -84,7 +84,46 @@ class GrblDriver:
         answer = await self._connection.send(f"G01 X{x} Y{y} Z{z} F{feedrate}")
         parser.move_parser(answer)
         await self._wait_till_idle()
+        
+    async def vertical_move(self, z: float, feedrate: int) -> None:
+        """
+        Moves the robot to the specified height.
 
+        Args:
+            z: The Z coordinate.
+            feedrate: The feedrate.
+
+        Raises:
+            ValueError: If the move command fails.
+        """
+        answer = await self._connection.send(f"G01 Z{z} F{feedrate}")
+        parser.move_parser(answer)
+        await self._wait_till_idle()
+        
+    async def configure_space(self, space_number: int, x_offset: float, y_offset: float, z_offset: float) -> None:
+        """
+        Configures the specified space.
+
+        Args:
+            space_number (int): Number of the space to configure.
+            x_offset (float): X offset of the space.
+            y_offset (float): Y offset of the space.
+            z_offset (float): Z offset of the space.
+        """
+          
+        answer = await self._connection.send(f"G10 L2 P{space_number} X{x_offset} Y{y_offset} Z{z_offset}")
+        parser.move_parser(answer)
+        
+    async def set_space(self, space_number: int) -> None:
+        """
+        Sets the specified space as the active space.
+
+        Args:
+            space_number (int): Number of the space to set.
+        """
+        answer = await self._connection.send(f"G{53+space_number}")
+        parser.move_parser(answer)
+        
     async def send_command(self, command: str) -> None:
         """
         Sends a command to the GRBL controller.

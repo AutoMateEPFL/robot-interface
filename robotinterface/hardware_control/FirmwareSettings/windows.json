@@ -2,7 +2,7 @@
   "ComSettings": [
     {
       "name": "dyna",
-      "port": "COM9",
+      "port": "auto",
       "bauderate": 57600,
       "motors": [
         {
@@ -12,20 +12,18 @@
            {
           "name": "rot",
           "id": 13,
-           "zero_pos": 2960
+           "zero_pos": 3072
         }
       ]
     },
     {
       "name": "grbl",
-      "port": "COM7",
-      "bauderate": 115600,
-      "z_offset": -288,
-      "x_offset_camera": 83.5,
-      "z_offset_camera": -240
+      "port": "auto",
+      "bauderate": 115600
     },
     {
-      "name": "camera"
+      "name": "camera",
+      "index": "off"
     }
   ]
 }

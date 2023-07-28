@@ -235,6 +235,17 @@ files = [
 ]
 
 [[package]]
+name = "comtypes"
+version = "1.2.0"
+description = "Pure Python COM package"
+optional = false
+python-versions = "*"
+files = [
+    {file = "comtypes-1.2.0-py2.py3-none-any.whl", hash = "sha256:26f261b1eed6972d5cdaa3af1fadb3fa76fc59877d0a1293835327a76573380d"},
+    {file = "comtypes-1.2.0.zip", hash = "sha256:c8f2f0e995d73baf0bd899a948d62adeb9ab908c8270c66a67ff09dfcf4872b7"},
+]
+
+[[package]]
 name = "coverage"
 version = "7.2.7"
 description = "Code coverage measurement for Python"
@@ -626,6 +637,21 @@ files = [
 ]
 
 [[package]]
+name = "pygrabber"
+version = "0.1"
+description = "Module for grabbing live video images using DirectShow"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pygrabber-0.1-py3-none-any.whl", hash = "sha256:282aabb1c84284a72364012dafbd392b46f0e67dcb86038b17ca7249b1e42b7c"},
+    {file = "pygrabber-0.1.tar.gz", hash = "sha256:9d504813a7d103a56d4b6d73ad27d057aa77fc33cafc605734dbcc8965604205"},
+]
+
+[package.dependencies]
+comtypes = ">=1.1.7"
+numpy = ">=1.17.3"
+
+[[package]]
 name = "pynacl"
 version = "1.5.0"
 description = "Python binding to the Networking and Cryptography (NaCl) library"
@@ -934,4 +960,4 @@ six = "*"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "fb75e42279930525c980204a696ccf75b0bb278676465637e591ba6807a2442e"
+content-hash = "60c73f166f5766fb929afd1de15f8fa234aa3c5b138b81ec8afcb1dbfe0d0923"

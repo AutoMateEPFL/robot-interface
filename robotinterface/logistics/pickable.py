@@ -27,7 +27,7 @@ class SmallPetriBottom(Pickable):
     This class defines the bottom part of a petri dish
     """
     name = "Small Petri Bottom"
-    height = 7.5
+    height = 12.5
     def __init__(self):
         super().__init__()
 

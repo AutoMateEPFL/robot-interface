@@ -8,7 +8,7 @@ log = logging.getLogger(__name__)
 
 class CameraInterface:
     @classmethod
-    async def build(cls):
+    async def build(cls, index:int = 0):
         """
         Asynchronously builds a CameraInterface instance.
 
@@ -19,7 +19,7 @@ class CameraInterface:
         self = cls()
         self.executor = ThreadPoolExecutor(max_workers=2)
         self.loop = asyncio.get_running_loop()
-        self.cap = cv2.VideoCapture()
+        self.cap = cv2.VideoCapture(index)
         fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
         await self.loop.run_in_executor(self.executor, partial(self.cap.open, cv2.CAP_DSHOW))
 

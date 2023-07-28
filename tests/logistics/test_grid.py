@@ -1,5 +1,4 @@
 import pytest
-import pytest
 import numpy as np
 from robotinterface.logistics.grid import Grid
 from robotinterface.logistics.positions import GridPosition, CartesianPosition
