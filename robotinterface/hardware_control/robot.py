@@ -92,7 +92,7 @@ class Robot:
 
         return cls(platform, gripper, camera, grid, tools_list)
 
-    def __init__(self, platform: Platform, gripper: Gripper, camera, grid: Grid, tools_list: dict[str, int]):
+    def __init__(self, platform: Platform, gripper: Gripper, camera: Vision, grid: Grid, tools_list: dict[str, int]):
         """
         Initializes a new instance of the Robot class.
 
@@ -108,7 +108,7 @@ class Robot:
         self.camera = camera
         self.grid = grid
         self.tools_list = tools_list
-        self.robot_position = GridPosition(0, 0)
+        self.robot_position = None
 
     async def _move_and_act(self, coordinates: CartesianPosition, action: types.FunctionType, action_after=lambda: None):
         """
@@ -153,7 +153,6 @@ class Robot:
         Args:
             tool (str): The name of the tool to be changed to.
         """
-        
         try:
             id = self.tools_list[tool]
             await self.platform.set_space(id)
@@ -216,26 +215,44 @@ class Robot:
         await self.pick(objects)
         await self.place(objects, position)
 
-    async def save_picture(self, obj: Pickable):
+    async def save_picture(self):
+        """
+        Save a picture.
+        
+        """
+        await self.camera.save_picture()
+        
+        
+    async def take_picture(self, obj: Pickable, obj_rem: Pickable = None):
         """
         Takes a picture of a specified object.
 
         Args:
             obj: The object to take a picture of.
         """
-        await self.platform.send_command("G56")
+        if obj_rem is not None:
+            await self.pick([obj_rem])
+        
+        coordinates = self.grid.get_coordinates(obj)
+        await self.platform.vertical_move(constants.PETRI_CLERANCE, constants.FEEDRATE)
+        await self.change_tool("camera")
         await self.gripper.rotate(90)
-        await self._move_and_act(self.grid.get_coordinates(obj), self.camera.save_picture)
+        await self.platform.move(coordinates.x, coordinates.y, constants.PICTURE_HEIGHT, constants.FEEDRATE)
+        await self.save_picture()
         await self.gripper.rotate(0)
-        await self.platform.send_command("G55")
-
+        await self.change_tool("gripper")
+        await self.platform.move(coordinates.x, coordinates.y, constants.PETRI_CLERANCE, constants.FEEDRATE)
+        
+        if obj_rem is not None:
+            await self.place([obj_rem], self.robot_position)
 
     async def shutdown(self):
         """
         Shuts down the robot by moving to the home position and shutting down the gripper.
         """
         logging.info("Shutting down robot")
-        await self.platform.send_command("G54")
-        await self.platform.move(0.0, 0.0, 0.0, constants.FEEDRATE)
+        await self.platform.vertical_move(constants.CLERANCE, constants.FEEDRATE)
+        await self.platform.set_space(1)
+        await self.platform.move(0.0, 0.0, 260, constants.FEEDRATE)
         await self.gripper.shutdown()
         await self.camera.shutdown()

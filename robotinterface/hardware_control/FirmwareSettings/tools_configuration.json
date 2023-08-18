@@ -1,18 +1,19 @@
 {
     "Tools": [
         {
-            "name": "Gripper",
+            "name": "gripper",
             "id": 1,
             "x_offset": 0,
             "y_offset": 0,
-            "z_offset": -295
+            "z_offset": -286
+
         },
         {
-            "name": "Camera",
+            "name": "camera",
             "id": 2,
-            "x_offset": 83,
+            "x_offset": -83,
             "y_offset": 0,
-            "z_offset": -380
+            "z_offset": -378
         }
     ]
 }

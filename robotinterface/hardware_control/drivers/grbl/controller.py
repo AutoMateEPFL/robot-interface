@@ -48,6 +48,7 @@ class GrblDriver:
         Raises:
             ValueError: If there is a problem with homing or with communications
         """
+        
         answer = await self._connection.send("$H")
         parser.homing_start_parser(answer)
         ack_homing_1 = await self._connection.get_answer()

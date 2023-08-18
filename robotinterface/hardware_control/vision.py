@@ -1,5 +1,6 @@
 from robotinterface.hardware_control.drivers.camera.controller import CameraInterface
 from robotinterface.hardware_control.drivers.serial.serial_port_detection import get_cam_index
+from robotinterface.hardware_control import constants
 import cv2
 import asyncio
 import datetime
@@ -51,7 +52,8 @@ class Vision:
         Args:
             path: The path to save the picture to.
         """
-        frame = await self.camera.capture_frame()
+        await asyncio.sleep(0.5)
+        frame = await self.camera.capture_frame(focus=constants.FOCUS)
 
         # Get the current timestamp and convert it to a string
         timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")

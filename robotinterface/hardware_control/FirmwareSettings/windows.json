@@ -23,7 +23,7 @@
     },
     {
       "name": "camera",
-      "index": "off"
+      "index": "auto"
     }
   ]
 }

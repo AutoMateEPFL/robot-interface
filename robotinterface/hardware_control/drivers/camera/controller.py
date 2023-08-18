@@ -15,19 +15,27 @@ class CameraInterface:
         Returns:
             CameraInterface: The built CameraInterface instance.
         """
-
         self = cls()
+        self.focus = 30
         self.executor = ThreadPoolExecutor(max_workers=2)
         self.loop = asyncio.get_running_loop()
-        self.cap = cv2.VideoCapture(index)
+        self.cap = await self.loop.run_in_executor(self.executor, partial(cv2.VideoCapture, index, cv2.CAP_DSHOW))
+        await self.loop.run_in_executor(self.executor, partial(self.cap.set, cv2.CAP_PROP_FRAME_WIDTH, 1920))
+        await self.loop.run_in_executor(self.executor, partial(self.cap.set, cv2.CAP_PROP_FRAME_HEIGHT, 1080))
+        await self.loop.run_in_executor(self.executor, partial(self.cap.set, cv2.CAP_PROP_FPS, 60))
+        # self.cap = cv2.VideoCapture(index, cv2.CAP_DSHOW)
+        # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 4096)
+        # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 2160)
+        # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+        # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
         fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
-        await self.loop.run_in_executor(self.executor, partial(self.cap.open, cv2.CAP_DSHOW))
+        # await self.loop.run_in_executor(self.executor, partial(self.cap.open, cv2.CAP_DSHOW))
 
         # Set the fourcc (codec used for compression), frame size and FPS
-        self.cap.set(cv2.CAP_PROP_FOURCC, fourcc)
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
-        self.cap.set(cv2.CAP_PROP_FPS, 60)
+        # self.cap.set(cv2.CAP_PROP_FOURCC, fourcc)
+        # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+        # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+        # self.cap.set(cv2.CAP_PROP_FPS, 60)
 
         # Check if camera opened successfully
         if not self.cap.isOpened():
@@ -35,7 +43,7 @@ class CameraInterface:
 
         return self
 
-    async def capture_frame(self, discarded_frames=2):
+    async def capture_frame(self, focus=None, discarded_frames=2):
         """
         Capture a frame from the camera asynchronously.
 
@@ -44,8 +52,12 @@ class CameraInterface:
                  frame. As otherwise the image could be black.
         """
         logging.debug("Camera capturing frame")
+        if focus is not None:
+            self.cap.set(cv2.CAP_PROP_FOCUS, self.focus)
         for _ in range(discarded_frames):
             ret, frame = await self.loop.run_in_executor(self.executor, self.cap.read)
+            self.focus += 5
+            logging.info(f"focus {self.focus}")
         return frame
 
     async def show_video(self):

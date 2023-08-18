@@ -4,7 +4,7 @@
 # max pwm for fast acceleration but will lead to overheating
 PWM_MAX = 400
 PWM_SOFT = 150
-PWM_RETAIN = 50
+PWM_RETAIN = 80
 
 
 # DIAMETER_OPEN = 128
@@ -28,4 +28,7 @@ FEEDRATE = 15000
 
 # clerance while moving
 CLERANCE = 180
+PETRI_CLERANCE = 25
+PICTURE_HEIGHT = 115
+FOCUS = 35
 
