@@ -1,6 +1,6 @@
-from robotinterface.hardware_control.drivers.dynamixel.controller import Dynamixel
-from robotinterface.hardware_control import constants
-from robotinterface.hardware_control.drivers.serial.serial_port_detection import get_com_port
+from hardware_control.drivers.dynamixel.controller import Dynamixel
+import hardware_control.constants
+from hardware_control.drivers.serial.serial_port_detection import get_com_port
 
 import logging
 import asyncio

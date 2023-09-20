@@ -2,7 +2,7 @@
   "ComSettings": [
     {
       "name": "dyna",
-      "port": "auto",
+      "port": "/dev/tty.usbserial-FT78LFZB",
       "bauderate": 57600,
       "motors": [
         {
@@ -18,12 +18,12 @@
     },
     {
       "name": "grbl",
-      "port": "auto",
+      "port": "/dev/cu.usbserial-AQ02ZA6M",
       "bauderate": 115600
     },
     {
       "name": "camera",
-      "index": "auto"
+      "index": 0
     }
   ]
 }

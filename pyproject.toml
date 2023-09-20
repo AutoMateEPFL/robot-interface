@@ -20,6 +20,7 @@ docker-compose = "1.29.2"
 pytest-cov = "^4.0.0"
 coverage = "^7.2.3"
 
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

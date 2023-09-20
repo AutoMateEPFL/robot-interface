@@ -1,5 +1,5 @@
 import logging
-from robotinterface.hardware_control.drivers.grbl import constants
+from hardware_control.drivers.grbl import constants
 
 log = logging.getLogger(__name__)
 

@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
-from robotinterface.logistics.grid import Grid, GridPosition
-from robotinterface.logistics.pickable import *
+from logistics.grid import Grid, GridPosition
+from logistics.pickable import *
 import logging
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
@@ -207,5 +207,4 @@ if __name__ == "__main__":
         grid = await loop.run_in_executor(executor, partial(load_grid, grid))
         
     asyncio.run(main())
-    
     

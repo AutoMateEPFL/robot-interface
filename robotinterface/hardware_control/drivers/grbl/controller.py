@@ -1,6 +1,6 @@
-from robotinterface.hardware_control.drivers.grbl.communication import SerialConnection
-from robotinterface.hardware_control.drivers.grbl import parser
-from robotinterface.hardware_control.drivers.grbl.constants import System
+from hardware_control.drivers.grbl.communication import SerialConnection
+from hardware_control.drivers.grbl import parser
+from hardware_control.drivers.grbl.constants import System
 
 import asyncio
 import logging

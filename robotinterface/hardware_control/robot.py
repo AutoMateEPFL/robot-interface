@@ -3,13 +3,13 @@ import time
 import types
 import asyncio
 import os
-from robotinterface.logistics.grid import Grid
-from robotinterface.logistics.positions import GridPosition, CartesianPosition
-from robotinterface.logistics.pickable import Pickable
-from robotinterface.hardware_control import constants
-from robotinterface.hardware_control.gripper import Gripper
-from robotinterface.hardware_control.platform import Platform
-from robotinterface.hardware_control.vision import Vision
+from logistics.grid import Grid
+from logistics.positions import GridPosition, CartesianPosition
+from logistics.pickable import Pickable
+import hardware_control.constants
+from hardware_control.gripper import Gripper
+from hardware_control.platform_robot import Platform
+from hardware_control.vision import Vision
 import logging
 
 log = logging.getLogger(__name__)
@@ -42,14 +42,14 @@ class Robot:
 
         # Load the settings from the json file
         if SECRET_KEY:
-            file_path = "robotinterface/hardware_control/FirmwareSettings/Docker.json"
+            file_path = "hardware_control/FirmwareSettings/Docker.json"
         else:
-            file_path = "robotinterface/hardware_control/FirmwareSettings/windows.json"
+            file_path = "/Users/Etienne/Documents/GitHub/robot-interface/robotinterface/hardware_control/FirmwareSettings/windows.json"
         with open(file_path, 'r') as f:
             data = json.load(f)
             
         #  Load the tools settings from the json file
-        file_path = "robotinterface/hardware_control/FirmwareSettings/tools_configuration.json"
+        file_path = "/Users/Etienne/Documents/GitHub/robot-interface/robotinterface/hardware_control/FirmwareSettings/tools_configuration.json"
         with open(file_path, 'r') as f:
             tools_settings = json.load(f)
             

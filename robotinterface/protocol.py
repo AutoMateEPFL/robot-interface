@@ -5,11 +5,12 @@
 import logging
 import asyncio
 
-from robotinterface.hardware_control.robot import Robot
 
-from robotinterface.logistics.grid import Grid, GridPosition
-from robotinterface.logistics.pickable import *
-from robotinterface.gui.user_gui import load_grid
+from hardware_control.robot import Robot
+
+from logistics.grid import Grid, GridPosition
+from logistics.pickable import *
+from gui.user_gui import load_grid
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 

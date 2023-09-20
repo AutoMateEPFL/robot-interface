@@ -1,6 +1,6 @@
 import logging
-from robotinterface.hardware_control.drivers.grbl.controller import GrblDriver
-from robotinterface.hardware_control.drivers.serial.serial_port_detection import get_com_port
+from hardware_control.drivers.grbl.controller import GrblDriver
+from hardware_control.drivers.serial.serial_port_detection import get_com_port
 
 log = logging.getLogger(__name__)
 

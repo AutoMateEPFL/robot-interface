@@ -1,8 +1,8 @@
 from typing import Tuple
 import logging
 import numpy as np
-from robotinterface.logistics.pickable import Pickable
-from robotinterface.logistics.positions import GridPosition, CartesianPosition
+from logistics.pickable import Pickable
+from logistics.positions import GridPosition, CartesianPosition
 
 log = logging.getLogger(__name__)
 
