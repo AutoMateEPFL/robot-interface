@@ -2,6 +2,10 @@
 # Interpreter path
 # C:\Users\APrap\AppData\Local\pypoetry\Cache\virtualenvs\robotinterface-u1VIN2jz-py3.10
 
+import os
+import sys 
+sys.path.append(os.path.join(sys.path[0],'..'))
+
 import logging
 import asyncio
 
@@ -20,14 +24,14 @@ logging.basicConfig(
 
 
 async def main():
-    grid = Grid(x_max=-800, x_dist=-199, y_max=-620, y_dist=-200)
+    grid = Grid(x_max=-800, x_dist=-199, y_max=-620, y_dist=-200)    
     
     drop_pos = GridPosition(grid.x_num_interval-1, grid.y_num_interval-1)
     pic_pos = GridPosition(2, 2)
     
     loop = asyncio.get_running_loop()
     executor = ThreadPoolExecutor(max_workers=2)
-
+    
     robot = await Robot.build(grid)
 
     grid = await loop.run_in_executor(executor, partial(load_grid, grid))
