@@ -4,7 +4,13 @@
 
 import logging
 import asyncio
+import sys
 
+<<<<<<< Updated upstream
+=======
+sys.path.append(r"/Users/Etienne/Documents/GitHub/robot-interface")
+from robotinterface.hardware_control.robot import Robot
+>>>>>>> Stashed changes
 
 from hardware_control.robot import Robot
 
@@ -31,8 +37,8 @@ async def main():
 
     robot = await Robot.build(grid)
 
-    grid = await loop.run_in_executor(executor, partial(load_grid, grid))
-    
+    #grid = await loop.run_in_executor(executor, partial(load_grid, grid))
+    grid = load_grid(grid)
     # TO DO : add a function to realize the protocol, check the load_grid function maybe find a better way to rewrite it in asyncronous way 
     for x in range(grid.x_num_interval):
         for y in range(grid.y_num_interval):

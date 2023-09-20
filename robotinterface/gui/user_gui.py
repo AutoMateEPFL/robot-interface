@@ -54,9 +54,9 @@ def draw_plateholder(grid_pos:GridPosition, imshow, grid_resolution, line_thickn
     
 def draw_petri(grid_pos:GridPosition, imshow, grid_resolution, line_thickness):
     if grid_pos.y_id%2 == 0:
-        model = cv2.imread("robotinterface\gui\petri_dark.png")
+        model = cv2.imread("/Users/Etienne/Documents/GitHub/robot-interface/robotinterface/gui/petri_dark.png")
     else:
-        model = cv2.imread("robotinterface\gui\petri_light.png")
+        model = cv2.imread("/Users/Etienne/Documents/GitHub/robot-interface/robotinterface/gui/petri_light.png")
         
     width, height = 70, 70
     model = cv2.resize(model, (width, height))/255
