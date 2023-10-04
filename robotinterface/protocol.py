@@ -1,22 +1,19 @@
-# poetry run python robotinterface\protocol.py
 # Interpreter path
 # C:\Users\APrap\AppData\Local\pypoetry\Cache\virtualenvs\robotinterface-u1VIN2jz-py3.10
 
+import os
+import sys 
+#sys.path.append(os.path.join(sys.path[0],'..'))
+
+#sys.path.append(r"/Users/Etienne/Documents/GitHub/robot-interface")
 import logging
 import asyncio
-import sys
 
-<<<<<<< Updated upstream
-=======
-sys.path.append(r"/Users/Etienne/Documents/GitHub/robot-interface")
 from robotinterface.hardware_control.robot import Robot
->>>>>>> Stashed changes
 
-from hardware_control.robot import Robot
-
-from logistics.grid import Grid, GridPosition
-from logistics.pickable import *
-from gui.user_gui import load_grid
+from robotinterface.logistics.grid import Grid, GridPosition
+from robotinterface.logistics.pickable import *
+from robotinterface.gui.user_gui import load_grid
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 
@@ -27,15 +24,15 @@ logging.basicConfig(
 
 
 async def main():
-    grid = Grid(x_max=-800, x_dist=-199, y_max=-620, y_dist=-200)
+    grid = Grid(x_max=-800, x_dist=-199, y_max=-620, y_dist=-200)    
     
     drop_pos = GridPosition(grid.x_num_interval-1, grid.y_num_interval-1)
-    pic_pos = GridPosition(2, 2)
+    pic_pos = GridPosition(3, 2)
     
     loop = asyncio.get_running_loop()
     executor = ThreadPoolExecutor(max_workers=2)
-
-    robot = await Robot.build(grid)
+    
+    #robot = await Robot.build(grid)
 
     #grid = await loop.run_in_executor(executor, partial(load_grid, grid))
     grid = load_grid(grid)
@@ -50,8 +47,10 @@ async def main():
                          target = [object, next_object]
                     else:
                         target = [object]
-
+    print("TARGET",target)
     await robot.pick_and_place(target, pic_pos)
+    #input("fonction bloquante")
+
     await robot.take_picture(target[0], obj_rem=target[1])
     await robot.pick_and_place(target, drop_pos)
     

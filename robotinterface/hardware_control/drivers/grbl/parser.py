@@ -54,6 +54,7 @@ def homing_start_parser(answer: str) -> None:
     """
     handle_error_alarm(answer)
     if "Home" not in answer:
+        print(answer)
         raise ValueError
     logging.debug("Homing has successfully started")
 

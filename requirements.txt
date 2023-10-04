@@ -1,0 +1,8 @@
+dynamixel-sdk==3.7.31
+future==0.18.3
+iso8601==2.1.0
+numpy==1.26.0
+opencv-python==4.8.1.78
+pyserial==3.5
+pyserial-asyncio==0.6
+PyYAML==6.0.1

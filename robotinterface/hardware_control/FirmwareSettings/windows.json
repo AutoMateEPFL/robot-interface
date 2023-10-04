@@ -18,11 +18,7 @@
     },
     {
       "name": "grbl",
-<<<<<<< Updated upstream
-      "port": "/dev/cu.usbserial-AQ02ZA6M",
-=======
       "port": "/dev/tty.usbserial-AQ02ZA6M",
->>>>>>> Stashed changes
       "bauderate": 115600
     },
     {
