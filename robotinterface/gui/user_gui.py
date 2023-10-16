@@ -3,11 +3,11 @@ import numpy as np
 from logistics.grid import Grid, GridPosition
 from logistics.pickable import *
 from robotinterface.gui.experiment_tkinter import *
-
 import logging
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
+import platform
 
 mouseX, mouseY, left_click, right_click, middle_click = 0, 0, False, False, False
 
@@ -39,9 +39,15 @@ def draw_plateholder(grid_pos:GridPosition, imshow, grid_resolution, line_thickn
     """Draws a plateholder on the given grid position."""
     
     if grid_pos.y_id%2 == 0:
-        model = cv2.imread("../robotinterface/gui/holder_dark.png")
+        if platform.system() == 'Windows':
+            model = cv2.imread("robotinterface\gui\petri_dark.png")
+        else :
+            model = cv2.imread("../robotinterface/gui/holder_dark.png")
     else:
-        model = cv2.imread("../robotinterface/gui/holder_light.png")
+        if platform.system() == 'Windows':
+            model = cv2.imread("robotinterface\gui\holder_light.png")
+        else:
+            model = cv2.imread("../robotinterface/gui/holder_light.png")
         
     width, height = 70, 70
     model = cv2.resize(model, (width, height))/255
@@ -57,8 +63,10 @@ def draw_plateholder(grid_pos:GridPosition, imshow, grid_resolution, line_thickn
 
 def draw_camera(grid_pos:GridPosition, imshow, grid_resolution, line_thickness):
     """Draws a plateholder on the given grid position."""
-
-    camera_image = cv2.imread("../robotinterface/gui/camera.png")
+    if platform.system() == 'Windows':
+        camera_image = cv2.imread("robotinterface\gui\camera.png")
+    else:
+        camera_image = cv2.imread("../robotinterface/gui/camera.png")
 
     width, height = 70, 70
     model = cv2.resize(camera_image, (width, height)) / 255
@@ -73,8 +81,11 @@ def draw_camera(grid_pos:GridPosition, imshow, grid_resolution, line_thickness):
 
 def draw_storage(grid_pos:GridPosition, imshow, grid_resolution, line_thickness):
     """Draws a plateholder on the given grid position."""
+    if platform.system() == 'Windows':
+        stack_image = cv2.imread("robotinterface\gui\stack.png")
+    else:
+        stack_image = cv2.imread("../robotinterface/gui/stack.png")
 
-    stack_image = cv2.imread("../robotinterface/gui/stack.png")
 
     width, height = 70, 70
     model = cv2.resize(stack_image, (width, height)) / 255
@@ -89,9 +100,15 @@ def draw_storage(grid_pos:GridPosition, imshow, grid_resolution, line_thickness)
     
 def draw_petri(grid_pos:GridPosition, imshow, grid_resolution, line_thickness):
     if grid_pos.y_id%2 == 0:
-        model = cv2.imread("../robotinterface/gui/petri_dark.png")
+        if platform.system() == 'Windows':
+            model = cv2.imread("robotinterface\gui\spetri_dark.png")
+        else:
+            model = cv2.imread("../robotinterface/gui/petri_dark.png")
     else:
-        model = cv2.imread("../robotinterface/gui/petri_light.png")
+        if platform.system() == 'Windows':
+            model = cv2.imread("robotinterface\gui\spetri_light.png")
+        else:
+            model = cv2.imread("../robotinterface/gui/petri_light.png")
         
     width, height = 70, 70
     model = cv2.resize(model, (width, height))/255

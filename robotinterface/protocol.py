@@ -2,8 +2,10 @@
 # C:\Users\APrap\AppData\Local\pypoetry\Cache\virtualenvs\robotinterface-u1VIN2jz-py3.10
 
 import os
-import sys 
-sys.path.append(os.path.join(sys.path[0],'..'))
+import sys
+import platform
+if platform.system() == 'Windows':
+    sys.path.append(os.path.join(sys.path[0],'..'))
 #sys.path.append(r"/Users/Etienne/Documents/GitHub/robot-interface")
 import logging
 import asyncio
