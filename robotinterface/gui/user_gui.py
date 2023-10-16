@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 from logistics.grid import Grid, GridPosition
 from logistics.pickable import *
+from robotinterface.gui.experiment_tkinter import *
+
 import logging
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
@@ -37,9 +39,9 @@ def draw_plateholder(grid_pos:GridPosition, imshow, grid_resolution, line_thickn
     """Draws a plateholder on the given grid position."""
     
     if grid_pos.y_id%2 == 0:
-        model = cv2.imread("robotinterface\gui\holder_dark.png")
+        model = cv2.imread("../robotinterface/gui/holder_dark.png")
     else:
-        model = cv2.imread("robotinterface\gui\holder_light.png")
+        model = cv2.imread("../robotinterface/gui/holder_light.png")
         
     width, height = 70, 70
     model = cv2.resize(model, (width, height))/255
@@ -51,12 +53,45 @@ def draw_plateholder(grid_pos:GridPosition, imshow, grid_resolution, line_thickn
     y_end = y + height
 
     imshow[y:y_end, x:x_end] = model
+
+
+def draw_camera(grid_pos:GridPosition, imshow, grid_resolution, line_thickness):
+    """Draws a plateholder on the given grid position."""
+
+    camera_image = cv2.imread("../robotinterface/gui/camera.png")
+
+    width, height = 70, 70
+    model = cv2.resize(camera_image, (width, height)) / 255
+
+    x = grid_pos.x_id * (grid_resolution + line_thickness) + grid_resolution // 2 - width // 2
+    y = grid_pos.y_id * (grid_resolution + line_thickness) + grid_resolution // 2 - height // 2
+
+    x_end = x + width
+    y_end = y + height
+
+    imshow[y:y_end, x:x_end] = model
+
+def draw_storage(grid_pos:GridPosition, imshow, grid_resolution, line_thickness):
+    """Draws a plateholder on the given grid position."""
+
+    stack_image = cv2.imread("../robotinterface/gui/stack.png")
+
+    width, height = 70, 70
+    model = cv2.resize(stack_image, (width, height)) / 255
+
+    x = grid_pos.x_id * (grid_resolution + line_thickness) + grid_resolution // 2 - width // 2
+    y = grid_pos.y_id * (grid_resolution + line_thickness) + grid_resolution // 2 - height // 2
+
+    x_end = x + width
+    y_end = y + height
+
+    imshow[y:y_end, x:x_end] = model
     
 def draw_petri(grid_pos:GridPosition, imshow, grid_resolution, line_thickness):
     if grid_pos.y_id%2 == 0:
-        model = cv2.imread("/Users/Etienne/Documents/GitHub/robot-interface/robotinterface/gui/petri_dark.png")
+        model = cv2.imread("../robotinterface/gui/petri_dark.png")
     else:
-        model = cv2.imread("/Users/Etienne/Documents/GitHub/robot-interface/robotinterface/gui/petri_light.png")
+        model = cv2.imread("../robotinterface/gui/petri_light.png")
         
     width, height = 70, 70
     model = cv2.resize(model, (width, height))/255
@@ -77,6 +112,9 @@ def mark_P(grid_pos:GridPosition, num, imshow, grid_resolution, line_thickness):
     
 def draw_grid(grid: Grid, imshow, grid_resolution, line_thickness):
     """Draw the grid on the imshow"""
+
+    draw_camera(GridPosition(grid.x_num_interval-1, grid.y_num_interval-1), imshow, grid_resolution, line_thickness)
+    draw_storage(GridPosition(grid.x_num_interval-2, grid.y_num_interval-1), imshow, grid_resolution, line_thickness)
     
     for x in range(grid.x_num_interval):
         for y in range(grid.y_num_interval):
@@ -99,6 +137,39 @@ def add_pertidish(grid: Grid, grid_pos:GridPosition):
     
     if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id]) // 2 < 6:
         grid.add_object([SmallPetriBottom(), SmallPetriTop()], grid_pos)
+    else:
+        logging.info("Max number of petri dish reached")
+
+
+def add_experiment(grid: Grid, grid_pos: GridPosition, tkinter_window):
+    """Add an experiment  on the grid"""
+
+    if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id]) // 2 < 2:
+        ThisExperiment = Experiment(name="")
+        ThisExperiment.load_external_window(tkinter_window)
+        #ThisExperiment.launch_registration()
+        #ExperimentNameQuestion = Question(ThisExperiment.window.inner, "Name of the experiment ")
+        ExperimentNameQuestion = Question_setup(ThisExperiment.window.inner, "Name of the experiment ", ThisExperiment.root)
+
+        #print(ThisExperiment.name)
+        for i in range(6):
+           ThisExperiment.question_list.append(Question(ThisExperiment.window.inner, "Name of the marker " + str(i + 1)))
+
+        #print(ThisExperiment.marker_list[0].answer)
+        ThisExperiment.window.mainloop()
+        ThisExperiment.update_name(ExperimentNameQuestion.answer)
+        for i in range(6):
+           ThisExperiment.marker_list.append(ThisExperiment.question_list[i].answer)
+
+        #objects = grid.object_grid[grid_pos.y_id][grid_pos.x_id]
+        plate_holder = PlateHolder(ThisExperiment)
+        grid.add_object([plate_holder], grid_pos)
+        #objects = [plate_holder] + objects
+
+        for i in range(6):
+            if ThisExperiment.marker_list[i] !='':
+                grid.add_object([SmallPetriBottom(), SmallPetriTop()], grid_pos)
+
     else:
         logging.info("Max number of petri dish reached")
         
@@ -130,7 +201,7 @@ def toggle_plateholder(grid: Grid, grid_pos:GridPosition):
     """Toggle the presence of a plate holder on the grid"""
     
     if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id]) == 0:
-        add_plateholder(grid, grid_pos)   
+        add_plateholder(grid, grid_pos)
     elif grid.object_grid[grid_pos.y_id][grid_pos.x_id][0].name == "Plate Holder":
         remove_plateholder(grid, grid_pos)
     else:
@@ -151,18 +222,22 @@ def mouse_click(event,x,y,flags,param):
     mouseX, mouseY = x, y
       
     
-def load_grid(grid: Grid, grid_resolution: int = 100, line_thickness: int = 2) -> Grid:
+def load_grid(grid: Grid, grid_resolution: int = 100, line_thickness: int = 2, tkinter_window=tk.Tk()) -> Grid:
     """Loads the grid and allows the user to interact with it"""
     
-    global mouseX,mouseY,left_click,right_click,middle_click
+    global mouseX, mouseY, left_click, right_click, middle_click
     
     cv2.namedWindow("Auto-One")
     cv2.setMouseCallback("Auto-One", mouse_click)
-    
+
     Platform = generate_grid_image(grid, grid_resolution, line_thickness)
     
     while True:
-        
+        if grid.object_grid[1][1] != []:
+            print('NAME',(grid.object_grid[1][1][0].experiment.name))
+        if grid.object_grid[1][1] != []:
+            print('MARKERS',(grid.object_grid[1][1][0].experiment.marker_list))
+
         imshow = Platform.copy()
         
         draw_grid(grid, imshow, grid_resolution, line_thickness)
@@ -171,14 +246,17 @@ def load_grid(grid: Grid, grid_resolution: int = 100, line_thickness: int = 2) -
             click_pos = GridPosition(mouseX//(grid_resolution+line_thickness), mouseY//(grid_resolution+line_thickness))
             add_pertidish(grid, click_pos)
             left_click = False
-        elif right_click:
+        elif middle_click:
             click_pos = GridPosition(mouseX//(grid_resolution+line_thickness), mouseY//(grid_resolution+line_thickness))
             remove_pertidish(grid, click_pos)
             right_click = False
-        elif middle_click:
+        elif right_click:
+
             click_pos = GridPosition(mouseX//(grid_resolution+line_thickness), mouseY//(grid_resolution+line_thickness))
-            toggle_plateholder(grid, click_pos)           
-            middle_click = False
+            #add_plateholder(grid, click_pos)
+            add_experiment(grid, click_pos,tkinter_window)
+            #ghost.destroy()
+            right_click = False
     
     
         cv2.imshow("Auto-One", imshow)

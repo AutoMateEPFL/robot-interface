@@ -4,7 +4,6 @@
 import os
 import sys 
 #sys.path.append(os.path.join(sys.path[0],'..'))
-
 #sys.path.append(r"/Users/Etienne/Documents/GitHub/robot-interface")
 import logging
 import asyncio
@@ -22,9 +21,12 @@ logging.basicConfig(
     level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S')
 
+# root = tk.Tk()
+# root.title("Experiment entry")
+# root.geometry("200x750")
 
 async def main():
-    grid = Grid(x_max=-800, x_dist=-199, y_max=-620, y_dist=-200)    
+    grid = Grid(x_max=-800, x_dist=-199, y_max=-620, y_dist=-200)
     
     drop_pos = GridPosition(grid.x_num_interval-1, grid.y_num_interval-1)
     pic_pos = GridPosition(3, 2)
@@ -36,6 +38,7 @@ async def main():
 
     #grid = await loop.run_in_executor(executor, partial(load_grid, grid))
     grid = load_grid(grid)
+
     # TO DO : add a function to realize the protocol, check the load_grid function maybe find a better way to rewrite it in asyncronous way 
     for x in range(grid.x_num_interval):
         for y in range(grid.y_num_interval):

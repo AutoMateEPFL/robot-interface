@@ -19,8 +19,9 @@ class PlateHolder(Pickable):
     """
     height = 5
     name = "Plate Holder"
-    def __init__(self):
+    def __init__(self,experiment):
         super().__init__()
+        self.experiment = experiment
 
 class SmallPetriBottom(Pickable):
     """
