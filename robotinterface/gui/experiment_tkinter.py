@@ -1,7 +1,8 @@
 import tkinter as tk
 
 # --- classes ---
-
+## TODO ADD COMMENT
+## FOR NOW ONE EXPERIMENT IS ASSOCIATED TO ONE PLATE HOLDER IS IT NEEDED TO DO 2 CLASSES?
 class Experiment:
     def __init__(self, name=""):
         self.name = name
@@ -23,7 +24,7 @@ class Experiment:
         self.window = ExperimentFrame(self.root)
         self.window.pack(expand=True, fill='both')
 
-    def update_name(self,newname):
+    def update_name(self, newname):
         self.name = newname
 
 
@@ -68,10 +69,10 @@ class ExperimentFrame(tk.Frame):
     def resize(self, event=None):
         self._canvas.configure(scrollregion=self._canvas.bbox('all'))
 
-    def close_registration(self):
-        print('CLOSSEEEE')
-        self.root.close()
-        #self.window.close()
+    # def close_registration(self):
+    #     print('CLOSSEEEE')
+    #     self.root.close()
+    #     #self.window.close()
 
 
 class Question:

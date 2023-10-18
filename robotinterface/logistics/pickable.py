@@ -40,3 +40,14 @@ class SmallPetriTop(Pickable):
     name = "Small Petri Top"
     def __init__(self):
         super().__init__()
+
+class SmallPetriTop(Pickable):
+    """
+    This class defines the top part of a small petri dish
+    """
+    height = 8.5
+    name = "Small Petri Top"
+    def __init__(self):
+        super().__init__()
+
+

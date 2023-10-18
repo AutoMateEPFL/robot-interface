@@ -61,14 +61,17 @@ def draw_plateholder(grid_pos:GridPosition, imshow, grid_resolution, line_thickn
     imshow[y:y_end, x:x_end] = model
 
 
-def draw_camera(grid_pos:GridPosition, imshow, grid_resolution, line_thickness):
+def draw_camera(grid: Grid, imshow, grid_resolution, line_thickness):
     """Draws a plateholder on the given grid position."""
+
+    grid_pos = grid.find_object(grid.cam)
+
     if platform.system() == 'Windows':
         camera_image = cv2.imread("robotinterface\gui\camera.png")
     else:
         camera_image = cv2.imread("../robotinterface/gui/camera.png")
 
-    width, height = 70, 70
+    width, height = 90, 90
     model = cv2.resize(camera_image, (width, height)) / 255
 
     x = grid_pos.x_id * (grid_resolution + line_thickness) + grid_resolution // 2 - width // 2
@@ -79,15 +82,18 @@ def draw_camera(grid_pos:GridPosition, imshow, grid_resolution, line_thickness):
 
     imshow[y:y_end, x:x_end] = model
 
-def draw_storage(grid_pos:GridPosition, imshow, grid_resolution, line_thickness):
+def draw_storage(grid: Grid, imshow, grid_resolution, line_thickness):
     """Draws a plateholder on the given grid position."""
+
+    grid_pos = grid.find_object(grid.stack)
+
     if platform.system() == 'Windows':
         stack_image = cv2.imread("robotinterface\gui\stack.png")
     else:
         stack_image = cv2.imread("../robotinterface/gui/stack.png")
 
 
-    width, height = 70, 70
+    width, height = 90, 90
     model = cv2.resize(stack_image, (width, height)) / 255
 
     x = grid_pos.x_id * (grid_resolution + line_thickness) + grid_resolution // 2 - width // 2
@@ -130,9 +136,9 @@ def mark_P(grid_pos:GridPosition, num, imshow, grid_resolution, line_thickness):
 def draw_grid(grid: Grid, imshow, grid_resolution, line_thickness):
     """Draw the grid on the imshow"""
 
-    draw_camera(GridPosition(grid.x_num_interval-1, grid.y_num_interval-1), imshow, grid_resolution, line_thickness)
-    draw_storage(GridPosition(grid.x_num_interval-2, grid.y_num_interval-1), imshow, grid_resolution, line_thickness)
-    
+    draw_camera(grid,imshow, grid_resolution, line_thickness)
+    draw_storage(grid, imshow, grid_resolution, line_thickness)
+
     for x in range(grid.x_num_interval):
         for y in range(grid.y_num_interval):
             num_petri = 0
@@ -148,7 +154,7 @@ def draw_grid(grid: Grid, imshow, grid_resolution, line_thickness):
                 mark_P(GridPosition(x, y), num_petri, imshow, grid_resolution, line_thickness)
             if holder:
                 mark_H(GridPosition(x, y), imshow, grid_resolution, line_thickness)
-    
+
 def add_pertidish(grid: Grid, grid_pos:GridPosition):
     """Add a petri dish on the grid"""
     
@@ -185,7 +191,8 @@ def add_experiment(grid: Grid, grid_pos: GridPosition, tkinter_window):
 
         for i in range(6):
             if ThisExperiment.marker_list[i] !='':
-                grid.add_object([SmallPetriBottom(), SmallPetriTop()], grid_pos)
+                add_pertidish(grid, grid_pos)
+                #grid.add_object([SmallPetriBottom(), SmallPetriTop()], grid_pos)
 
     else:
         logging.info("Max number of petri dish reached")
@@ -254,6 +261,7 @@ def load_grid(grid: Grid, grid_resolution: int = 100, line_thickness: int = 2, t
             print('NAME',(grid.object_grid[1][1][0].experiment.name))
         if grid.object_grid[1][1] != []:
             print('MARKERS',(grid.object_grid[1][1][0].experiment.marker_list))
+            print(type(grid.object_grid[1][1][0])==PlateHolder)
 
         imshow = Platform.copy()
         
@@ -263,17 +271,15 @@ def load_grid(grid: Grid, grid_resolution: int = 100, line_thickness: int = 2, t
             click_pos = GridPosition(mouseX//(grid_resolution+line_thickness), mouseY//(grid_resolution+line_thickness))
             add_pertidish(grid, click_pos)
             left_click = False
-        elif middle_click:
+        elif right_click:
             click_pos = GridPosition(mouseX//(grid_resolution+line_thickness), mouseY//(grid_resolution+line_thickness))
             remove_pertidish(grid, click_pos)
             right_click = False
-        elif right_click:
-
+        elif middle_click:
             click_pos = GridPosition(mouseX//(grid_resolution+line_thickness), mouseY//(grid_resolution+line_thickness))
             #add_plateholder(grid, click_pos)
             add_experiment(grid, click_pos,tkinter_window)
-            #ghost.destroy()
-            right_click = False
+            middle_click = False
     
     
         cv2.imshow("Auto-One", imshow)
@@ -302,4 +308,6 @@ if __name__ == "__main__":
         grid = await loop.run_in_executor(executor, partial(load_grid, grid))
         
     asyncio.run(main())
+
+
     

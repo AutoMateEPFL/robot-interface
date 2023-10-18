@@ -23,10 +23,6 @@ logging.basicConfig(
     level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S')
 
-# root = tk.Tk()
-# root.title("Experiment entry")
-# root.geometry("200x750")
-
 async def main():
     grid = Grid(x_max=-800, x_dist=-199, y_max=-620, y_dist=-200)
     

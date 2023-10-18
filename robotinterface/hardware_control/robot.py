@@ -11,7 +11,7 @@ from hardware_control.gripper import Gripper
 from hardware_control.platform_robot import Platform
 from hardware_control.vision import Vision
 import logging
-
+import platform
 log = logging.getLogger(__name__)
 
 class Robot:
@@ -43,6 +43,8 @@ class Robot:
         # Load the settings from the json file
         if SECRET_KEY:
             file_path = "hardware_control/FirmwareSettings/Docker.json"
+        elif platform.system() == 'Windows':
+            file_path = "/Users/Etienne/Documents/GitHub/robot-interface/robotinterface/hardware_control/FirmwareSettings/windows.json"
         else:
             file_path = "/Users/Etienne/Documents/GitHub/robot-interface/robotinterface/hardware_control/FirmwareSettings/windows.json"
         with open(file_path, 'r') as f:

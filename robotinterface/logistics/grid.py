@@ -2,6 +2,7 @@ from typing import Tuple
 import logging
 import numpy as np
 from logistics.pickable import Pickable
+from logistics.non_pickable import *
 from logistics.positions import GridPosition, CartesianPosition
 
 log = logging.getLogger(__name__)
@@ -137,3 +138,17 @@ class Grid:
             Tuple[float, float]: The 2D Cartesian coordinates derived from the grid position.
         """
         return self.xx[position.x_id], self.yy[position.y_id]
+
+    def set_camera_and_stack_position(self, position_camera: GridPosition, position_stack: GridPosition ) :
+        """
+        Adds a
+        Args:
+
+        Returns:
+
+        """
+        self.cam = CameraSpot()
+        self.stack = StackSpot()
+        self.add_object([self.cam], position_camera)
+        self.add_object([self.stack], position_stack)
+
