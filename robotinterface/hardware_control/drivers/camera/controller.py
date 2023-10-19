@@ -3,6 +3,9 @@ import cv2
 import logging
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
+import platform
+
+my_platform = platform.system()
 
 log = logging.getLogger(__name__)
 
@@ -19,7 +22,10 @@ class CameraInterface:
         self.focus = 30
         self.executor = ThreadPoolExecutor(max_workers=2)
         self.loop = asyncio.get_running_loop()
-        self.cap = await self.loop.run_in_executor(self.executor, partial(cv2.VideoCapture, index))
+        if my_platform == 'Windows':
+            self.cap = await self.loop.run_in_executor(self.executor, partial(cv2.VideoCapture, index),cv2.CAP_DSHOW)
+        else :
+            self.cap = await self.loop.run_in_executor(self.executor, partial(cv2.VideoCapture, index))
         await self.loop.run_in_executor(self.executor, partial(self.cap.set, cv2.CAP_PROP_FRAME_WIDTH, 1920))
         await self.loop.run_in_executor(self.executor, partial(self.cap.set, cv2.CAP_PROP_FRAME_HEIGHT, 1080))
         await self.loop.run_in_executor(self.executor, partial(self.cap.set, cv2.CAP_PROP_FPS, 60))

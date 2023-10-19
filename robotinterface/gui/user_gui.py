@@ -107,12 +107,12 @@ def draw_storage(grid: Grid, imshow, grid_resolution, line_thickness):
 def draw_petri(grid_pos:GridPosition, imshow, grid_resolution, line_thickness):
     if grid_pos.y_id%2 == 0:
         if platform.system() == 'Windows':
-            model = cv2.imread("robotinterface\gui\spetri_dark.png")
+            model = cv2.imread("robotinterface\gui\petri_dark.png")
         else:
             model = cv2.imread("../robotinterface/gui/petri_dark.png")
     else:
         if platform.system() == 'Windows':
-            model = cv2.imread("robotinterface\gui\spetri_light.png")
+            model = cv2.imread("robotinterface\gui\petri_light.png")
         else:
             model = cv2.imread("../robotinterface/gui/petri_light.png")
         
@@ -257,11 +257,11 @@ def load_grid(grid: Grid, grid_resolution: int = 100, line_thickness: int = 2, t
     Platform = generate_grid_image(grid, grid_resolution, line_thickness)
     
     while True:
-        if grid.object_grid[1][1] != []:
-            print('NAME',(grid.object_grid[1][1][0].experiment.name))
-        if grid.object_grid[1][1] != []:
-            print('MARKERS',(grid.object_grid[1][1][0].experiment.marker_list))
-            print(type(grid.object_grid[1][1][0])==PlateHolder)
+        #if grid.object_grid[1][1] != []:
+        #    print('NAME',(grid.object_grid[1][1][0].experiment.name))
+        #if grid.object_grid[1][1] != []:
+        #    print('MARKERS',(grid.object_grid[1][1][0].experiment.marker_list))
+        #    print(type(grid.object_grid[1][1][0])==PlateHolder)
 
         imshow = Platform.copy()
         

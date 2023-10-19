@@ -1,5 +1,10 @@
 from hardware_control.drivers.dynamixel.controller import Dynamixel
-import hardware_control.constants
+import platform
+my_platform = platform.system()
+if my_platform == 'Windows':
+    from hardware_control import constants
+else :
+    import hardware_control.constants
 from hardware_control.drivers.serial.serial_port_detection import get_com_port
 
 import logging

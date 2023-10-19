@@ -6,12 +6,20 @@ import os
 from logistics.grid import Grid
 from logistics.positions import GridPosition, CartesianPosition
 from logistics.pickable import Pickable
-import hardware_control.constants
+import platform
+my_platform = platform.system()
+if my_platform == 'Windows':
+    from hardware_control import constants
+else :
+    import hardware_control.constants
 from hardware_control.gripper import Gripper
 from hardware_control.platform_robot import Platform
 from hardware_control.vision import Vision
 import logging
 import platform
+
+my_platform = platform.system()
+
 log = logging.getLogger(__name__)
 
 class Robot:
@@ -43,15 +51,22 @@ class Robot:
         # Load the settings from the json file
         if SECRET_KEY:
             file_path = "hardware_control/FirmwareSettings/Docker.json"
-        elif platform.system() == 'Windows':
-            file_path = "/Users/Etienne/Documents/GitHub/robot-interface/robotinterface/hardware_control/FirmwareSettings/windows.json"
+        
+        if my_platform == 'Windows':
+            file_path = "robotinterface/hardware_control/FirmwareSettings/windows.json"
         else:
-            file_path = "/Users/Etienne/Documents/GitHub/robot-interface/robotinterface/hardware_control/FirmwareSettings/windows.json"
+            file_path = "/Users/Etienne/Documents/GitHub/robot-interface/robotinterface/hardware_control/FirmwareSettings/mac.json"
         with open(file_path, 'r') as f:
             data = json.load(f)
             
         #  Load the tools settings from the json file
-        file_path = "/Users/Etienne/Documents/GitHub/robot-interface/robotinterface/hardware_control/FirmwareSettings/tools_configuration.json"
+        if my_platform == 'Windows':
+            file_path = "robotinterface/hardware_control/FirmwareSettings/tools_configuration.json"
+        else:
+            file_path = "/Users/Etienne/Documents/GitHub/robot-interface/robotinterface/hardware_control/FirmwareSettings/tools_configuration.json"
+
+            
+        #file_path = "/Users/Etienne/Documents/GitHub/robot-interface/robotinterface/hardware_control/FirmwareSettings/tools_configuration.json"
         with open(file_path, 'r') as f:
             tools_settings = json.load(f)
             

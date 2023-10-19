@@ -1,6 +1,11 @@
 from hardware_control.drivers.camera.controller import CameraInterface
 from hardware_control.drivers.serial.serial_port_detection import get_cam_index
-import hardware_control.constants
+import platform
+my_platform = platform.system()
+if my_platform == 'Windows':
+    from hardware_control import constants
+else :
+    import hardware_control.constants
 import cv2
 import asyncio
 import datetime

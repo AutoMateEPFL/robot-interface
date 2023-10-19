@@ -1,9 +1,16 @@
 {
   "ExpandedNodes": [
     "",
+    "\\images",
     "\\robotinterface",
-    "\\robotinterface\\logistics"
+    "\\robotinterface\\gui",
+    "\\robotinterface\\hardware_control",
+    "\\robotinterface\\hardware_control\\drivers",
+    "\\robotinterface\\hardware_control\\drivers\\camera",
+    "\\robotinterface\\hardware_control\\drivers\\dynamixel",
+    "\\robotinterface\\hardware_control\\drivers\\grbl",
+    "\\robotinterface\\hardware_control\\FirmwareSettings"
   ],
-  "SelectedNode": "\\robotinterface\\logistics\\grid.py",
+  "SelectedNode": "\\robotinterface\\protocol_one_experiment.py",
   "PreviewInSolutionExplorer": false
 }
