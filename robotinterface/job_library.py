@@ -4,7 +4,7 @@ import platform
 import logging
 import asyncio
 
-def find_al_experiments(grid):
+def find_all_experiments(grid):
     list_of_experiments = []
     for x in range(grid.x_num_interval):
         for y in range(grid.y_num_interval):
@@ -15,11 +15,12 @@ def find_al_experiments(grid):
                     print('EXPERIMENT FOUND', x, y)
                     list_of_experiments.append(grid.object_grid[y][x][0])
     return list_of_experiments
+
 async def take_photo_of_all_experiments_and_reconstruct_piles(robot, grid, pic_pos, stack_pos):
 
     # FIND ALL EXPERIMENTS IN THE GRID, FOR NOW ONE EXPERIMENT = ONE PLATEHOLDER
 
-    list_of_experiments = find_al_experiments(grid)
+    list_of_experiments = find_all_experiments(grid)
 
     # FOR EACH EXPERIMENT TAKE PICTURES AND DECONSTRUCT THE PILE
 
@@ -37,7 +38,6 @@ async def take_photo_of_all_experiments_and_reconstruct_piles(robot, grid, pic_p
                     target = [object, next_object]
                 else:
                     target = [object]
-        print("TARGET", target)
 
             await robot.pick_and_place(target, pic_pos)
 

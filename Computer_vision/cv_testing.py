@@ -1,10 +1,19 @@
 import cv2
 import sys
-sys.path.append(r"../robot-interface")
+import os
+import platform
+if platform.system() == 'Windows':
+    sys.path.append(os.path.join(sys.path[0],'..'))
+else:
+    sys.path.append(r"/Users/Etienne/Documents/GitHub/robot-interface")
 from Image_processing.cv_matrix import analyse_matrix, draw_resutls
 from Image_processing.cv_orientation import rotateImage, fing_perti_angle
 
-filename = "Image_processing/Petri_1.jpeg"
+if platform.system() == 'Windows':
+    filename = "C:\Users\AutoMate EPFL\Documents\GitHub\robot-interface\Computer_vision\Image_processing\Petri_1.jpeg"
+else: 
+    filename = "Image_processing/Petri_1.jpeg"
+    
 image = cv2.imread(filename)
 
 user_angle = 0

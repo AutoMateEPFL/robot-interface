@@ -157,11 +157,11 @@ def draw_grid(grid: Grid, imshow, grid_resolution, line_thickness):
             if holder:
                 mark_H(GridPosition(x, y), imshow, grid_resolution, line_thickness)
 
-def add_pertidish(grid: Grid, grid_pos:GridPosition):
+def add_pertidish(grid: Grid, grid_pos:GridPosition, name=""):
     """Add a petri dish on the grid"""
     
     if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id]) // 2 < 6:
-        grid.add_object([SmallPetriBottom(), SmallPetriTop()], grid_pos)
+        grid.add_object([SmallPetriBottom(associated_name=name), SmallPetriTop(associated_name=name)], grid_pos)
     else:
         logging.info("Max number of petri dish reached")
 
@@ -188,7 +188,7 @@ def add_experiment(grid: Grid, grid_pos: GridPosition, tkinter_window):
 
         ## Add objects on the grid
         #PlateHolder associated with the experiment
-        plate_holder = PlateHolder(ThisExperiment,name=ExperimentNameQuestion.answer)
+        plate_holder = PlateHolder(ThisExperiment,associated_name=ExperimentNameQuestion.answer)
         grid.add_object([plate_holder], grid_pos)
 
         # PlateHolder associated with the experiment

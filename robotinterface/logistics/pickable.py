@@ -19,13 +19,13 @@ class PlateHolder(Pickable):
     """
     height = 5
     name = "Plate Holder"
-    def __init__(self,experiment,name=""):
+    def __init__(self,experiment,associated_name=""):
         super().__init__()
         self.experiment = experiment
-        self.name = name
+        self.associated_name = associated_name
 
-    def set_name(self,name):
-        self.name = name
+    def set_associated_name(self,associated_name):
+        self.associated_name = associated_name
 
 class SmallPetriBottom(Pickable):
     """
@@ -33,12 +33,12 @@ class SmallPetriBottom(Pickable):
     """
     name = "Small Petri Bottom"
     height = 12.5
-    def __init__(self,name=""):
+    def __init__(self,associated_name=""):
         super().__init__()
-        self.name = name
+        self.associated_name = associated_name
 
-    def set_name(self, name):
-        self.name = name
+    def set_associated_name(self, associated_name):
+        self.associated_name = associated_name
 
 class SmallPetriTop(Pickable):
     """
@@ -46,10 +46,10 @@ class SmallPetriTop(Pickable):
     """
     height = 8.5
     name = "Small Petri Top"
-    def __init__(self,name=""):
+    def __init__(self,associated_name=""):
         super().__init__()
-        self.name = name
+        self.associated_name = associated_name
 
-    def set_name(self, name):
-        self.name = name
+    def set_associated_name(self, associated_name):
+        self.associated_name = associated_name
 

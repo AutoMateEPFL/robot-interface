@@ -71,7 +71,7 @@ class Vision:
         else :
             # Ensure the images directory exists
             os.makedirs('images/'+folder_name, exist_ok=True)
-            filename = f'images/' + folder_name + '/' + '{timestamp}.jpg'
+            filename = f'images/' + folder_name + f'/{timestamp}'+suffix+'.jpg'
 
 
         # Save the frame to a file

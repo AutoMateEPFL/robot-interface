@@ -232,12 +232,12 @@ class Robot:
         await self.pick(objects)
         await self.place(objects, position)
 
-    async def save_picture(self):
+    async def save_picture(self,folder_name="", suffix=""):
         """
         Save a picture.
         
         """
-        await self.camera.save_picture()
+        await self.camera.save_picture(folder_name=folder_name, suffix=suffix)
         
         
     async def take_picture(self, obj: Pickable, obj_rem: Pickable = None, folder_name="", suffix=""):
