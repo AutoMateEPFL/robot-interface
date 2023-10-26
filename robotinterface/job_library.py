@@ -1,8 +1,19 @@
-import os
 import sys
-import platform
 import logging
 import asyncio
+import glob
+import os
+import platform
+import cv2
+if platform.system() == 'Windows':
+    sys.path.append(os.path.join(sys.path[0],'..'))
+else:
+    sys.path.append(r"/Users/Etienne/Documents/GitHub/robot-interface")
+
+from Computer_vision.Image_processing.cv_matrix import analyse_matrix, draw_resutls
+from Computer_vision.Image_processing.cv_orientation import rotateImage, fing_perti_angle
+
+
 
 def find_all_experiments(grid):
     list_of_experiments = []
@@ -57,3 +68,39 @@ async def take_photo_of_all_experiments_and_reconstruct_piles(robot, grid, pic_p
             await robot.pick_and_place(target, pos_experiment)
 
     await robot.shutdown()
+
+def analyse_each_image_separately(folder_name):
+    images = glob.glob(folder_name+'/*.jpg')
+    auto_rotate = False
+    positions = [(128, 87), (438, 399)]
+    for image in images :
+        print(image)
+        input_image = cv2.imread(image)
+        tall = input_image.shape[0]
+        width =  input_image.shape[1]
+
+        cropped_input = input_image[:,(width-tall)//2:width-(width-tall)//2][:]
+
+        print(cropped_input.shape)
+
+        # Correction for the rotation of the image
+        angle = fing_perti_angle(cropped_input)
+        if angle is not None:
+            #output = rotateImage(input_image, -angle)
+            output = cropped_input
+        else:
+            output = cropped_input.copy()
+            angle = 0
+
+        cv2.putText(cropped_input, str(round(angle, 2)), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
+
+        # Analyse the results
+        matrix = analyse_matrix(output, positions)
+        output = draw_resutls(output, positions, matrix)
+
+        cv2.imshow('Input', cropped_input)
+        cv2.imshow('Output', output)
+        cv2.imwrite(image.replace('.jpg','')+"_out.jpeg",output)
+
+if __name__ == "__main__":
+    analyse_each_image_separately("/Users/Etienne/Documents/GitHub/robot-interface/images/ss")

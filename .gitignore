@@ -161,3 +161,21 @@ cython_debug/
 .idea/
 
 
+images/q/{timestamp}.jpg
+images/q/{timestamp}_q.jpg
+images/ss/.DS_Store
+images/ss/20231026110513_a.jpg
+images/ss/20231026110513_a_out.jpeg
+images/ss/20231026111835_qq_out.jpeg
+images/ss/Petri_0.jpg
+images/ss/Petri_0_out.jpeg
+images/ss/Petri_1.jpg
+images/ss/Petri_1_out.jpeg
+images/ss/Petri_2.jpg
+images/ss/Petri_2_out.jpeg
+images/ss/{timestamp}.jpg
+images/ss/{timestamp}_out.jpeg
+images/UNIL pictures/Plate_1_EMM.jpg
+images/UNIL pictures/Plate_1_hph.jpg
+images/UNIL pictures/Plate_1_kan.jpg
+images/UNIL pictures/Plate_1_original.jpg

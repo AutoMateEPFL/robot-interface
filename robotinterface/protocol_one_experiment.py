@@ -42,6 +42,9 @@ async def main():
     grid = load_grid(grid)
 
     list_of_experiments = find_all_experiments(grid)
+    ## to do function to load experiment
+
+    reconstruct_pile = False
 
     # FOR EACH EXPERIMENT TAKE PICTURES AND DECONSTRUCT THE PILE
 
@@ -65,17 +68,18 @@ async def main():
             await robot.take_picture(target[0], obj_rem=target[1], folder_name=experiment.associated_name, suffix="_"+str(target[0].associated_name))
             await robot.pick_and_place(target, stack_pos)
 
-        # RECONSTRUCT THE PILE ON THE INITIAL POS
-        x_stack, y_stack = stack_pos.x_id, stack_pos.y_id
-        for num in range(len(grid.object_grid[y_stack][x_stack]) // 2):
-            object = grid.object_grid[y_stack][x_stack][-2]
-            next_object = grid.object_grid[y_stack][x_stack][-1]
-            if object.name == "Small Petri Bottom":
-                if next_object.name == "Small Petri Top":
-                    target = [object, next_object]
-                else:
-                    target = [object]
-            await robot.pick_and_place(target, pos_experiment)
+        if reconstruct_pile:
+            # RECONSTRUCT THE PILE ON THE INITIAL POS
+            x_stack, y_stack = stack_pos.x_id, stack_pos.y_id
+            for num in range(len(grid.object_grid[y_stack][x_stack]) // 2):
+                object = grid.object_grid[y_stack][x_stack][-2]
+                next_object = grid.object_grid[y_stack][x_stack][-1]
+                if object.name == "Small Petri Bottom":
+                    if next_object.name == "Small Petri Top":
+                        target = [object, next_object]
+                    else:
+                        target = [object]
+                await robot.pick_and_place(target, pos_experiment)
 
     await robot.shutdown()
 

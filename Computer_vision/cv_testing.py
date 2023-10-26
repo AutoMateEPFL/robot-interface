@@ -10,7 +10,7 @@ from Image_processing.cv_matrix import analyse_matrix, draw_resutls
 from Image_processing.cv_orientation import rotateImage, fing_perti_angle
 
 if platform.system() == 'Windows':
-    filename = "C:\Users\AutoMate EPFL\Documents\GitHub\robot-interface\Computer_vision\Image_processing\Petri_1.jpeg"
+    filename = "C:\\Users\AutoMate EPFL\Documents\GitHub\robot-interface\Computer_vision\Image_processing\Petri_1.jpeg"
 else: 
     filename = "Image_processing/Petri_1.jpeg"
     
