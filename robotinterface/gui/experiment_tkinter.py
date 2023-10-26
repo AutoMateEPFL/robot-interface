@@ -4,12 +4,21 @@ import tkinter as tk
 ## TODO ADD COMMENT
 ## FOR NOW ONE EXPERIMENT IS ASSOCIATED TO ONE PLATE HOLDER IS IT NEEDED TO DO 2 CLASSES?
 class Experiment:
+    """
+    This class represents an experiment to be filled out.
+
+    Args:
+        name: Empty first, filled out by tkinter then
+        question_list: Question on the markers
+        marker_list: Answers on the questions once filled out
+    """
     def __init__(self, name=""):
         self.name = name
         self.question_list = []
         self.marker_list = []
 
     def load_external_window(self, external_window):
+        """Launch registration on an external window"""
         self.root = external_window
         self.root.title("Experiment entry")
         self.root.geometry("200x720")
@@ -17,18 +26,24 @@ class Experiment:
         self.window.pack(expand=True, fill='both')
 
     def launch_registration(self):
+        """Launch registration of experiment/marker names"""
         self.root = tk.Tk()
         self.root.title("Experiment entry")
         self.root.geometry("200x700")
-
         self.window = ExperimentFrame(self.root)
         self.window.pack(expand=True, fill='both')
 
     def update_name(self, newname):
         self.name = newname
 
-
 class ExperimentFrame(tk.Frame):
+    """
+    This class represents a tkinter frame to fill informations on an experiment.
+
+    Args:
+        name: Empty first, filled out by tkinter then
+
+    """
     def __init__(self, parent, vertical=True, horizontal=False):
         super().__init__(parent)
 
@@ -76,7 +91,13 @@ class ExperimentFrame(tk.Frame):
 
 
 class Question:
+    """
+    This class represents questions on marker names.
 
+    Args:
+        name: Empty first, filled out by tkinter then
+
+    """
     def __init__(self, parent, question):
         self.parent = parent
         self.question = question
@@ -102,6 +123,13 @@ class Question:
         self.button.pack()
 
 class Question_setup:
+    """
+    This class represents question on experiment name.
+
+    Args:
+        name: Empty first, filled out by tkinter then
+
+    """
 
     def __init__(self, parent, question, tkinter_window):
         self.parent = parent
@@ -118,7 +146,7 @@ class Question_setup:
 
     def validate_function(self):
         self.tkinter_window.destroy()
-        #self.tkinter_window.close_registration()
+
 
     def create_widgets(self):
         self.label = tk.Label(self.labelframe, text= self.question)

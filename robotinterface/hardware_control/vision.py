@@ -50,7 +50,7 @@ class Vision:
         self.camera = camera
 
 
-    async def save_picture(self):
+    async def save_picture(self, folder_name="", suffix=""):
         """
         Takes a picture with the camera and saves it to the given path.
 
@@ -63,11 +63,16 @@ class Vision:
         # Get the current timestamp and convert it to a string
         timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
-        # Ensure the images directory exists
-        os.makedirs('images', exist_ok=True)
+        if folder_name == "" :
+            # Ensure the images directory exists
+            os.makedirs('images', exist_ok=True)
+            # Construct the filename
+            filename = f'images/{timestamp}'+suffix+'.jpg'
+        else :
+            # Ensure the images directory exists
+            os.makedirs('images/'+folder_name, exist_ok=True)
+            filename = f'images/' + folder_name + '/' + '{timestamp}.jpg'
 
-        # Construct the filename
-        filename = f'images/{timestamp}.jpg'
 
         # Save the frame to a file
         cv2.imwrite(filename, frame)

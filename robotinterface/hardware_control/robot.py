@@ -240,7 +240,7 @@ class Robot:
         await self.camera.save_picture()
         
         
-    async def take_picture(self, obj: Pickable, obj_rem: Pickable = None):
+    async def take_picture(self, obj: Pickable, obj_rem: Pickable = None, folder_name="", suffix=""):
         """
         Takes a picture of a specified object.
 
@@ -255,7 +255,7 @@ class Robot:
         await self.change_tool("camera")
         await self.gripper.rotate(90)
         await self.platform.move(coordinates.x, coordinates.y, constants.PICTURE_HEIGHT, constants.FEEDRATE)
-        await self.save_picture()
+        await self.save_picture(folder_name=folder_name, suffix=suffix)
         await self.gripper.rotate(0)
         await self.change_tool("gripper")
         await self.platform.move(coordinates.x, coordinates.y, constants.PETRI_CLERANCE, constants.FEEDRATE)

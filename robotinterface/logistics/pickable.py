@@ -19,9 +19,13 @@ class PlateHolder(Pickable):
     """
     height = 5
     name = "Plate Holder"
-    def __init__(self,experiment):
+    def __init__(self,experiment,name=""):
         super().__init__()
         self.experiment = experiment
+        self.name = name
+
+    def set_name(self,name):
+        self.name = name
 
 class SmallPetriBottom(Pickable):
     """
@@ -29,8 +33,12 @@ class SmallPetriBottom(Pickable):
     """
     name = "Small Petri Bottom"
     height = 12.5
-    def __init__(self):
+    def __init__(self,name=""):
         super().__init__()
+        self.name = name
+
+    def set_name(self, name):
+        self.name = name
 
 class SmallPetriTop(Pickable):
     """
@@ -38,16 +46,10 @@ class SmallPetriTop(Pickable):
     """
     height = 8.5
     name = "Small Petri Top"
-    def __init__(self):
+    def __init__(self,name=""):
         super().__init__()
+        self.name = name
 
-class SmallPetriTop(Pickable):
-    """
-    This class defines the top part of a small petri dish
-    """
-    height = 8.5
-    name = "Small Petri Top"
-    def __init__(self):
-        super().__init__()
-
+    def set_name(self, name):
+        self.name = name
 

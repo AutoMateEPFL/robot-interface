@@ -62,7 +62,7 @@ def draw_plateholder(grid_pos:GridPosition, imshow, grid_resolution, line_thickn
 
 
 def draw_camera(grid: Grid, imshow, grid_resolution, line_thickness):
-    """Draws a plateholder on the given grid position."""
+    """Draws a camera on the given grid position."""
 
     grid_pos = grid.find_object(grid.cam)
 
@@ -83,7 +83,7 @@ def draw_camera(grid: Grid, imshow, grid_resolution, line_thickness):
     imshow[y:y_end, x:x_end] = model
 
 def draw_storage(grid: Grid, imshow, grid_resolution, line_thickness):
-    """Draws a plateholder on the given grid position."""
+    """Draws a storage spot  on the given grid position."""
 
     grid_pos = grid.find_object(grid.stack)
 
@@ -105,6 +105,7 @@ def draw_storage(grid: Grid, imshow, grid_resolution, line_thickness):
     imshow[y:y_end, x:x_end] = model
     
 def draw_petri(grid_pos:GridPosition, imshow, grid_resolution, line_thickness):
+    """Draws a petri box  on the given grid position."""
     if grid_pos.y_id%2 == 0:
         if platform.system() == 'Windows':
             model = cv2.imread("robotinterface\gui\petri_dark.png")
@@ -128,6 +129,7 @@ def draw_petri(grid_pos:GridPosition, imshow, grid_resolution, line_thickness):
     imshow[y:y_end, x:x_end] = model
     
 def mark_H(grid_pos:GridPosition, imshow, grid_resolution, line_thickness):
+    """Draws H for holder on the given grid position."""
     cv2.putText(imshow, "H", (grid_pos.x_id*(grid_resolution+line_thickness)+5, grid_pos.y_id*(grid_resolution+line_thickness)+17), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 0), 2)
     
 def mark_P(grid_pos:GridPosition, num, imshow, grid_resolution, line_thickness):
@@ -168,34 +170,33 @@ def add_experiment(grid: Grid, grid_pos: GridPosition, tkinter_window):
     """Add an experiment  on the grid"""
 
     if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id]) // 2 < 2:
+        #create empty experiment
         ThisExperiment = Experiment(name="")
         ThisExperiment.load_external_window(tkinter_window)
-        #ThisExperiment.launch_registration()
-        #ExperimentNameQuestion = Question(ThisExperiment.window.inner, "Name of the experiment ")
-        ExperimentNameQuestion = Question_setup(ThisExperiment.window.inner, "Name of the experiment ", ThisExperiment.root)
 
-        #print(ThisExperiment.name)
+        #Setup questions
+        ExperimentNameQuestion = Question_setup(ThisExperiment.window.inner, "Name of the experiment ", ThisExperiment.root)
         for i in range(6):
            ThisExperiment.question_list.append(Question(ThisExperiment.window.inner, "Name of the marker " + str(i + 1)))
 
-        #print(ThisExperiment.marker_list[0].answer)
         ThisExperiment.window.mainloop()
+
+        # Updates name of the experiment and names of the markers
         ThisExperiment.update_name(ExperimentNameQuestion.answer)
         for i in range(6):
            ThisExperiment.marker_list.append(ThisExperiment.question_list[i].answer)
 
-        #objects = grid.object_grid[grid_pos.y_id][grid_pos.x_id]
-        plate_holder = PlateHolder(ThisExperiment)
+        ## Add objects on the grid
+        #PlateHolder associated with the experiment
+        plate_holder = PlateHolder(ThisExperiment,name=ExperimentNameQuestion.answer)
         grid.add_object([plate_holder], grid_pos)
-        #objects = [plate_holder] + objects
 
+        # PlateHolder associated with the experiment
         for i in range(6):
             if ThisExperiment.marker_list[i] !='':
-                add_pertidish(grid, grid_pos)
-                #grid.add_object([SmallPetriBottom(), SmallPetriTop()], grid_pos)
-
+                add_pertidish(grid, grid_pos,name=ThisExperiment.question_list[i].answer)
     else:
-        logging.info("Max number of petri dish reached")
+        logging.info("Max number of Experiment reached")
         
 def remove_pertidish(grid: Grid, grid_pos:GridPosition):
     """Remove a petri dish on the grid"""
