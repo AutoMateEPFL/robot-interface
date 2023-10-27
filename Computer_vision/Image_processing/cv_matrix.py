@@ -10,20 +10,20 @@ mouseX,mouseY,left_click,right_click,middle_click = 0,0,False,False,False
 params = cv2.SimpleBlobDetector_Params()
  
 # Change thresholds
-params.minThreshold = 50
+params.minThreshold = 30
  
 # Filter by Area.
 params.filterByArea = True
-params.minArea = 70
-params.maxArea = 400
+params.minArea = 150
+#params.maxArea = 6000
 
 # Filter by Circularity
 params.filterByCircularity = True
-params.minCircularity = 0.4
+params.minCircularity = 0.3
  
 # Filter by Convexity
-params.filterByConvexity = False
-params.minConvexity = 0.6
+params.filterByConvexity = True
+params.minConvexity = 0.01
  
 # Filter by Inertia
 params.filterByInertia = False
@@ -71,7 +71,7 @@ def draw_matrix(image: np.ndarray, positions: list)->None:
                 cv2.rectangle(image, pt1, pt2, (255,0,0), 1)
            
            
-def analyse_matrix(image: np.ndarray, positions: list)->np.ndarray:
+def analyse_matrix(image: np.ndarray, positions: list,draw_blob=False)->np.ndarray:
     """
     Analyses the matrix and returns a matrix of 1s and 0s
 
@@ -94,20 +94,48 @@ def analyse_matrix(image: np.ndarray, positions: list)->np.ndarray:
     offset: tuple = ((pos1[0]-pos0[0])/num_cols, (pos1[1]-pos0[1])/num_rows)
     
     bw: np.ndarray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    tr: np.ndarray = cv2.adaptiveThreshold(bw,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 71, -10)
-    
+    tr: np.ndarray = cv2.adaptiveThreshold(bw,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 71, -10)
+
     cv2.imshow('tr', tr)
-    keypoints: list(cv2.KeyPoint) = colony_detector.detect(tr) 
-    
+    cv2.imwrite("/Users/Etienne/Documents/GitHub/robot-interface/Computer_vision/Image_processing/matrix_gaussian.jpeg",tr)
+
+    keypoints: list(cv2.KeyPoint) = colony_detector.detect(tr)
+
     for keypoint in keypoints:
+
         if keypoint.pt[0] > pos0[0] and keypoint.pt[0] < pos1[0] and keypoint.pt[1] > pos0[1] and keypoint.pt[1] < pos1[1]:
             matrix[int((keypoint.pt[0]-pos0[0])/offset[0]), int((keypoint.pt[1]-pos0[1])/offset[1])] = 1
-            # cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), int(keypoint.size), (255,0,0), 2)
-            # cv2.putText(image, str(round(keypoint.size, 2)), (int(keypoint.pt[0]), int(keypoint.pt[1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2, cv2.LINE_AA)
-            
+            if draw_blob:
+                cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), int(keypoint.size), (255,0,0), 2)
+                cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), 2, (255,0,0), 2)
+                # cv2.putText(image, str(round(keypoint.size, 2)), (int(keypoint.pt[0]), int(keypoint.pt[1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2, cv2.LINE_AA)
 
-    return matrix
+    thickness: int = 2
+    keypoint = keypoints[0]
+    i, j =int((keypoint.pt[0]-pos0[0])/offset[0]), int((keypoint.pt[1]-pos0[1])/offset[1])
+    int((keypoint.pt[0] - pos0[0]) / offset[0]), int((keypoint.pt[1] - pos0[1]) / offset[1])
+    pt1: tuple = int(pos0[0] + i * offset[0]) + thickness, int(pos0[1] + j * offset[1]) + thickness
+    pt2: tuple = int(pos0[0] + (i + 1) * offset[0]) - thickness, int(pos0[1] + (j + 1) * offset[1]) - thickness
+    x , y = (pt2[0]+pt1[0])/2,(pt2[1]+pt1[1])/2
+    new_offset = [keypoint.pt[0]-x,keypoint.pt[1]-y]
 
+    new_positions = [(positions[0][0] + new_offset[0], positions[0][1] + new_offset[1]),
+                     (positions[1][0] + new_offset[0], positions[1][1] + new_offset[1])]
+
+    pos0: tuple = new_positions[0]
+    pos1: tuple = new_positions[1]
+    matrix: np.ndarray = np.zeros((num_cols, num_rows))
+    for keypoint in keypoints:
+        #print(keypoint.pt)
+        if keypoint.pt[0] > pos0[0] and keypoint.pt[0] < pos1[0] and keypoint.pt[1] > pos0[1] and keypoint.pt[1] < pos1[1]:
+            matrix[int((keypoint.pt[0]-pos0[0])/offset[0]), int((keypoint.pt[1]-pos0[1])/offset[1])] = 1
+            if draw_blob:
+                cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), int(keypoint.size), (255,0,0), 2)
+                cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), 2, (255,0,0), 2)
+                # cv2.putText(image, str(round(keypoint.size, 2)), (int(keypoint.pt[0]), int(keypoint.pt[1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2, cv2.LINE_AA)
+
+
+    return matrix, new_offset
 
 def draw_resutls(image: np.ndarray, positions: list, matrix: np.ndarray, thickness: int = 2)->np.ndarray:
     """

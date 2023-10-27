@@ -72,7 +72,7 @@ async def take_photo_of_all_experiments_and_reconstruct_piles(robot, grid, pic_p
 def analyse_each_image_separately(folder_name):
     images = glob.glob(folder_name+'/*.jpg')
     auto_rotate = False
-    positions = [(128, 87), (438, 399)]
+    positions = [(280, 280), (850, 850)]
     for image in images :
         print(image)
         input_image = cv2.imread(image)
@@ -86,21 +86,25 @@ def analyse_each_image_separately(folder_name):
         # Correction for the rotation of the image
         angle = fing_perti_angle(cropped_input)
         if angle is not None:
-            #output = rotateImage(input_image, -angle)
-            output = cropped_input
+            rotated_image = rotateImage(cropped_input, -angle)
+            #output = cropped_input
         else:
-            output = cropped_input.copy()
+            rotated_image = cropped_input.copy()
             angle = 0
 
-        cv2.putText(cropped_input, str(round(angle, 2)), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
+        cv2.putText(rotated_image, str(round(angle, 2)), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
 
         # Analyse the results
-        matrix = analyse_matrix(output, positions)
-        output = draw_resutls(output, positions, matrix)
+        matrix, new_offset = analyse_matrix(rotated_image, positions, draw_blob=True)
+        #new_offset = [0,0]
+        new_positions = [(positions[0][0]+new_offset[0],positions[0][1]+new_offset[1]),
+                         (positions[1][0]+new_offset[0],positions[1][1]+new_offset[1])]
+
+        output = draw_resutls(rotated_image, new_positions, matrix)
 
         cv2.imshow('Input', cropped_input)
         cv2.imshow('Output', output)
         cv2.imwrite(image.replace('.jpg','')+"_out.jpeg",output)
 
 if __name__ == "__main__":
-    analyse_each_image_separately("/Users/Etienne/Documents/GitHub/robot-interface/images/ss")
+    analyse_each_image_separately("/Users/Etienne/Documents/GitHub/robot-interface/images/2")
