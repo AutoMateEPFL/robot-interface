@@ -50,7 +50,7 @@ class Vision:
         self.camera = camera
 
 
-    async def save_picture(self, folder_name="", suffix=""):
+    async def save_picture(self, folder_name="", prefix="", suffix=""):
         """
         Takes a picture with the camera and saves it to the given path.
 
@@ -67,11 +67,11 @@ class Vision:
             # Ensure the images directory exists
             os.makedirs('images', exist_ok=True)
             # Construct the filename
-            filename = f'images/{timestamp}'+suffix+'.jpg'
+            filename = f'images/'+prefix+f'{timestamp}'+suffix+'.jpg'
         else :
             # Ensure the images directory exists
             os.makedirs('images/'+folder_name, exist_ok=True)
-            filename = f'images/' + folder_name + f'/{timestamp}'+suffix+'.jpg'
+            filename = f'images/' + folder_name + '/'+prefix+f'{timestamp}'+suffix+'.jpg'
 
 
         # Save the frame to a file

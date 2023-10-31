@@ -36,8 +36,9 @@ async def main():
     
     loop = asyncio.get_running_loop()
     executor = ThreadPoolExecutor(max_workers=2)
-    
-    robot = await Robot.build(grid)
+
+    if platform.system() == 'Windows':
+        robot = await Robot.build(grid)
 
     grid = load_grid(grid)
 
@@ -65,7 +66,7 @@ async def main():
 
             await robot.pick_and_place(target, pic_pos)
 
-            await robot.take_picture(target[0], obj_rem=target[1], folder_name=experiment.associated_name, suffix="_"+str(target[0].associated_name))
+            await robot.take_picture(target[0], obj_rem=target[1], folder_name=experiment.associated_name, prefix="marker_"+str(target[0].number)+"_",suffix="_"+str(target[0].associated_name))
             await robot.pick_and_place(target, stack_pos)
 
         if reconstruct_pile:

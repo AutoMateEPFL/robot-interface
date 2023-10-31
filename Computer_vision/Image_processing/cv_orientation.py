@@ -14,9 +14,9 @@ def rotateImage(image: np.ndarray, angle: float)->np.ndarray:
         np.ndarray: image rotated by the angle with zero padding
     """
     row,col = image.shape[0:2]
-    center=tuple(np.array([row,col])/2)
+    center=tuple(np.array([col,row])/2)
     rot_mat = cv2.getRotationMatrix2D(center,angle,1.0)
-    new_image = cv2.warpAffine(image, rot_mat, (col,row))
+    new_image = cv2.warpAffine(image, rot_mat, (col,row), image.shape[1::-1], flags=cv2.INTER_LINEAR)
     
     return new_image
 
@@ -75,7 +75,7 @@ def fing_perti_angle(image: np.ndarray)->float:
         
             angle.append(180/np.pi*np.arctan2(center[1]-proj[1], center[0]-proj[0]))
 
-        return -np.mean(angle)
+        return 180-np.mean(angle)
     else:
         logging.info('No lines found')
         return None

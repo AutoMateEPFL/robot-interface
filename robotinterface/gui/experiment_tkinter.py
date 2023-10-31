@@ -84,11 +84,6 @@ class ExperimentFrame(tk.Frame):
     def resize(self, event=None):
         self._canvas.configure(scrollregion=self._canvas.bbox('all'))
 
-    # def close_registration(self):
-    #     print('CLOSSEEEE')
-    #     self.root.close()
-    #     #self.window.close()
-
 
 class Question:
     """
@@ -147,7 +142,6 @@ class Question_setup:
     def validate_function(self):
         self.tkinter_window.destroy()
 
-
     def create_widgets(self):
         self.label = tk.Label(self.labelframe, text= self.question)
         self.label.pack(expand=True, fill='both')
@@ -162,6 +156,5 @@ class Question_setup:
         self.labelframe = tk.LabelFrame(self.parent)
         self.labelframe.pack(fill="both", expand=True)
         self.button = tk.Button(self.labelframe, text="OK", command=self.tkinter_window.destroy)
-        #self.button = tk.Button(self.labelframe, text="OK", command=lambda : self.validate_function())
         self.button.pack()
 

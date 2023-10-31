@@ -5,6 +5,7 @@ import glob
 import os
 import platform
 import cv2
+import numpy as np
 if platform.system() == 'Windows':
     sys.path.append(os.path.join(sys.path[0],'..'))
 else:
@@ -69,17 +70,19 @@ async def take_photo_of_all_experiments_and_reconstruct_piles(robot, grid, pic_p
 
     await robot.shutdown()
 
-def analyse_each_image_separately(folder_name):
+def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=False):
     images = glob.glob(folder_name+'/*.jpg')
-    auto_rotate = False
-    positions = [(280, 280), (850, 850)]
+    #auto_rotate = False
+    positions = [(240, 240), (880, 810)]
     for image in images :
         print(image)
         input_image = cv2.imread(image)
         tall = input_image.shape[0]
         width =  input_image.shape[1]
 
-        cropped_input = input_image[:,(width-tall)//2:width-(width-tall)//2][:]
+        #cropped_input = input_image[:,(width-tall)//2:width-(width-tall)//2][:]
+
+        cropped_input = input_image[:, 350:1480][:]
 
         print(cropped_input.shape)
 
@@ -95,7 +98,39 @@ def analyse_each_image_separately(folder_name):
         cv2.putText(rotated_image, str(round(angle, 2)), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
 
         # Analyse the results
-        matrix, new_offset = analyse_matrix(rotated_image, positions, draw_blob=True)
+        matrix, matrix_of_keypoints, new_offset = analyse_matrix(rotated_image, positions, draw_blob=True, auto_offset=auto_offset)
+
+        if auto_rotate:
+            #print(matrix)
+            #print(matrix[0,:])
+            max_dist = 0
+            for i in range(0,len(matrix[:,0])):
+                line = matrix[i,:]
+                #print(line)
+                line_index = 0
+                #print(np.where(line == 1)[0])
+                if np.linalg.norm(line) > 0:
+                    first_index = np.where(line == 1)[0][0]
+                    last_index = np.where(line == 1)[0][-1]
+                    if abs( last_index-first_index)>max_dist:
+                        max_dist = abs( last_index-first_index)
+                        my_first_index = first_index
+                        my_last_index = last_index
+                        line_index = i
+            #print('where first',np.where(line == 1)[0][0])
+            #print('where last', np.where(line == 1)[0][-1])
+            #print('I',line_index)
+            first_point = matrix_of_keypoints[line_index][my_first_index]
+            last_point = matrix_of_keypoints[line_index][my_last_index]
+            theta= np.arctan((first_point.pt[1]-last_point.pt[1])/(first_point.pt[0]-last_point.pt[0]))
+            print('THETA',theta)
+            rotated_image = rotateImage(cropped_input, -angle+theta)
+            cv2.putText(rotated_image, str(round(angle-theta, 2)), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
+                        cv2.LINE_AA)
+
+            matrix, matrix_of_keypoints, new_offset = analyse_matrix(rotated_image, positions, draw_blob=True,
+                                                                     auto_offset=auto_offset)
+
         #new_offset = [0,0]
         new_positions = [(positions[0][0]+new_offset[0],positions[0][1]+new_offset[1]),
                          (positions[1][0]+new_offset[0],positions[1][1]+new_offset[1])]
@@ -106,5 +141,31 @@ def analyse_each_image_separately(folder_name):
         cv2.imshow('Output', output)
         cv2.imwrite(image.replace('.jpg','')+"_out.jpeg",output)
 
+def summary_of_all_images(folder_name):
+    input_images = glob.glob(folder_name + '/*.jpg')
+    output_images = glob.glob(folder_name+'/*'+'_out.jpeg')
+    print(input_images)
+    print(output_images)
+    tall = cv2.imread(input_images[0]).shape[0]
+    width = cv2.imread(input_images[0]).shape[1]
+
+    #input_summary = cv2.imread(input_images[0])[:, (width - tall) // 2:width - (width - tall) // 2][:]
+    input_summary = cv2.imread(input_images[0])[:, 350: 1480][:]
+    output_summary = cv2.imread(output_images[0])
+
+    for i in range(1,len(input_images)) :
+        #input_summary= np.concatenate((input_summary, cv2.imread(input_images[i])[:, (width - tall) // 2:width - (width - tall) // 2][:]), axis=0)
+        input_summary= np.concatenate((input_summary, cv2.imread(input_images[i])[:, 350: 1480][:]), axis=0)
+        output_summary = np.concatenate((output_summary, cv2.imread(output_images[i])), axis=0)
+
+    image_summary = np.concatenate((input_summary, output_summary), axis=1)
+
+    cv2.imwrite( folder_name+"/image_summary.jpeg", image_summary)
+
+
+
 if __name__ == "__main__":
-    analyse_each_image_separately("/Users/Etienne/Documents/GitHub/robot-interface/images/2")
+    #/Users/Etienne/Documents/GitHub/robot-interface/images/test
+    #/Users/Etienne/Documents/GitHub/robot-interface/images/1_trait
+    analyse_each_image_separately("/Users/Etienne/Documents/GitHub/robot-interface/images/2_trait", auto_offset=True, auto_rotate=True)
+    summary_of_all_images("/Users/Etienne/Documents/GitHub/robot-interface/images/2_trait")

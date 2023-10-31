@@ -232,15 +232,15 @@ class Robot:
         await self.pick(objects)
         await self.place(objects, position)
 
-    async def save_picture(self,folder_name="", suffix=""):
+    async def save_picture(self,folder_name="", prefix="",suffix=""):
         """
         Save a picture.
         
         """
-        await self.camera.save_picture(folder_name=folder_name, suffix=suffix)
+        await self.camera.save_picture(folder_name=folder_name, prefix=prefix, suffix=suffix)
         
         
-    async def take_picture(self, obj: Pickable, obj_rem: Pickable = None, folder_name="", suffix=""):
+    async def take_picture(self, obj: Pickable, obj_rem: Pickable = None, folder_name="", prefix="", suffix=""):
         """
         Takes a picture of a specified object.
 
@@ -255,7 +255,7 @@ class Robot:
         await self.change_tool("camera")
         await self.gripper.rotate(90)
         await self.platform.move(coordinates.x, coordinates.y, constants.PICTURE_HEIGHT, constants.FEEDRATE)
-        await self.save_picture(folder_name=folder_name, suffix=suffix)
+        await self.save_picture(folder_name=folder_name,prefix=prefix, suffix=suffix)
         await self.gripper.rotate(0)
         await self.change_tool("gripper")
         await self.platform.move(coordinates.x, coordinates.y, constants.PETRI_CLERANCE, constants.FEEDRATE)

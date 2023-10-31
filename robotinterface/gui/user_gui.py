@@ -157,11 +157,11 @@ def draw_grid(grid: Grid, imshow, grid_resolution, line_thickness):
             if holder:
                 mark_H(GridPosition(x, y), imshow, grid_resolution, line_thickness)
 
-def add_pertidish(grid: Grid, grid_pos:GridPosition, name=""):
-    """Add a petri dish on the grid"""
+def add_pertidish(grid: Grid, grid_pos:GridPosition, number= "", name=""):
+    """Add a petri dish on the grid, number : position on the pile from the ground"""
     
     if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id]) // 2 < 6:
-        grid.add_object([SmallPetriBottom(associated_name=name), SmallPetriTop(associated_name=name)], grid_pos)
+        grid.add_object([SmallPetriBottom(number=number,associated_name=name), SmallPetriTop(number=number,associated_name=name)], grid_pos)
     else:
         logging.info("Max number of petri dish reached")
 
@@ -252,8 +252,8 @@ def load_grid(grid: Grid, grid_resolution: int = 100, line_thickness: int = 2, t
     
     global mouseX, mouseY, left_click, right_click, middle_click
     
-    cv2.namedWindow("Auto-One")
-    cv2.setMouseCallback("Auto-One", mouse_click)
+    cv2.namedWindow("AutoMate Interface")
+    cv2.setMouseCallback("AutoMate Interface", mouse_click)
 
     Platform = generate_grid_image(grid, grid_resolution, line_thickness)
     
@@ -283,7 +283,7 @@ def load_grid(grid: Grid, grid_resolution: int = 100, line_thickness: int = 2, t
             middle_click = False
     
     
-        cv2.imshow("Auto-One", imshow)
+        cv2.imshow("AutoMate Interface", imshow)
         key = cv2.waitKey(5)    
         
         if key == 13 or key == 27:
