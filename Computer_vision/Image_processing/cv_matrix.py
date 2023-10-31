@@ -44,7 +44,7 @@ def draw_clicks(image: np.ndarray, positions: list)->None:
         cv2.circle(image, positions[i], 2, (0,0,255), -1)
         
         
-def draw_matrix(image: np.ndarray, positions: list)->None:
+def draw_matrix(image: np.ndarray, positions: list,num_cols=10)->None:
     """
     Draws the matrix on the image
 
@@ -53,7 +53,7 @@ def draw_matrix(image: np.ndarray, positions: list)->None:
         positions (list): list of the two corners of the matrix
     """
     if len(positions) >= 2:
-        num_cols: int = 10
+        num_cols: int = num_cols
         num_rows: int = 9
         
         pos0: tuple = positions[0]
@@ -71,7 +71,7 @@ def draw_matrix(image: np.ndarray, positions: list)->None:
                 cv2.rectangle(image, pt1, pt2, (255,0,0), 1)
            
            
-def analyse_matrix(image: np.ndarray, positions: list,draw_blob=False, auto_offset=False)->np.ndarray:
+def analyse_matrix(image: np.ndarray, positions: list,draw_blob=False, auto_offset=False,num_cols=10)->np.ndarray:
     """
     Analyses the matrix and returns a matrix of 1s and 0s
 
@@ -84,7 +84,7 @@ def analyse_matrix(image: np.ndarray, positions: list,draw_blob=False, auto_offs
     """
     global colony_detector
     
-    num_cols: int = 10
+    num_cols: int = num_cols
     num_rows: int = 9
     
     matrix: np.ndarray = np.zeros((num_cols,num_rows))
@@ -146,7 +146,7 @@ def analyse_matrix(image: np.ndarray, positions: list,draw_blob=False, auto_offs
 
     return matrix, matrix_of_keypoints, new_offset
 
-def draw_resutls(image: np.ndarray, positions: list, matrix: np.ndarray, thickness: int = 2)->np.ndarray:
+def draw_resutls(image: np.ndarray, positions: list, matrix: np.ndarray, thickness: int = 2,num_cols=10)->np.ndarray:
     """
     Draws the results on the image
 
@@ -160,7 +160,7 @@ def draw_resutls(image: np.ndarray, positions: list, matrix: np.ndarray, thickne
         image (np.ndarray): image with the results drawn on it
     """
     
-    num_cols: int = 10
+    num_cols: int = num_cols
     num_rows: int = 9
     
     pos0: tuple = positions[0]

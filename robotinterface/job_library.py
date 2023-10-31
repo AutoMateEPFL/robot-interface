@@ -70,8 +70,9 @@ async def take_photo_of_all_experiments_and_reconstruct_piles(robot, grid, pic_p
 
     await robot.shutdown()
 
-def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=False):
+def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=False,num_cols=10):
     images = glob.glob(folder_name+'/*.jpg')
+    num_cols = num_cols
     #auto_rotate = False
     positions = [(240, 240), (880, 810)]
     for image in images :
@@ -98,7 +99,7 @@ def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=Fa
         cv2.putText(rotated_image, str(round(angle, 2)), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
 
         # Analyse the results
-        matrix, matrix_of_keypoints, new_offset = analyse_matrix(rotated_image, positions, draw_blob=True, auto_offset=auto_offset)
+        matrix, matrix_of_keypoints, new_offset = analyse_matrix(rotated_image, positions, draw_blob=True, auto_offset=auto_offset,num_cols=num_cols)
 
         if auto_rotate:
             #print(matrix)
@@ -129,13 +130,13 @@ def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=Fa
                         cv2.LINE_AA)
 
             matrix, matrix_of_keypoints, new_offset = analyse_matrix(rotated_image, positions, draw_blob=True,
-                                                                     auto_offset=auto_offset)
+                                                                     auto_offset=auto_offset,num_cols=num_cols)
 
         #new_offset = [0,0]
         new_positions = [(positions[0][0]+new_offset[0],positions[0][1]+new_offset[1]),
                          (positions[1][0]+new_offset[0],positions[1][1]+new_offset[1])]
 
-        output = draw_resutls(rotated_image, new_positions, matrix)
+        output = draw_resutls(rotated_image, new_positions, matrix,num_cols=num_cols)
 
         cv2.imshow('Input', cropped_input)
         cv2.imshow('Output', output)
@@ -167,5 +168,5 @@ def summary_of_all_images(folder_name):
 if __name__ == "__main__":
     #/Users/Etienne/Documents/GitHub/robot-interface/images/test
     #/Users/Etienne/Documents/GitHub/robot-interface/images/1_trait
-    analyse_each_image_separately("/Users/Etienne/Documents/GitHub/robot-interface/images/2_trait", auto_offset=True, auto_rotate=True)
+    analyse_each_image_separately("/Users/Etienne/Documents/GitHub/robot-interface/images/2_trait", auto_offset=True, auto_rotate=True,num_cols=10)
     summary_of_all_images("/Users/Etienne/Documents/GitHub/robot-interface/images/2_trait")

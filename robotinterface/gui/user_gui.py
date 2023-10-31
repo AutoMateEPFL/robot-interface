@@ -161,7 +161,12 @@ def add_pertidish(grid: Grid, grid_pos:GridPosition, number= "", name=""):
     """Add a petri dish on the grid, number : position on the pile from the ground"""
     
     if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id]) // 2 < 6:
-        grid.add_object([SmallPetriBottom(number=number,associated_name=name), SmallPetriTop(number=number,associated_name=name)], grid_pos)
+        if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id])>0 and grid.object_grid[grid_pos.y_id][grid_pos.x_id][0] == grid.cam:
+            logging.info("Cannot use photo spot")
+        elif len(grid.object_grid[grid_pos.y_id][grid_pos.x_id])>0 and grid.object_grid[grid_pos.y_id][grid_pos.x_id][0] == grid.stack:
+            logging.info("Cannot use stack spot")
+        else :
+            grid.add_object([SmallPetriBottom(number=number,associated_name=name), SmallPetriTop(number=number,associated_name=name)], grid_pos)
     else:
         logging.info("Max number of petri dish reached")
 
@@ -208,11 +213,17 @@ def remove_pertidish(grid: Grid, grid_pos:GridPosition):
     
 def add_plateholder(grid: Grid, grid_pos:GridPosition):
     """"Add a plate holder on the grid"""
-    
-    objects = grid.object_grid[grid_pos.y_id][grid_pos.x_id]
-    objects = [PlateHolder()] + objects	
-    grid.object_grid[grid_pos.y_id][grid_pos.x_id] = objects 
-    grid.height_grid[grid_pos.y_id][grid_pos.x_id] += PlateHolder().height
+    if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id]) > 0 and grid.object_grid[grid_pos.y_id][grid_pos.x_id][
+        0] == grid.cam:
+        logging.info("Cannot use photo spot")
+    elif len(grid.object_grid[grid_pos.y_id][grid_pos.x_id]) > 0 and grid.object_grid[grid_pos.y_id][grid_pos.x_id][
+        0] == grid.stack:
+        logging.info("Cannot use stack spot")
+    else:
+        objects = grid.object_grid[grid_pos.y_id][grid_pos.x_id]
+        objects = [PlateHolder()] + objects
+        grid.object_grid[grid_pos.y_id][grid_pos.x_id] = objects
+        grid.height_grid[grid_pos.y_id][grid_pos.x_id] += PlateHolder().height
 
 def remove_plateholder(grid: Grid, grid_pos:GridPosition):
     """Remove a plate holder on the grid"""
