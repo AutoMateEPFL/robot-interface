@@ -67,7 +67,13 @@ async def main():
             await robot.pick_and_place(target, pic_pos)
 
             await robot.take_picture(target[0], obj_rem=target[1], folder_name=experiment.associated_name, prefix="marker_"+str(target[0].number)+"_",suffix="_"+str(target[0].associated_name))
-            await robot.pick_and_place(target, stack_pos)
+            if num != n_petri-1:
+                await robot.pick_and_place(target, stack_pos)
+            else:
+                if reconstruct_pile :
+                    await robot.pick_and_place(target, pos_experiment)
+                else :
+                    await robot.pick_and_place(target, stack_pos)
 
         if reconstruct_pile:
             # RECONSTRUCT THE PILE ON THE INITIAL POS

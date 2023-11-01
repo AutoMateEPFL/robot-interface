@@ -32,11 +32,16 @@ class SmallPetriBottom(Pickable):
     This class defines the bottom part of a petri dish
     """
     name = "Small Petri Bottom"
-    height = 12.5
-    def __init__(self,number="",associated_name=""):
+
+    def __init__(self,number="",associated_name="",type="Corning"):
         super().__init__()
         self.associated_name = associated_name
         self.number = number
+        self.type = type
+        if self.type == "Corning":
+            self.height = 12.5
+        elif self.type == "SARSTEDT":
+            self.height = 12.5
 
     def set_associated_name(self, associated_name):
         self.associated_name = associated_name
@@ -45,13 +50,17 @@ class SmallPetriTop(Pickable):
     """
     This class defines the top part of a small petri dish
     """
-    height = 8.5
     name = "Small Petri Top"
 
-    def __init__(self, number="", associated_name=""):
+    def __init__(self, number="", associated_name="",type="Corning"):
         super().__init__()
         self.associated_name = associated_name
         self.number = number
+        self.type = type
+        if self.type == "Corning":
+            self.height = 8.5
+        elif self.type == "SARSTEDT":
+            self.height = 7.9
 
     def set_associated_name(self, associated_name):
         self.associated_name = associated_name
