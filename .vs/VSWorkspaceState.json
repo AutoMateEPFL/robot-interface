@@ -1,15 +1,15 @@
 {
   "ExpandedNodes": [
     "",
-    "\\images",
+    "\\Computer_vision",
+    "\\Computer_vision\\Image_processing",
     "\\robotinterface",
     "\\robotinterface\\gui",
     "\\robotinterface\\hardware_control",
     "\\robotinterface\\hardware_control\\drivers",
     "\\robotinterface\\hardware_control\\drivers\\camera",
-    "\\robotinterface\\hardware_control\\drivers\\dynamixel",
-    "\\robotinterface\\hardware_control\\drivers\\grbl",
-    "\\robotinterface\\hardware_control\\FirmwareSettings"
+    "\\robotinterface\\hardware_control\\FirmwareSettings",
+    "\\robotinterface\\logistics"
   ],
   "SelectedNode": "\\robotinterface\\protocol_one_experiment.py",
   "PreviewInSolutionExplorer": false

@@ -45,7 +45,7 @@ async def main():
     list_of_experiments = find_all_experiments(grid)
     ## to do function to load experiment
 
-    reconstruct_pile = False
+    reconstruct_pile = True
 
     # FOR EACH EXPERIMENT TAKE PICTURES AND DECONSTRUCT THE PILE
 
