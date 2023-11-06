@@ -8,7 +8,7 @@ real_points = np.array([[(10,10),(30,10)],
 points = np.array([[10,10],[30,10],[10,30],[30,30]])
 
 real_points_vector = np.array([10,30,10,30,10,10,30,30])
-real_points_vector = real_points_vector +15 + np.random.random((1,8))[0]
+real_points_vector = real_points_vector +0 + np.random.random((1,8))[0]
 #print('real_points_vector',real_points_vector)
 d = 20 # distance between points, known
 
@@ -16,7 +16,7 @@ def rotation_matrix(theta):
     return np.array([[np.cos(theta),-np.sin(theta)],
                      [np.sin(theta),np.cos(theta)]])
 
-theta = 5*np.pi/180
+theta = 10*np.pi/180
 R_theta = rotation_matrix(theta)
 rotated_points_list = []
 

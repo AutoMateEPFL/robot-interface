@@ -74,7 +74,10 @@ def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=Fa
     images = glob.glob(folder_name+'/*.jpg')
     num_cols = num_cols
     #auto_rotate = False
-    positions = [(240, 240), (880, 810)]
+    if num_cols == 10:
+        positions = [(240, 240), (880, 810)]
+    elif num_cols == 9:
+        positions = [(240, 240), (840, 810)]
     for image in images :
         print(image)
         input_image = cv2.imread(image)
@@ -168,5 +171,5 @@ def summary_of_all_images(folder_name):
 if __name__ == "__main__":
     #/Users/Etienne/Documents/GitHub/robot-interface/images/test
     #/Users/Etienne/Documents/GitHub/robot-interface/images/1_trait
-    analyse_each_image_separately("/Users/Etienne/Documents/GitHub/robot-interface/images/2_trait", auto_offset=True, auto_rotate=True,num_cols=10)
-    summary_of_all_images("/Users/Etienne/Documents/GitHub/robot-interface/images/2_trait")
+    analyse_each_image_separately("/Users/Etienne/Documents/GitHub/robot-interface/images/celso_1", auto_offset=False, auto_rotate=False,num_cols=9)
+    summary_of_all_images("/Users/Etienne/Documents/GitHub/robot-interface/images/celso_1")

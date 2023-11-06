@@ -175,19 +175,24 @@ def add_experiment(grid: Grid, grid_pos: GridPosition, tkinter_window):
     """Add an experiment  on the grid"""
 
     if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id]) // 2 < 2:
-        #create empty experiment
-        ThisExperiment = Experiment(name="")
-        ThisExperiment.load_external_window(tkinter_window)
+        if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id])>0 and grid.object_grid[grid_pos.y_id][grid_pos.x_id][0] == grid.cam:
+            logging.info("Cannot use photo spot")
+        elif len(grid.object_grid[grid_pos.y_id][grid_pos.x_id])>0 and grid.object_grid[grid_pos.y_id][grid_pos.x_id][0] == grid.stack:
+            logging.info("Cannot use stack spot")
+        else :
+            #create empty experiment
+            ThisExperiment = Experiment(name="")
+            ThisExperiment.load_external_window(tkinter_window)
 
-        #Setup questions
-        ExperimentNameQuestion = Question_setup(ThisExperiment.window.inner, "Name of the experiment ", ThisExperiment.root)
-        for i in range(6):
-           ThisExperiment.question_list.append(Question(ThisExperiment.window.inner, "Name of the marker " + str(i + 1)))
+            #Setup questions
+            ExperimentNameQuestion = Question_setup(ThisExperiment.window.inner, "Name of the experiment ", ThisExperiment.root)
+            for i in range(6):
+               ThisExperiment.question_list.append(Question(ThisExperiment.window.inner, "Name of the marker " + str(i + 1)))
 
-        ThisExperiment.window.mainloop()
+            ThisExperiment.window.mainloop()
 
-        # Updates name of the experiment and names of the markers
-        ThisExperiment.update_name(ExperimentNameQuestion.answer)
+            # Updates name of the experiment and names of the markers
+            ThisExperiment.update_name(ExperimentNameQuestion.answer)
         for i in range(6):
            ThisExperiment.marker_list.append(ThisExperiment.question_list[i].answer)
 

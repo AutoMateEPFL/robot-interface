@@ -96,7 +96,8 @@ def analyse_matrix(image: np.ndarray, positions: list,draw_blob=False, auto_offs
     
     bw: np.ndarray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # old block value : 71
-    tr: np.ndarray = cv2.adaptiveThreshold(bw,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 55, -10)
+    # block value for 55
+    tr: np.ndarray = cv2.adaptiveThreshold(bw,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 155, -10)
 
     cv2.imshow('tr', tr)
     cv2.imwrite("/Users/Etienne/Documents/GitHub/robot-interface/Computer_vision/Image_processing/matrix_gaussian.jpeg",tr)
