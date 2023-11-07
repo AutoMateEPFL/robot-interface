@@ -77,7 +77,7 @@ def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=Fa
     if num_cols == 10:
         positions = [(240, 240), (880, 810)]
     elif num_cols == 9:
-        positions = [(240, 240), (840, 810)]
+        positions = [(200, 250), (780, 830)]
     for image in images :
         print(image)
         input_image = cv2.imread(image)
@@ -86,7 +86,7 @@ def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=Fa
 
         #cropped_input = input_image[:,(width-tall)//2:width-(width-tall)//2][:]
 
-        cropped_input = input_image[:, 350:1480][:]
+        cropped_input = input_image[:, 430:1560][:]
 
         print(cropped_input.shape)
 
@@ -154,15 +154,15 @@ def summary_of_all_images(folder_name):
     width = cv2.imread(input_images[0]).shape[1]
 
     #input_summary = cv2.imread(input_images[0])[:, (width - tall) // 2:width - (width - tall) // 2][:]
-    input_summary = cv2.imread(input_images[0])[:, 350: 1480][:]
+    input_summary = cv2.imread(input_images[0])[:, 430:1560][:]
     output_summary = cv2.imread(output_images[0])
 
     for i in range(1,len(input_images)) :
         #input_summary= np.concatenate((input_summary, cv2.imread(input_images[i])[:, (width - tall) // 2:width - (width - tall) // 2][:]), axis=0)
-        input_summary= np.concatenate((input_summary, cv2.imread(input_images[i])[:, 350: 1480][:]), axis=0)
-        output_summary = np.concatenate((output_summary, cv2.imread(output_images[i])), axis=0)
+        input_summary= np.concatenate((input_summary, cv2.imread(input_images[i])[:, 430:1560][:]), axis=1)
+        output_summary = np.concatenate((output_summary, cv2.imread(output_images[i])), axis=1)
 
-    image_summary = np.concatenate((input_summary, output_summary), axis=1)
+    image_summary = np.concatenate((input_summary, output_summary), axis=0)
 
     cv2.imwrite( folder_name+"/image_summary.jpeg", image_summary)
 
@@ -171,5 +171,5 @@ def summary_of_all_images(folder_name):
 if __name__ == "__main__":
     #/Users/Etienne/Documents/GitHub/robot-interface/images/test
     #/Users/Etienne/Documents/GitHub/robot-interface/images/1_trait
-    analyse_each_image_separately("/Users/Etienne/Documents/GitHub/robot-interface/images/celso_1", auto_offset=False, auto_rotate=False,num_cols=9)
-    summary_of_all_images("/Users/Etienne/Documents/GitHub/robot-interface/images/celso_1")
+    analyse_each_image_separately("/Users/Etienne/Documents/GitHub/robot-interface/images/black_1", auto_offset=True, auto_rotate=False,num_cols=9)
+    summary_of_all_images("/Users/Etienne/Documents/GitHub/robot-interface/images/black_1")

@@ -87,6 +87,9 @@ async def main():
                     else:
                         target = [object]
                 await robot.pick_and_place(target, pos_experiment)
+        analyse_each_image_separately("/Users/Etienne/Documents/GitHub/robot-interface/images/"+experiment.name,
+                                      auto_offset=True, auto_rotate=False, num_cols=9)
+        summary_of_all_images("/Users/Etienne/Documents/GitHub/robot-interface/images/"+experiment.name)
 
     await robot.shutdown()
 

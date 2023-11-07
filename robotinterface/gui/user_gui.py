@@ -204,7 +204,7 @@ def add_experiment(grid: Grid, grid_pos: GridPosition, tkinter_window):
         # PlateHolder associated with the experiment
         for i in range(6):
             if ThisExperiment.marker_list[i] !='':
-                add_pertidish(grid, grid_pos,name=ThisExperiment.question_list[i].answer)
+                add_pertidish(grid, grid_pos,number=i,name=ThisExperiment.question_list[i].answer)
     else:
         logging.info("Max number of Experiment reached")
         
