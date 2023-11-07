@@ -171,5 +171,5 @@ def summary_of_all_images(folder_name):
 if __name__ == "__main__":
     #/Users/Etienne/Documents/GitHub/robot-interface/images/test
     #/Users/Etienne/Documents/GitHub/robot-interface/images/1_trait
-    analyse_each_image_separately("/Users/Etienne/Documents/GitHub/robot-interface/images/black_1", auto_offset=True, auto_rotate=False,num_cols=9)
-    summary_of_all_images("/Users/Etienne/Documents/GitHub/robot-interface/images/black_1")
+    analyse_each_image_separately("/Users/Etienne/Documents/GitHub/robot-interface/images/demo", auto_offset=True, auto_rotate=False,num_cols=9)
+    summary_of_all_images("/Users/Etienne/Documents/GitHub/robot-interface/images/demo")

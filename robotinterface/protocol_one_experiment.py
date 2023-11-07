@@ -74,6 +74,11 @@ async def main():
                     await robot.pick_and_place(target, pos_experiment)
                 else :
                     await robot.pick_and_place(target, stack_pos)
+        print("/Users/Etienne/Documents/GitHub/robot-interface/images/"+str(experiment.associated_name))
+        analyse_each_image_separately("/Users/Etienne/Documents/GitHub/robot-interface/images/"+str(experiment.associated_name),
+                                      auto_offset=True, auto_rotate=False, num_cols=9)
+        summary_of_all_images("/Users/Etienne/Documents/GitHub/robot-interface/images/"+str(experiment.associated_name))
+        summary_picture = cv2.imread("/Users/Etienne/Documents/GitHub/robot-interface/images/"+str(experiment.associated_name)+"/image_summary.jpeg")
 
         if reconstruct_pile:
             # RECONSTRUCT THE PILE ON THE INITIAL POS
@@ -87,9 +92,8 @@ async def main():
                     else:
                         target = [object]
                 await robot.pick_and_place(target, pos_experiment)
-        analyse_each_image_separately("/Users/Etienne/Documents/GitHub/robot-interface/images/"+experiment.name,
-                                      auto_offset=True, auto_rotate=False, num_cols=9)
-        summary_of_all_images("/Users/Etienne/Documents/GitHub/robot-interface/images/"+experiment.name)
+
+
 
     await robot.shutdown()
 
