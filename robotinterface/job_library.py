@@ -71,13 +71,13 @@ async def take_photo_of_all_experiments_and_reconstruct_piles(robot, grid, pic_p
     await robot.shutdown()
 
 def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=False,num_cols=10):
-    images = glob.glob(folder_name+'/*.jpg')
+    images = sorted(glob.glob(folder_name+'/*.jpg'))
     num_cols = num_cols
     #auto_rotate = False
     if num_cols == 10:
         positions = [(240, 240), (880, 810)]
     elif num_cols == 9:
-        positions = [(200, 250), (780, 830)]
+        positions = [(200, 270), (780, 830)]
     for image in images :
         print(image)
         input_image = cv2.imread(image)
@@ -86,7 +86,7 @@ def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=Fa
 
         #cropped_input = input_image[:,(width-tall)//2:width-(width-tall)//2][:]
 
-        cropped_input = input_image[:, 430:1560][:]
+        cropped_input = input_image[:, 380:1500][:]
 
         print(cropped_input.shape)
 
@@ -146,20 +146,20 @@ def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=Fa
         cv2.imwrite(image.replace('.jpg','')+"_out.jpeg",output)
 
 def summary_of_all_images(folder_name):
-    input_images = glob.glob(folder_name + '/*.jpg')
-    output_images = glob.glob(folder_name+'/*'+'_out.jpeg')
+    input_images = sorted(glob.glob(folder_name + '/*.jpg'))
+    output_images = sorted(glob.glob(folder_name+'/*'+'_out.jpeg'))
     print(input_images)
     print(output_images)
     tall = cv2.imread(input_images[0]).shape[0]
     width = cv2.imread(input_images[0]).shape[1]
 
     #input_summary = cv2.imread(input_images[0])[:, (width - tall) // 2:width - (width - tall) // 2][:]
-    input_summary = cv2.imread(input_images[0])[:, 430:1560][:]
+    input_summary = cv2.imread(input_images[0])[:, 380:1500][:]
     output_summary = cv2.imread(output_images[0])
 
     for i in range(1,len(input_images)) :
         #input_summary= np.concatenate((input_summary, cv2.imread(input_images[i])[:, (width - tall) // 2:width - (width - tall) // 2][:]), axis=0)
-        input_summary= np.concatenate((input_summary, cv2.imread(input_images[i])[:, 430:1560][:]), axis=1)
+        input_summary= np.concatenate((input_summary, cv2.imread(input_images[i])[:, 380:1500][:]), axis=1)
         output_summary = np.concatenate((output_summary, cv2.imread(output_images[i])), axis=1)
 
     image_summary = np.concatenate((input_summary, output_summary), axis=0)
