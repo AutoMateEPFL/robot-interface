@@ -77,8 +77,12 @@ def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=Fa
     if num_cols == 10:
         positions = [(240, 240), (880, 810)]
     elif num_cols == 9:
-        positions = [(200, 270), (780, 830)]
+        positions = [(200, 250), (780, 830)]
+
+    matrix_list = []
+    marker_names_list = []
     for image in images :
+        marker_names_list.append(image[-5])
         print(image)
         input_image = cv2.imread(image)
         tall = input_image.shape[0]
@@ -100,6 +104,8 @@ def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=Fa
             angle = 0
 
         cv2.putText(rotated_image, str(round(angle, 2)), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
+        if image == images[0]:
+            background = rotated_image.copy()
 
         # Analyse the results
         matrix, matrix_of_keypoints, new_offset = analyse_matrix(rotated_image, positions, draw_blob=True, auto_offset=auto_offset,num_cols=num_cols)
@@ -134,16 +140,23 @@ def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=Fa
 
             matrix, matrix_of_keypoints, new_offset = analyse_matrix(rotated_image, positions, draw_blob=True,
                                                                      auto_offset=auto_offset,num_cols=num_cols)
+        matrix_list.append(matrix)
 
         #new_offset = [0,0]
         new_positions = [(positions[0][0]+new_offset[0],positions[0][1]+new_offset[1]),
                          (positions[1][0]+new_offset[0],positions[1][1]+new_offset[1])]
-
+        if image == images[0]:
+            new_positions_0 = new_positions
         output = draw_resutls(rotated_image, new_positions, matrix,num_cols=num_cols)
 
         cv2.imshow('Input', cropped_input)
         cv2.imshow('Output', output)
         cv2.imwrite(image.replace('.jpg','')+"_out.jpeg",output)
+
+    aggregated_image = create_aggregated_matrix(matrix_list=matrix_list, marker_names_list=marker_names_list,
+                                                positions=new_positions_0, num_cols=num_cols,background=background,
+                                                experiment_name=folder_name.split("/")[-1])
+    cv2.imwrite(folder_name + "/aggregated_matrix.jpeg", aggregated_image)
 
 def summary_of_all_images(folder_name):
     input_images = sorted(glob.glob(folder_name + '/*.jpg'))
@@ -166,7 +179,46 @@ def summary_of_all_images(folder_name):
 
     cv2.imwrite( folder_name+"/image_summary.jpeg", image_summary)
 
+def create_aggregated_matrix(matrix_list,marker_names_list,positions,num_cols,background=0,experiment_name=""):
+    N = len(matrix_list)
+    if background.all == 0 :
+        image = np.zeros((1000,1000,3))
+        image = cv2.imread("/Users/Etienne/Documents/GitHub/robot-interface/images/20230817153856.jpg")[:,430:1430]
+    else:
+        #image = cv2.imread(background)[:,430:1430]
+        image = background
+    print('marker_names_list',marker_names_list)
 
+    if experiment_name != "":
+        cv2.putText(image, "Experiment: "+str(experiment_name), (320,220),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1.7, (255, 255, 255), 2, cv2.LINE_AA)
+
+    if len(positions) >= 2:
+        num_cols: int = num_cols
+        num_rows: int = 9
+
+        pos0: tuple = positions[0]
+        pos1: tuple = positions[1]
+        offset: tuple = ((pos1[0] - pos0[0]) / num_cols, (pos1[1] - pos0[1]) / num_rows)
+
+        for i in range(num_cols):
+            for j in range(num_rows):
+                if j == 4:
+                    continue
+
+                pt1: tuple = int(pos0[0] + i * offset[0]), int(pos0[1] + j * offset[1])
+                pt2: tuple = int(pos0[0] + (i + 1) * offset[0]) - 1, int(pos0[1] + (j + 1) * offset[1]) - 1
+                #BGR
+                if matrix_list[0][i, j] == 1:
+                    cv2.rectangle(image, pt1, pt2, (0, 255, 0), 2)
+                else :
+                    cv2.rectangle(image, pt1, pt2, (0, 0, 255), 2)
+
+                for k in range(0,N):
+                    if matrix_list[k][i,j]:
+                        cv2.putText(image, str(marker_names_list[k]), (5+pt1[0]+30*(k%2),-40+pt2[1]+30*k//2 ),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2, cv2.LINE_AA)
+        return image
 
 if __name__ == "__main__":
     #/Users/Etienne/Documents/GitHub/robot-interface/images/test
