@@ -49,6 +49,7 @@ async def main():
 
     # FOR EACH EXPERIMENT TAKE PICTURES AND DECONSTRUCT THE PILE
 
+
     for experiment in list_of_experiments:
         pos_experiment = grid.find_object(experiment)
         x_exp, y_exp = pos_experiment.x_id, pos_experiment.y_id
@@ -78,10 +79,7 @@ async def main():
         #analyse_each_image_separately("/Users/Etienne/Documents/GitHub/robot-interface/images/"+str(experiment.associated_name),
         #                              auto_offset=True, auto_rotate=False, num_cols=9)
         #summary_of_all_images("/Users/Etienne/Documents/GitHub/robot-interface/images/"+str(experiment.associated_name))
-        summary_picture = cv2.imread(r"C:\Users\AutoMate EPFL\Documents\GitHub\robot-interface\images\demo\image_summary.jpeg")
-        summary_picture = cv2.resize(summary_picture,dsize=(1300,800))
-        cv2.imshow("",summary_picture)
-        cv2.waitKey(0)
+
 
 
         if reconstruct_pile:
