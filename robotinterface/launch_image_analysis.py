@@ -126,7 +126,7 @@ if __name__ == "__main__":
     NumberOfColsQuestion.entry.insert(0, "9")
 
     to_aggregate = tk.IntVar()
-    tk.Checkbutton(ThisExperiment.root, text='Aggregate results', variable=to_aggregate, onvalue=0, offvalue=1).pack()
+    tk.Checkbutton(ThisExperiment.window.inner, text='Aggregate results', variable=to_aggregate, onvalue=0, offvalue=1).pack()
 
     ThisExperiment.update_name(ExperimentNameQuestion._answer)
 
