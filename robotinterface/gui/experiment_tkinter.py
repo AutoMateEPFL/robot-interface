@@ -93,9 +93,18 @@ class Question:
         name: Empty first, filled out by tkinter then
 
     """
-    def __init__(self, parent, question):
+    def __init__(self, parent, question, tkinter_window, setup_question = False):
         self.parent = parent
-        self.question = question
+        self._question = question
+        self._setup_question = setup_question
+        self._tkinter_window = tkinter_window
+        if self._setup_question :
+            self.labelframe = tk.LabelFrame(self.parent, text=self._question)
+            self.labelframe.pack(fill="both", expand=True)
+            self.create_validator()
+        else :
+            self.labelframe = tk.LabelFrame(self.parent, text="Marker (empty if not used) :")
+            self.labelframe.pack(fill="both", expand=True)
         self.create_widgets()
         self.answer = ""
 
@@ -103,47 +112,12 @@ class Question:
         value = str(self.entry.get())
         print(str(self.entry.get()))
         self.answer =value
-
-    def create_widgets(self):
-        self.labelframe = tk.LabelFrame(self.parent, text="Marker (empty if not used) :")
-        self.labelframe.pack(fill="both", expand=True)
-
-        self.label = tk.Label(self.labelframe, text= self.question)
-        self.label.pack(expand=True, fill='both')
-
-        self.entry = tk.Entry(self.labelframe)
-        self.entry.pack()
-
-        self.button = tk.Button(self.labelframe, text="Validate", command=lambda : self.button_function())
-        self.button.pack()
-
-class Question_setup:
-    """
-    This class represents question on experiment name.
-
-    Args:
-        name: Empty first, filled out by tkinter then
-
-    """
-
-    def __init__(self, parent, question, tkinter_window):
-        self.parent = parent
-        self.tkinter_window = tkinter_window
-        self.question = question
-        self.create_validator()
-        self.create_widgets()
-        self.answer = ""
-
-    def button_function(self):
-        value = str(self.entry.get())
-        print(str(self.entry.get()))
-        self.answer =value
-
     def validate_function(self):
-        self.tkinter_window.destroy()
+        self._tkinter_window.destroy()
 
     def create_widgets(self):
-        self.label = tk.Label(self.labelframe, text= self.question)
+
+        self.label = tk.Label(self.labelframe, text= self._question)
         self.label.pack(expand=True, fill='both')
 
         self.entry = tk.Entry(self.labelframe)
@@ -153,8 +127,47 @@ class Question_setup:
         self.button.pack()
 
     def create_validator(self):
-        self.labelframe = tk.LabelFrame(self.parent)
-        self.labelframe.pack(fill="both", expand=True)
-        self.button = tk.Button(self.labelframe, text="OK", command=self.tkinter_window.destroy)
+        self.button = tk.Button(self.labelframe, text="OK", command=self._tkinter_window.destroy)
         self.button.pack()
-
+#
+# class Question_setup:
+#     """
+#     This class represents question on experiment name.
+#
+#     Args:
+#         name: Empty first, filled out by tkinter then
+#
+#     """
+#
+#     def __init__(self, parent, question, tkinter_window):
+#         self.parent = parent
+#         self.tkinter_window = tkinter_window
+#         self.question = question
+#         self.create_validator()
+#         self.create_widgets()
+#         self.answer = ""
+#
+#     def button_function(self):
+#         value = str(self.entry.get())
+#         print(str(self.entry.get()))
+#         self.answer =value
+#
+#     def validate_function(self):
+#         self.tkinter_window.destroy()
+#
+#     def create_widgets(self):
+#         self.label = tk.Label(self.labelframe, text= self.question)
+#         self.label.pack(expand=True, fill='both')
+#
+#         self.entry = tk.Entry(self.labelframe)
+#         self.entry.pack()
+#
+#         self.button = tk.Button(self.labelframe, text="Validate", command=lambda : self.button_function())
+#         self.button.pack()
+#
+#     def create_validator(self):
+#         self.labelframe = tk.LabelFrame(self.parent)
+#         self.labelframe.pack(fill="both", expand=True)
+#         self.button = tk.Button(self.labelframe, text="OK", command=self.tkinter_window.destroy)
+#         self.button.pack()
+#

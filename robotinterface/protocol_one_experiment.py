@@ -42,16 +42,15 @@ async def main():
 
     grid = load_grid(grid)
 
-    list_of_experiments = find_all_experiments(grid)
+    list_of_experiments = find_all_PlateHolder(grid)
     ## to do function to load experiment
 
     reconstruct_pile = True
 
     # FOR EACH EXPERIMENT TAKE PICTURES AND DECONSTRUCT THE PILE
-
-
-    for experiment in list_of_experiments:
-        pos_experiment = grid.find_object(experiment)
+    for plate_holder in list_of_experiments:
+        save_datalog_of_an_experiment(plate_holder)
+        pos_experiment = grid.find_object(plate_holder)
         x_exp, y_exp = pos_experiment.x_id, pos_experiment.y_id
         n_petri = (len(grid.object_grid[y_exp][x_exp]) - 1) // 2
         print("n petri", n_petri)
@@ -67,7 +66,7 @@ async def main():
 
             await robot.pick_and_place(target, pic_pos)
 
-            await robot.take_picture(target[0], obj_rem=target[1], folder_name=experiment.associated_name, prefix="marker_"+str(target[0].number)+"_",suffix="_"+str(target[0].associated_name))
+            await robot.take_picture(target[0], obj_rem=target[1], folder_name=plate_holder.experiment.associated_name, prefix="marker_"+str(target[0].number)+"_",suffix="_"+str(target[0].associated_name))
             if num != n_petri-1:
                 await robot.pick_and_place(target, stack_pos)
             else:
@@ -79,8 +78,6 @@ async def main():
         #analyse_each_image_separately("/Users/Etienne/Documents/GitHub/robot-interface/images/"+str(experiment.associated_name),
         #                              auto_offset=True, auto_rotate=False, num_cols=9)
         #summary_of_all_images("/Users/Etienne/Documents/GitHub/robot-interface/images/"+str(experiment.associated_name))
-
-
 
         if reconstruct_pile:
             # RECONSTRUCT THE PILE ON THE INITIAL POS

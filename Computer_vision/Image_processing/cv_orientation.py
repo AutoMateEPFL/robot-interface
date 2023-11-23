@@ -37,7 +37,7 @@ def projection(pt_to_project: np.ndarray, vect: np.ndarray, pt:np.ndarray)->np.n
     
     return proj
 
-def fing_perti_angle(image: np.ndarray)->float:
+def fing_petri_angle(image: np.ndarray)->float:
     """
     Finds the angle of the petri dish using the Hough transform on the Canny edge detection
 
@@ -92,7 +92,7 @@ if __name__ == '__main__':
 
         input = rotateImage(image, user_angle)
         
-        angle = fing_perti_angle(input)
+        angle = fing_petri_angle(input)
         output = rotateImage(input, -angle)
         
         cv2.putText(input, str(round(angle, 2)), (50,100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2, cv2.LINE_AA)

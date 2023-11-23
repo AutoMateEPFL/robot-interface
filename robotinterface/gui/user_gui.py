@@ -185,9 +185,9 @@ def add_experiment(grid: Grid, grid_pos: GridPosition, tkinter_window):
             ThisExperiment.load_external_window(tkinter_window)
 
             #Setup questions
-            ExperimentNameQuestion = Question_setup(ThisExperiment.window.inner, "Name of the experiment ", ThisExperiment.root)
+            ExperimentNameQuestion = Question(ThisExperiment.window.inner, "Name of the experiment ", ThisExperiment.root,setup_question=True)
             for i in range(6):
-               ThisExperiment.question_list.append(Question(ThisExperiment.window.inner, "Name of the marker " + str(i + 1)))
+               ThisExperiment.question_list.append(Question(ThisExperiment.window.inner, "Name of the marker " + str(i + 1),tkinter_window=ThisExperiment.root))
 
             ThisExperiment.window.mainloop()
 
@@ -288,15 +288,15 @@ def load_grid(grid: Grid, grid_resolution: int = 100, line_thickness: int = 2, t
             click_pos = GridPosition(mouseX//(grid_resolution+line_thickness), mouseY//(grid_resolution+line_thickness))
             add_pertidish(grid, click_pos)
             left_click = False
-        elif right_click:
+        elif middle_click:
             click_pos = GridPosition(mouseX//(grid_resolution+line_thickness), mouseY//(grid_resolution+line_thickness))
             remove_pertidish(grid, click_pos)
-            right_click = False
-        elif middle_click:
+            middle_click = False
+        elif right_click:
             click_pos = GridPosition(mouseX//(grid_resolution+line_thickness), mouseY//(grid_resolution+line_thickness))
             #add_plateholder(grid, click_pos)
             add_experiment(grid, click_pos,tkinter_window)
-            middle_click = False
+            right_click = False
     
     
         cv2.imshow("AutoMate Interface", imshow)

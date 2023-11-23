@@ -97,7 +97,7 @@ def analyse_matrix(image: np.ndarray, positions: list,draw_blob=False, auto_offs
     bw: np.ndarray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # old block value : 71
     # block value for 55
-    tr: np.ndarray = cv2.adaptiveThreshold(bw,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 55, -10)
+    tr: np.ndarray = cv2.adaptiveThreshold(bw,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 65, -10)
 
     cv2.imshow('tr', tr)
     cv2.imwrite("/Users/Etienne/Documents/GitHub/robot-interface/Computer_vision/Image_processing/matrix_gaussian.jpeg",tr)
@@ -126,6 +126,7 @@ def analyse_matrix(image: np.ndarray, positions: list,draw_blob=False, auto_offs
             delta_x, delta_y = (pt2[0] + pt1[0]) / 2, (pt2[1] + pt1[1]) / 2
             # Average over all points
             new_offset = [new_offset[0]+(keypoint.pt[0] - delta_x)/N_blob,new_offset[1] + (keypoint.pt[1] - delta_y)/N_blob]
+
     if auto_offset:
         # Shift the matrix with the obtained delta :
         new_positions = [(positions[0][0] + new_offset[0], positions[0][1] + new_offset[1]),
@@ -143,7 +144,6 @@ def analyse_matrix(image: np.ndarray, positions: list,draw_blob=False, auto_offs
                     cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), int(keypoint.size), (255,0,0), 2)
                     cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), 2, (255,0,0), 2)
                     # cv2.putText(image, str(round(keypoint.size, 2)), (int(keypoint.pt[0]), int(keypoint.pt[1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2, cv2.LINE_AA)
-
 
     return matrix, matrix_of_keypoints, new_offset
 
