@@ -99,7 +99,7 @@ def analyse_matrix(image: np.ndarray, positions: list,draw_blob=False, auto_offs
     # block value for 55
     tr: np.ndarray = cv2.adaptiveThreshold(bw,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 65, -10)
 
-    cv2.imshow('tr', tr)
+    #cv2.imshow('tr', tr)
     cv2.imwrite("/Users/Etienne/Documents/GitHub/robot-interface/Computer_vision/Image_processing/matrix_gaussian.jpeg",tr)
 
     keypoints: list(cv2.KeyPoint) = colony_detector.detect(tr)
