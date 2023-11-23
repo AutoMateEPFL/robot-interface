@@ -117,8 +117,6 @@ def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=Fa
             new_positions_0 = new_positions
         output = draw_resutls(rotated_image, new_positions, matrix,num_cols=num_cols)
 
-        cv2.imshow('Input', cropped_input)
-        cv2.imshow('Output', output)
         cv2.imwrite(image.replace('.jpg','')+"_out.jpeg",output)
 
     if aggregation:
@@ -221,7 +219,10 @@ def save_datalog_of_an_experiment(experiment):
     timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M")
     text = "EXPERIMENT LOG, date : "+timestamp+ " , name : "+experiment.associated_name + '\n'
     text+=("LIST OF MARKER NAMES FROM GROUND TO TOP :")
-    path = os.path.join('..', 'images',experiment.associated_name)
+    if platform.system() == 'Windows':
+        path = os.path.join( 'images',experiment.associated_name)
+    else:
+        path = os.path.join('..', 'images',experiment.associated_name)
     #path = "../images/"+experiment.associated_name
     equivalent_names = ['a', 'b', 'c', 'd', 'e', 'f']
 

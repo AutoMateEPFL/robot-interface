@@ -131,7 +131,10 @@ if __name__ == "__main__":
     ThisExperiment.update_name(ExperimentNameQuestion._answer)
 
     ThisExperiment.root.mainloop()
-    path = os.path.join('..','images',ExperimentNameQuestion._answer)
+    if platform.system() == 'Windows':
+        path = os.path.join('images', ExperimentNameQuestion._answer)
+    else:
+        path = os.path.join('..','images',ExperimentNameQuestion._answer)
     #path = "../images/"+str(ExperimentNameQuestion._answer)
     print("path",path)
     analyse_each_image_separately(path, auto_offset=True, auto_rotate=False,

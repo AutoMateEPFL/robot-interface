@@ -228,7 +228,7 @@ if __name__ == '__main__':
         matrix = analyse_matrix(imshow, positions)
         imshow = draw_resutls(imshow, positions, matrix)
         
-        cv2.imshow(windowname, imshow)
+        #cv2.imshow(windowname, imshow)
         
         key = cv2.waitKey(5)
         
