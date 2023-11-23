@@ -9,8 +9,10 @@ import numpy as np
 import datetime
 if platform.system() == 'Windows':
     sys.path.append(os.path.join(sys.path[0],'..'))
+    splitter = "\\"
 else:
     sys.path.append(r"/Users/Etienne/Documents/GitHub/robot-interface")
+    splitter = "/"
 
 from Computer_vision.Image_processing.cv_matrix import analyse_matrix, draw_resutls
 from Computer_vision.Image_processing.cv_orientation import rotateImage, fing_petri_angle
@@ -59,7 +61,9 @@ def rotation_correction(matrix,matrix_of_keypoints,positions, cropped_input, ang
                                                              auto_offset=auto_offset, num_cols=num_cols)
 
 def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=False,num_cols=10,aggregation = False):
-    images = sorted(glob.glob(folder_name+'/*.jpg'))
+    path = os.path.join(folder_name,'*.jpg')
+    #images = sorted(glob.glob(folder_name+'/*.jpg'))
+    images = sorted(glob.glob(path))
     num_cols = num_cols
     #auto_rotate = False
     if num_cols == 10:
@@ -120,12 +124,20 @@ def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=Fa
     if aggregation:
         aggregated_image = create_aggregated_matrix(matrix_list=matrix_list, marker_names_list=marker_names_list,
                                                     positions=new_positions_0, num_cols=num_cols,background=background,
-                                                    experiment_name=folder_name.split("/")[-1])
-        cv2.imwrite(folder_name + "/aggregated_matrix.jpeg", aggregated_image)
+                                                    experiment_name=folder_name.split(splitter)[-1])
+        path = os.path.join(folder_name, "aggregated_matrix.jpeg")
+        #cv2.imwrite(folder_name + "/aggregated_matrix.jpeg", aggregated_image)
+        cv2.imwrite(path, aggregated_image)
 
 def summary_of_all_images(folder_name):
-    input_images = sorted(glob.glob(folder_name + '/*.jpg'))
-    output_images = sorted(glob.glob(folder_name+'/*'+'_out.jpeg'))
+    path_input = os.path.join(folder_name, '*.jpg')
+    #input_images = sorted(glob.glob(folder_name + '/*.jpg'))
+    input_images = sorted(glob.glob(path_input))
+
+    path_output = os.path.join(folder_name, '*_out.jpeg')
+    #output_images = sorted(glob.glob(folder_name+'/*'+'_out.jpeg'))
+    output_images = sorted(glob.glob(path_output))
+
     print(input_images)
     print(output_images)
     tall = cv2.imread(input_images[0]).shape[0]
@@ -142,7 +154,10 @@ def summary_of_all_images(folder_name):
 
     image_summary = np.concatenate((input_summary, output_summary), axis=0)
 
-    cv2.imwrite( folder_name+"/image_summary.jpeg", image_summary)
+    path = os.path.join(folder_name, "image_summary.jpeg")
+    #cv2.imwrite( folder_name+"/image_summary.jpeg", image_summary)
+    cv2.imwrite(path, image_summary)
+
 
 def create_aggregated_matrix(matrix_list,marker_names_list,positions,num_cols,background=0,experiment_name=""):
     N = len(matrix_list)
@@ -206,7 +221,8 @@ def save_datalog_of_an_experiment(experiment):
     timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M")
     text = "EXPERIMENT LOG, date : "+timestamp+ " , name : "+experiment.associated_name + '\n'
     text+=("LIST OF MARKER NAMES FROM GROUND TO TOP :")
-    path = "../images/"+experiment.associated_name
+    path = os.path.join('..', 'images',experiment.associated_name)
+    #path = "../images/"+experiment.associated_name
     equivalent_names = ['a', 'b', 'c', 'd', 'e', 'f']
 
     for eq, marker in zip(equivalent_names,experiment.experiment.marker_list):
@@ -215,7 +231,9 @@ def save_datalog_of_an_experiment(experiment):
 
     # Ensure the images directory exists
     os.makedirs(path, exist_ok=True)
-    with open(path+"/"+experiment.associated_name+'_info.txt', 'w') as f:
+
+    #with open(path+"/"+experiment.associated_name+'_info.txt', 'w') as f:
+    with open(os.path.join(path, experiment.associated_name+ '_info.txt'), 'w') as f:
         f.write(text)
 
 if __name__ == "__main__":

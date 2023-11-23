@@ -73,7 +73,6 @@ class Vision:
             os.makedirs('images/'+folder_name, exist_ok=True)
             filename = f'images/' + folder_name + '/'+prefix+f'{timestamp}'+suffix+'.jpg'
 
-
         # Save the frame to a file
         cv2.imwrite(filename, frame)
         logging.info(f"Saved image to {filename}")

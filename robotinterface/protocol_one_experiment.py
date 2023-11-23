@@ -66,7 +66,7 @@ async def main():
 
             await robot.pick_and_place(target, pic_pos)
 
-            await robot.take_picture(target[0], obj_rem=target[1], folder_name=plate_holder.experiment.associated_name, prefix="marker_"+str(target[0].number)+"_",suffix="_"+str(target[0].associated_name))
+            await robot.take_picture(target[0], obj_rem=target[1], folder_name=plate_holder.associated_name, prefix="marker_"+str(target[0].number)+"_",suffix="_"+str(target[0].associated_name))
             if num != n_petri-1:
                 await robot.pick_and_place(target, stack_pos)
             else:
@@ -74,10 +74,6 @@ async def main():
                     await robot.pick_and_place(target, pos_experiment)
                 else :
                     await robot.pick_and_place(target, stack_pos)
-        #print("/Users/Etienne/Documents/GitHub/robot-interface/images/"+str(experiment.associated_name))
-        #analyse_each_image_separately("/Users/Etienne/Documents/GitHub/robot-interface/images/"+str(experiment.associated_name),
-        #                              auto_offset=True, auto_rotate=False, num_cols=9)
-        #summary_of_all_images("/Users/Etienne/Documents/GitHub/robot-interface/images/"+str(experiment.associated_name))
 
         if reconstruct_pile:
             # RECONSTRUCT THE PILE ON THE INITIAL POS

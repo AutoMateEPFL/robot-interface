@@ -1,7 +1,7 @@
 import tkinter as tk
 from job_library import *
 import glob
-
+import platform
 # --- classes ---
 ## TODO ADD COMMENT
 ## FOR NOW ONE EXPERIMENT IS ASSOCIATED TO ONE PLATE HOLDER IS IT NEEDED TO DO 2 CLASSES?
@@ -105,9 +105,14 @@ class Question:
 
 
 if __name__ == "__main__":
-    list_of_folders = glob.glob( "../images/*")
+    path = os.path.join("..","images","*")
+    #list_of_folders = glob.glob( "../images/*")
+    list_of_folders=glob.glob(path)
     list_of_folders.sort(key=os.path.getmtime)
-    list_of_experiments = [folder.split("/")[-1] for folder in list_of_folders]
+    if platform.system() == 'Windows':
+        list_of_experiments = [folder.split("\\")[-1] for folder in list_of_folders]
+    else :
+        list_of_experiments = [folder.split("/")[-1] for folder in list_of_folders]
 
     ThisExperiment = Experiment(name="")
     ThisExperiment.launch_registration()
@@ -126,9 +131,9 @@ if __name__ == "__main__":
     ThisExperiment.update_name(ExperimentNameQuestion._answer)
 
     ThisExperiment.root.mainloop()
-    path = "../images/"+str(ExperimentNameQuestion._answer)
-    print("path",
-          path)
+    path = os.path.join('..','images',ExperimentNameQuestion._answer)
+    #path = "../images/"+str(ExperimentNameQuestion._answer)
+    print("path",path)
     analyse_each_image_separately(path, auto_offset=True, auto_rotate=False,
                                    num_cols=int(NumberOfColsQuestion._answer),aggregation = to_aggregate)
 
