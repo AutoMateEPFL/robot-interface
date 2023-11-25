@@ -69,7 +69,7 @@ def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=Fa
     if num_cols == 10:
         positions = [(240, 240), (880, 810)]
     elif num_cols == 9:
-        positions_saarstedt = [(230, 245), (780, 830)]
+        positions_saarstedt = [(240, 245), (800, 830)]
         positions_corning = [(260, 250), (820, 830)]
         positions = positions_saarstedt
 

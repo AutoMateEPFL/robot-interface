@@ -1,0 +1,8 @@
+EXPERIMENT LOG, date : 202311241143 , name : demoe
+LIST OF MARKER NAMES FROM GROUND TO TOP :
+Marker a : a
+Marker b : b
+Marker c : c
+Marker d : d
+Marker e : 
+Marker f : 
