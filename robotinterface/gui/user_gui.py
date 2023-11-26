@@ -8,7 +8,7 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 import platform
-
+import csv
 mouseX, mouseY, left_click, right_click, middle_click = 0, 0, False, False, False
 
 def generate_grid_image(grid: Grid, grid_resolution: int, line_thickness: int):
@@ -248,7 +248,27 @@ def toggle_plateholder(grid: Grid, grid_pos:GridPosition):
     else:
         add_plateholder(grid, grid_pos)
             
-            
+def load_csv_of_experiments(grid: Grid, path):
+    with open(path, newline='') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+
+        for i, row in enumerate(spamreader):
+            for j in range(0, 5):
+                text = row[0].split(";")[j]
+                if i % 7 == 0:
+                    print(i, j, text)
+                    if text != '':
+                        print("add exp ", text, " at ", i//7, j)
+                        ThisExperiment = Experiment(name=text)
+                        plate_holder = PlateHolder(ThisExperiment, associated_name=text)
+                        grid.add_object([plate_holder], GridPosition(j,i//7))
+                else:
+                    if text != '':
+                        print("add marker", text, " at ", i//7, j)
+                        add_pertidish(grid, GridPosition(j,i//7), number=i%7, name=text)
+
+
+
 def mouse_click(event,x,y,flags,param):
     """Mouse callback function that allows the user to interact with the grid"""
     
@@ -267,7 +287,7 @@ def load_grid(grid: Grid, grid_resolution: int = 100, line_thickness: int = 2, t
     """Loads the grid and allows the user to interact with it"""
     
     global mouseX, mouseY, left_click, right_click, middle_click
-    
+
     cv2.namedWindow("AutoMate Interface")
     cv2.setMouseCallback("AutoMate Interface", mouse_click)
 
@@ -288,15 +308,15 @@ def load_grid(grid: Grid, grid_resolution: int = 100, line_thickness: int = 2, t
             click_pos = GridPosition(mouseX//(grid_resolution+line_thickness), mouseY//(grid_resolution+line_thickness))
             add_pertidish(grid, click_pos)
             left_click = False
-        elif middle_click:
+        elif right_click:
             click_pos = GridPosition(mouseX//(grid_resolution+line_thickness), mouseY//(grid_resolution+line_thickness))
             remove_pertidish(grid, click_pos)
-            middle_click = False
-        elif right_click:
+            right_click = False
+        elif middle_click:
             click_pos = GridPosition(mouseX//(grid_resolution+line_thickness), mouseY//(grid_resolution+line_thickness))
             #add_plateholder(grid, click_pos)
             add_experiment(grid, click_pos,tkinter_window)
-            right_click = False
+            middle_click = False
     
     
         cv2.imshow("AutoMate Interface", imshow)
