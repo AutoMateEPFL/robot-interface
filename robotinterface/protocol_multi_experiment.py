@@ -42,12 +42,12 @@ async def main():
     if platform.system() == 'Windows':
         robot = await Robot.build(grid)
 
-    load_csv_of_experiments(grid,path='/Users/Etienne/Documents/GitHub/robot-interface/AutoMate_panel.csv')
+    load_csv_of_experiments(grid,path="AutoMate_panel.csv")
     grid = load_grid(grid)
 
     list_of_experiments = find_all_PlateHolder(grid)
 
-    reconstruct_pile = True
+    reconstruct_pile = False
     # FOR EACH EXPERIMENT TAKE PICTURES AND DECONSTRUCT THE PILE
     for plate_holder in list_of_experiments:
         save_datalog_of_an_experiment(plate_holder)

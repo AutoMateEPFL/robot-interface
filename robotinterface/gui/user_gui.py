@@ -249,12 +249,14 @@ def toggle_plateholder(grid: Grid, grid_pos:GridPosition):
         add_plateholder(grid, grid_pos)
             
 def load_csv_of_experiments(grid: Grid, path):
+    
     with open(path, newline='') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
 
         for i, row in enumerate(spamreader):
-            for j in range(0, 5):
-                text = row[0].split(";")[j]
+            for j in range(0, 2):
+                print("j",j, row[0].split(",") )
+                text = row[0].split(",")[j]
                 if i % 7 == 0:
                     print(i, j, text)
                     if text != '':
