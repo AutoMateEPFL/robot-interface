@@ -16,7 +16,7 @@ class CameraSpot(NonPickable):
     """
     This class represents a plate holder with a certain floor thickness
     """
-    height = 0
+    height = -0.5 # Possible offset to adjust for the grip thickness
     name = "Camera"
     def __init__(self):
         super().__init__()

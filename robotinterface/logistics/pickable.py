@@ -33,7 +33,7 @@ class SmallPetriBottom(Pickable):
     """
     name = "Small Petri Bottom"
 
-    def __init__(self,number="",associated_name="",brand="SARSTEDT"):
+    def __init__(self,number="",associated_name="",brand="SARSTEDT",associated_experiment=""):
         super().__init__()
         self.associated_name = associated_name
         self.number = number
@@ -41,7 +41,8 @@ class SmallPetriBottom(Pickable):
         if self.type == "Corning":
             self.height = 12.5
         elif self.type == "SARSTEDT":
-            self.height = 6.5
+            self.height = 7.5
+        self._associated_experiment = associated_experiment
 
     def set_associated_name(self, associated_name):
         self.associated_name = associated_name
@@ -52,7 +53,7 @@ class SmallPetriTop(Pickable):
     """
     name = "Small Petri Top"
 
-    def __init__(self, number="", associated_name="",brand="SARSTEDT"):
+    def __init__(self, number="", associated_name="",brand="SARSTEDT",associated_experiment=""):
         super().__init__()
         self.associated_name = associated_name
         self.number = number
@@ -60,7 +61,7 @@ class SmallPetriTop(Pickable):
         if self.type == "Corning":
             self.height = 8.5
         elif self.type == "SARSTEDT":
-            self.height = 8.9
+            self.height = 8.6
 
     def set_associated_name(self, associated_name):
         self.associated_name = associated_name

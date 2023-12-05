@@ -10,19 +10,19 @@ mouseX,mouseY,left_click,right_click,middle_click = 0,0,False,False,False
 params = cv2.SimpleBlobDetector_Params()
  
 # Change thresholds
-params.minThreshold = 30
+params.minThreshold = 20
  
 # Filter by Area.
 params.filterByArea = True
-params.minArea = 300
+params.minArea = 200
 #params.maxArea = 6000
 
 # Filter by Circularity
-params.filterByCircularity = True
-params.minCircularity = 0.3
+params.filterByCircularity = False
+params.minCircularity = 0.01
  
 # Filter by Convexity
-params.filterByConvexity = True
+params.filterByConvexity = False
 params.minConvexity = 0.01
  
 # Filter by Inertia
@@ -97,7 +97,7 @@ def analyse_matrix(image: np.ndarray, positions: list,draw_blob=False, auto_offs
     bw: np.ndarray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # old block value : 71
     # block value for 55
-    tr: np.ndarray = cv2.adaptiveThreshold(bw,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 65, -10)
+    tr: np.ndarray = cv2.adaptiveThreshold(bw,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 95, -10)
 
     #cv2.imshow('tr', tr)
     cv2.imwrite("/Users/Etienne/Documents/GitHub/robot-interface/Computer_vision/Image_processing/matrix_gaussian.jpeg",tr)
@@ -114,6 +114,8 @@ def analyse_matrix(image: np.ndarray, positions: list,draw_blob=False, auto_offs
             cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), int(keypoint.size), (255, 0, 0), 2)
             cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), 2, (255, 0, 0), 2)
         if keypoint.pt[0] > pos0[0] and keypoint.pt[0] < pos1[0] and keypoint.pt[1] > pos0[1] and keypoint.pt[1] < pos1[1]:
+            cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), int(keypoint.size), (255, 0, 0), 2)
+            cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), 2, (255, 0, 0), 2)
             i, j = (int((keypoint.pt[0] - pos0[0]) / offset[0]), int((keypoint.pt[1] - pos0[1]) / offset[1]))
             matrix[i, j] = 1
             matrix_of_keypoints[i][j] = keypoint
@@ -145,6 +147,7 @@ def analyse_matrix(image: np.ndarray, positions: list,draw_blob=False, auto_offs
                     cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), 2, (255,0,0), 2)
                     # cv2.putText(image, str(round(keypoint.size, 2)), (int(keypoint.pt[0]), int(keypoint.pt[1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2, cv2.LINE_AA)
 
+    sum = matrix.sum()
     return matrix, matrix_of_keypoints, new_offset
 
 def draw_resutls(image: np.ndarray, positions: list, matrix: np.ndarray, thickness: int = 2,num_cols=10)->np.ndarray:

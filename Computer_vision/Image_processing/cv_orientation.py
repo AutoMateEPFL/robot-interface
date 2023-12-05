@@ -75,7 +75,7 @@ def fing_petri_angle(image: np.ndarray)->float:
         
             angle.append(180/np.pi*np.arctan2(center[1]-proj[1], center[0]-proj[0]))
 
-        return 180-np.mean(angle)
+        return -np.mean(angle)
     else:
         logging.info('No lines found')
         return None

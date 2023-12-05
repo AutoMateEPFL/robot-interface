@@ -157,7 +157,7 @@ def draw_grid(grid: Grid, imshow, grid_resolution, line_thickness):
             if holder:
                 mark_H(GridPosition(x, y), imshow, grid_resolution, line_thickness)
 
-def add_pertidish(grid: Grid, grid_pos:GridPosition, number= "", name=""):
+def add_pertidish(grid: Grid, grid_pos:GridPosition, number= "", name="", associated_experiment=""):
     """Add a petri dish on the grid, number : position on the pile from the ground"""
     
     if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id]) // 2 < 6:
@@ -166,7 +166,8 @@ def add_pertidish(grid: Grid, grid_pos:GridPosition, number= "", name=""):
         elif len(grid.object_grid[grid_pos.y_id][grid_pos.x_id])>0 and grid.object_grid[grid_pos.y_id][grid_pos.x_id][0] == grid.stack:
             logging.info("Cannot use stack spot")
         else :
-            grid.add_object([SmallPetriBottom(number=number,associated_name=name), SmallPetriTop(number=number,associated_name=name)], grid_pos)
+            grid.add_object([SmallPetriBottom(number=number,associated_name=name,associated_experiment=associated_experiment),
+                             SmallPetriTop(number=number,associated_name=name,associated_experiment=associated_experiment)], grid_pos)
     else:
         logging.info("Max number of petri dish reached")
 
@@ -186,14 +187,14 @@ def add_experiment(grid: Grid, grid_pos: GridPosition, tkinter_window):
 
             #Setup questions
             ExperimentNameQuestion = Question(ThisExperiment.window.inner, "Name of the experiment ", ThisExperiment.root,setup_question=True)
-            for i in range(6):
+            for i in range(10):
                ThisExperiment.question_list.append(Question(ThisExperiment.window.inner, "Name of the marker " + str(i + 1),tkinter_window=ThisExperiment.root))
 
             ThisExperiment.window.mainloop()
 
             # Updates name of the experiment and names of the markers
             ThisExperiment.update_name(ExperimentNameQuestion.answer)
-        for i in range(6):
+        for i in range(10):
            ThisExperiment.marker_list.append(ThisExperiment.question_list[i].answer)
 
         ## Add objects on the grid
@@ -204,7 +205,8 @@ def add_experiment(grid: Grid, grid_pos: GridPosition, tkinter_window):
         # PlateHolder associated with the experiment
         for i in range(6):
             if ThisExperiment.marker_list[i] !='':
-                add_pertidish(grid, grid_pos,number=i,name=ThisExperiment.question_list[i].answer)
+                add_pertidish(grid, grid_pos,number=i,name=ThisExperiment.question_list[i].answer,
+                              associated_experiment=ExperimentNameQuestion.answer)
     else:
         logging.info("Max number of Experiment reached")
         

@@ -21,9 +21,10 @@ class Experiment:
         """Launch registration on an external window"""
         self.root = external_window
         self.root.title("Experiment entry")
-        self.root.geometry("200x720")
+        self.root.geometry("290x560")
         self.window = ExperimentFrame(self.root)
         self.window.pack(expand=True, fill='both')
+
 
     def launch_registration(self):
         """Launch registration of experiment/marker names"""
@@ -100,8 +101,10 @@ class Question:
         self._tkinter_window = tkinter_window
         if self._setup_question :
             self.labelframe = tk.LabelFrame(self.parent, text=self._question)
+            #self.labelframe = tk.LabelFrame(self.parent)
             self.labelframe.pack(fill="both", expand=True)
             self.create_validator()
+
         else :
             self.labelframe = tk.LabelFrame(self.parent, text="Marker (empty if not used) :")
             self.labelframe.pack(fill="both", expand=True)
@@ -116,12 +119,12 @@ class Question:
         self._tkinter_window.destroy()
 
     def create_widgets(self):
-
-        self.label = tk.Label(self.labelframe, text= self._question)
-        self.label.pack(expand=True, fill='both')
+        #self.label = tk.Label(self.labelframe, text= self._question)
+        #self.label = tk.Label(self.labelframe)
+        #self.label.pack(expand=False, fill='both')
 
         self.entry = tk.Entry(self.labelframe)
-        self.entry.pack()
+        self.entry.pack(side = tk.LEFT)
 
         self.button = tk.Button(self.labelframe, text="Validate", command=lambda : self.button_function())
         self.button.pack()
