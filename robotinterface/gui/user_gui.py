@@ -40,7 +40,7 @@ def draw_plateholder(grid_pos:GridPosition, imshow, grid_resolution, line_thickn
     
     if grid_pos.y_id%2 == 0:
         if platform.system() == 'Windows':
-            model = cv2.imread("robotinterface\gui\petri_dark.png")
+            model = cv2.imread("robotinterface\gui\holder_dark.png")
         else :
             model = cv2.imread("../robotinterface/gui/holder_dark.png")
     else:
@@ -160,7 +160,7 @@ def draw_grid(grid: Grid, imshow, grid_resolution, line_thickness):
 def add_pertidish(grid: Grid, grid_pos:GridPosition, number= "", name="", associated_experiment=""):
     """Add a petri dish on the grid, number : position on the pile from the ground"""
     
-    if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id]) // 2 < 6:
+    if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id]) // 2 < 10:
         if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id])>0 and grid.object_grid[grid_pos.y_id][grid_pos.x_id][0] == grid.cam:
             logging.info("Cannot use photo spot")
         elif len(grid.object_grid[grid_pos.y_id][grid_pos.x_id])>0 and grid.object_grid[grid_pos.y_id][grid_pos.x_id][0] == grid.stack:
@@ -203,7 +203,7 @@ def add_experiment(grid: Grid, grid_pos: GridPosition, tkinter_window):
         grid.add_object([plate_holder], grid_pos)
 
         # PlateHolder associated with the experiment
-        for i in range(6):
+        for i in range(10):
             if ThisExperiment.marker_list[i] !='':
                 add_pertidish(grid, grid_pos,number=i,name=ThisExperiment.question_list[i].answer,
                               associated_experiment=ExperimentNameQuestion.answer)

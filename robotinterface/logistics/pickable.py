@@ -41,7 +41,7 @@ class SmallPetriBottom(Pickable):
         if self.type == "Corning":
             self.height = 12.5
         elif self.type == "SARSTEDT":
-            self.height = 7.5
+            self.height = 7.6
         self._associated_experiment = associated_experiment
 
     def set_associated_name(self, associated_name):
@@ -61,7 +61,7 @@ class SmallPetriTop(Pickable):
         if self.type == "Corning":
             self.height = 8.5
         elif self.type == "SARSTEDT":
-            self.height = 8.6
+            self.height = 8.4
 
     def set_associated_name(self, associated_name):
         self.associated_name = associated_name

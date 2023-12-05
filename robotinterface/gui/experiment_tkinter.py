@@ -30,7 +30,7 @@ class Experiment:
         """Launch registration of experiment/marker names"""
         self.root = tk.Tk()
         self.root.title("Experiment entry")
-        self.root.geometry("200x700")
+        self.root.geometry("150x700")
         self.window = ExperimentFrame(self.root)
         self.window.pack(expand=True, fill='both')
 
@@ -101,7 +101,6 @@ class Question:
         self._tkinter_window = tkinter_window
         if self._setup_question :
             self.labelframe = tk.LabelFrame(self.parent, text=self._question)
-            #self.labelframe = tk.LabelFrame(self.parent)
             self.labelframe.pack(fill="both", expand=True)
             self.create_validator()
 
