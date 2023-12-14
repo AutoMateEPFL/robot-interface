@@ -68,15 +68,11 @@ async def main():
                     target = [object]
 
             await robot.pick_and_place(target, pic_pos)
+            
+            await robot.take_picture(target[0], obj_rem=target[1], folder_name=target[0]._associated_experiment,
+                                        prefix="marker_" + str(target[0].number) + "_",
+                                        suffix="_" + str(target[0].associated_name), to_save = True)
 
-            if is_it_first_picture:
-                await robot.take_picture(target[0], obj_rem=target[1], folder_name=target[0].associated_experiment,
-                                         prefix="marker_" + str(target[0].number) + "_",
-                                         suffix="_" + str(target[0].associated_name), to_save = False)
-            else :
-                await robot.take_picture(target[0], obj_rem=target[1], folder_name=target[0].associated_experiment,
-                                         prefix="marker_" + str(target[0].number) + "_",
-                                         suffix="_" + str(target[0].associated_name), to_save=True)
             if num != n_petri - 1:
                 await robot.pick_and_place(target, stack_pos)
             else:
