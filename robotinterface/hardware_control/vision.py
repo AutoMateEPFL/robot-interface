@@ -50,7 +50,7 @@ class Vision:
         self.camera = camera
 
 
-    async def save_picture(self, folder_name="", prefix="", suffix=""):
+    async def save_picture(self, folder_name="", prefix="", suffix="", to_save= True):
         """
         Takes a picture with the camera and saves it to the given path.
 
@@ -73,9 +73,12 @@ class Vision:
             os.makedirs('images/'+folder_name, exist_ok=True)
             filename = f'images/' + folder_name + '/'+prefix+f'{timestamp}'+suffix+'.jpg'
 
-        # Save the frame to a file
-        cv2.imwrite(filename, frame)
-        logging.info(f"Saved image to {filename}")
+        if to_save :
+            # Save the frame to a file
+            cv2.imwrite(filename, frame)
+            logging.info(f"Saved image to {filename}")
+        else :
+            logging.info("Photo taken but not saved")
 
 
     async def shutdown(self):

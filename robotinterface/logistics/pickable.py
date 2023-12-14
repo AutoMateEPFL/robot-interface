@@ -19,10 +19,11 @@ class PlateHolder(Pickable):
     """
     height = 5
     name = "Plate Holder"
-    def __init__(self,experiment,associated_name=""):
+    def __init__(self,experiment_list=[],associated_name="",num_experiments=0):
         super().__init__()
-        self.experiment = experiment
+        self.experiment_list = experiment_list
         self.associated_name = associated_name
+        self.num_experiments = num_experiments
 
     def set_associated_name(self,associated_name):
         self.associated_name = associated_name

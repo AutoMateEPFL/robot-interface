@@ -232,15 +232,15 @@ class Robot:
         await self.pick(objects)
         await self.place(objects, position)
 
-    async def save_picture(self,folder_name="", prefix="",suffix=""):
+    async def save_picture(self,folder_name="", prefix="",suffix="",to_save=True):
         """
         Save a picture.
         
         """
-        await self.camera.save_picture(folder_name=folder_name, prefix=prefix, suffix=suffix)
+        await self.camera.save_picture(folder_name=folder_name, prefix=prefix, suffix=suffix, to_save=to_save)
         
         
-    async def take_picture(self, obj: Pickable, obj_rem: Pickable = None, folder_name="", prefix="", suffix=""):
+    async def take_picture(self, obj: Pickable, obj_rem: Pickable = None, folder_name="", prefix="", suffix="",to_save=True):
         """
         Takes a picture of a specified object.
 
@@ -255,10 +255,11 @@ class Robot:
         await self.change_tool("camera")
         await self.gripper.rotate(90)
         await self.platform.move(coordinates.x, coordinates.y, constants.PICTURE_HEIGHT, constants.FEEDRATE)
-        await self.save_picture(folder_name=folder_name,prefix=prefix, suffix=suffix)
+        await self.save_picture(folder_name=folder_name,prefix=prefix, suffix=suffix,to_save=to_save)
+        await self.platform.move(coordinates.x, coordinates.y, constants.PETRI_CLERANCE, constants.FEEDRATE)
         await self.gripper.rotate(0)
         await self.change_tool("gripper")
-        await self.platform.move(coordinates.x, coordinates.y, constants.PETRI_CLERANCE, constants.FEEDRATE)
+
         
         if obj_rem is not None:
             await self.place([obj_rem], self.robot_position)

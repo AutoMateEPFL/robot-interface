@@ -28,12 +28,13 @@ logging.basicConfig(
     level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S')
 
-
+is_it_first_picture = True
 async def main():
     grid = Grid(x_max=-800, x_dist=-199, y_max=-620, y_dist=-200)
-    grid.set_camera_and_stack_position(GridPosition(2, 1), GridPosition(3, 1))
 
-    stack_pos = grid.find_object(grid.stack)
+    grid.set_camera_position(GridPosition(2, 1))
+    grid.set_stack_positions([GridPosition(3, i) for i in range(0,4)]+[GridPosition(4, i) for i in range(0,4)])
+
     pic_pos = grid.find_object(grid.cam)
 
     loop = asyncio.get_running_loop()
@@ -42,15 +43,16 @@ async def main():
     if platform.system() == 'Windows':
         robot = await Robot.build(grid)
 
-    load_csv_of_experiments(grid,path="AutoMate_panel.csv")
+    #load_csv_of_experiments(grid,path="AutoMate_panel.csv")
     grid = load_grid(grid)
 
     list_of_experiments = find_all_PlateHolder(grid)
 
     reconstruct_pile = False
     # FOR EACH EXPERIMENT TAKE PICTURES AND DECONSTRUCT THE PILE
-    for plate_holder in list_of_experiments:
-        save_datalog_of_an_experiment(plate_holder)
+    for index, plate_holder in enumerate(list_of_experiments):
+        stack_pos = grid.find_object(grid.stack_list[index])
+        #save_datalog_of_a_plateholder(plate_holder)
         pos_experiment = grid.find_object(plate_holder)
         x_exp, y_exp = pos_experiment.x_id, pos_experiment.y_id
         n_petri = (len(grid.object_grid[y_exp][x_exp]) - 1) // 2
@@ -67,9 +69,14 @@ async def main():
 
             await robot.pick_and_place(target, pic_pos)
 
-            await robot.take_picture(target[0], obj_rem=target[1], folder_name=plate_holder.associated_name,
-                                     prefix="marker_" + str(target[0].number) + "_",
-                                     suffix="_" + str(target[0].associated_name))
+            if is_it_first_picture:
+                await robot.take_picture(target[0], obj_rem=target[1], folder_name=target[0].associated_experiment,
+                                         prefix="marker_" + str(target[0].number) + "_",
+                                         suffix="_" + str(target[0].associated_name), to_save = False)
+            else :
+                await robot.take_picture(target[0], obj_rem=target[1], folder_name=target[0].associated_experiment,
+                                         prefix="marker_" + str(target[0].number) + "_",
+                                         suffix="_" + str(target[0].associated_name), to_save=True)
             if num != n_petri - 1:
                 await robot.pick_and_place(target, stack_pos)
             else:

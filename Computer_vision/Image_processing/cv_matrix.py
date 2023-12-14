@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
+from Computer_vision.Image_processing.cv_orientation import rotateImage
 
+#from cv_orientation import rotateImage
 mouseX,mouseY,left_click,right_click,middle_click = 0,0,False,False,False
 
 #TO DO:
@@ -8,10 +10,10 @@ mouseX,mouseY,left_click,right_click,middle_click = 0,0,False,False,False
 
 # Setup SimpleBlobDetector parameters.
 params = cv2.SimpleBlobDetector_Params()
- 
+
 # Change thresholds
 params.minThreshold = 20
- 
+
 # Filter by Area.
 params.filterByArea = True
 params.minArea = 200
@@ -20,11 +22,11 @@ params.minArea = 200
 # Filter by Circularity
 params.filterByCircularity = False
 params.minCircularity = 0.01
- 
+
 # Filter by Convexity
 params.filterByConvexity = False
 params.minConvexity = 0.01
- 
+
 # Filter by Inertia
 params.filterByInertia = False
 params.minInertiaRatio = 0.01
@@ -148,7 +150,7 @@ def analyse_matrix(image: np.ndarray, positions: list,draw_blob=False, auto_offs
                     # cv2.putText(image, str(round(keypoint.size, 2)), (int(keypoint.pt[0]), int(keypoint.pt[1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2, cv2.LINE_AA)
 
     sum = matrix.sum()
-    return matrix, matrix_of_keypoints, new_offset
+    return matrix, matrix_of_keypoints, new_offset, sum
 
 def draw_resutls(image: np.ndarray, positions: list, matrix: np.ndarray, thickness: int = 2,num_cols=10)->np.ndarray:
     """
@@ -187,7 +189,6 @@ def draw_resutls(image: np.ndarray, positions: list, matrix: np.ndarray, thickne
             cv2.rectangle(image, pt1, pt2, color, thickness)
             
     return image
-    
 
 def mouse_click(event,x,y,flags,param):
     global mouseX,mouseY,left_click,right_click,middle_click
@@ -197,8 +198,24 @@ def mouse_click(event,x,y,flags,param):
         right_click = True
     elif event == cv2.EVENT_MBUTTONDOWN:
         middle_click = True
-        
+
     mouseX, mouseY = x, y
+
+def auto_rotate_number_of_blobs(cropped_input,reference,name="",angle_first_guess=0):
+
+    min = 0
+    for angle in np.arange(angle_first_guess - 5, angle_first_guess + 5, 0.5):
+        rotated_image = rotateImage(cropped_input, -angle)
+        matrix, matrix_of_keypoints, new_offset, sum = analyse_matrix(rotated_image, [(285, 250), (850, 850)], draw_blob=False, auto_offset=False, num_cols=9)
+
+        if sum >= min:
+            print('angle', angle, 'norm', sum)
+            min_angle = angle
+            #best_image = rotated_image
+            #best_image = draw_resutls(best_image, [(285, 250), (850, 850)],matrix, thickness= 2, num_cols = 9)
+            min = sum
+    return min_angle
+
     
 if __name__ == '__main__':
         

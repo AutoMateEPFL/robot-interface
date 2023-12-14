@@ -139,7 +139,7 @@ class Grid:
         """
         return self.xx[position.x_id], self.yy[position.y_id]
 
-    def set_camera_and_stack_position(self, position_camera: GridPosition, position_stack: GridPosition ) :
+    def set_camera_position(self, position_camera: GridPosition) :
         """
         Adds a
         Args:
@@ -147,8 +147,19 @@ class Grid:
         Returns:
 
         """
-        self.cam = CameraSpot()
-        self.stack = StackSpot()
+        self.cam = CameraSpot(grid_position=GridPosition)
         self.add_object([self.cam], position_camera)
-        self.add_object([self.stack], position_stack)
+
+    def set_stack_positions(self, position_stack ) :
+        """
+        Adds a
+        Args:
+
+        Returns:
+
+        """
+        self.stack_list = []
+        for index, position in enumerate(position_stack):
+            self.stack_list.append(StackSpot(grid_position=position))
+            self.add_object([self.stack_list[index]], position)
 

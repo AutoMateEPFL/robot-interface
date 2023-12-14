@@ -7,6 +7,7 @@ import platform
 import cv2
 import numpy as np
 import datetime
+
 if platform.system() == 'Windows':
     sys.path.append(os.path.join(sys.path[0],'..'))
     splitter = "\\"
@@ -15,7 +16,7 @@ else:
     splitter = "/"
 
 from Computer_vision.Image_processing.cv_matrix import analyse_matrix, draw_resutls
-from Computer_vision.Image_processing.cv_orientation import rotateImage, fing_petri_angle
+from Computer_vision.Image_processing.cv_orientation import rotateImage, fing_petri_angle, detect_sticker
 
 def find_all_PlateHolder(grid):
     list_of_experiments = []
@@ -46,9 +47,7 @@ def rotation_correction(matrix,matrix_of_keypoints,positions, cropped_input, ang
                 my_first_index = first_index
                 my_last_index = last_index
                 line_index = i
-    # print('where first',np.where(line == 1)[0][0])
-    # print('where last', np.where(line == 1)[0][-1])
-    # print('I',line_index)
+
     first_point = matrix_of_keypoints[line_index][my_first_index]
     last_point = matrix_of_keypoints[line_index][my_last_index]
     theta = np.arctan((first_point.pt[1] - last_point.pt[1]) / (first_point.pt[0] - last_point.pt[0]))
@@ -60,7 +59,7 @@ def rotation_correction(matrix,matrix_of_keypoints,positions, cropped_input, ang
     matrix, matrix_of_keypoints, new_offset = analyse_matrix(rotated_image, positions, draw_blob=False,
                                                              auto_offset=auto_offset, num_cols=num_cols)
 
-def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=False,num_cols=10,aggregation = False):
+def analyse_each_image_separately(folder_name, method='sticker', auto_offset=False, auto_rotate=False,num_cols=10,aggregation = False):
     experiment_name = folder_name.split("/")[-1]
     path = os.path.join(folder_name,'*.jpg')
     #images = sorted(glob.glob(folder_name+'/*.jpg'))
@@ -72,7 +71,7 @@ def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=Fa
     elif num_cols == 9:
         positions_saarstedt = [(240, 245), (800, 830)]
         positions_corning = [(305, 250), (820, 830)]
-        positions_corning = [(295, 250), (880, 810)]
+        positions_corning = [(230, 250), (880, 810)]
         positions = positions_corning
 
     matrix_list = []
@@ -81,22 +80,24 @@ def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=Fa
 
     for image in images :
         marker_names_list.append(image.split("_")[-1][:-4])
+        print('marker_names_list',marker_names_list)
 
         input_image = cv2.imread(image)
-        tall = input_image.shape[0]
-        width =  input_image.shape[1]
-
+        #tall = input_image.shape[0]
+        #width =  input_image.shape[1]
         #cropped_input = input_image[:,(width-tall)//2:width-(width-tall)//2][:]
 
         cropped_input = input_image[:, 450:1520][:]
 
-        print(cropped_input.shape)
-
         # Correction for the rotation of the image
-        angle = fing_petri_angle(cropped_input)
+        if method=='sticker':
+            angle = detect_sticker(cropped_input)
+        elif method=='line':
+            angle = fing_petri_angle(cropped_input)
+        else :
+            angle = fing_petri_angle(cropped_input)
         if angle is not None:
             rotated_image = rotateImage(cropped_input, -angle)
-            #output = cropped_input
         else:
             rotated_image = cropped_input.copy()
             angle = 0
@@ -106,7 +107,7 @@ def analyse_each_image_separately(folder_name, auto_offset=False, auto_rotate=Fa
             background = rotated_image.copy()
 
         # Analyse the results
-        matrix, matrix_of_keypoints, new_offset = analyse_matrix(rotated_image, positions, draw_blob=False, auto_offset=auto_offset,num_cols=num_cols)
+        matrix, matrix_of_keypoints, new_offset = analyse_matrix(rotated_image, positions, draw_blob=False, auto_offset=auto_offset,num_cols=num_cols)[0:3]
 
         if auto_rotate:
             rotation_correction(matrix=matrix, matrix_of_keypoints=matrix_of_keypoints, positions=positions,
@@ -168,7 +169,7 @@ def summary_of_all_images(folder_name):
 
 def create_aggregated_matrix(matrix_list,marker_names_list,positions,num_cols,background=0,experiment_name=""):
     N = len(matrix_list)
-    equivalent_names = ['a','b','c','d','e','f']
+    equivalent_names = ['a','b','c','d','e','f','g','h','k']
     if background.all == 0 :
         image = np.zeros((1000,1000,3))
         image = cv2.imread("/Users/Etienne/Documents/GitHub/robot-interface/images/20230817153856.jpg")[:,430:1430]
@@ -224,18 +225,20 @@ def create_aggregated_matrix(matrix_list,marker_names_list,positions,num_cols,ba
                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
         return image
 
-def save_datalog_of_an_experiment(experiment):
+def save_datalog_of_a_plateholder(plateholder):
     timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M")
-    text = "EXPERIMENT LOG, date : "+timestamp+ " , name : "+experiment.associated_name + '\n'
+    #for names i
+
+    text = "EXPERIMENT LOG, date : "+timestamp+ " , name : "+plateholder.associated_name + '\n'
     text+=("LIST OF MARKER NAMES FROM GROUND TO TOP :")
     if platform.system() == 'Windows':
-        path = os.path.join( 'images',experiment.associated_name)
+        path = os.path.join( 'images',plateholder.associated_name)
     else:
-        path = os.path.join('..', 'images',experiment.associated_name)
+        path = os.path.join('..', 'images',plateholder.associated_name)
     #path = "../images/"+experiment.associated_name
     equivalent_names = ['a', 'b', 'c', 'd', 'e', 'f']
 
-    for eq, marker in zip(equivalent_names,experiment.experiment.marker_list):
+    for eq, marker in zip(equivalent_names,plateholder.experiment.marker_list):
         text+=('\n')
         text+=("Marker "+str(eq)+" : "+str(marker))
 

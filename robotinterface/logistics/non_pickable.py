@@ -9,8 +9,9 @@ class NonPickable:
     # ensures that each object has unique ID
     id_iter = itertools.count()
 
-    def __init__(self) -> None:
+    def __init__(self,grid_position) -> None:
         self.id = next(self.id_iter)
+        self._grid_position = grid_position
 
 class CameraSpot(NonPickable):
     """
@@ -18,8 +19,8 @@ class CameraSpot(NonPickable):
     """
     height = -1.0 # Possible offset to adjust for the grip thickness
     name = "Camera"
-    def __init__(self):
-        super().__init__()
+    def __init__(self,grid_position):
+        super().__init__(grid_position)
 
 class StackSpot(NonPickable):
     """
@@ -27,6 +28,6 @@ class StackSpot(NonPickable):
     """
     name = "Stack"
     height = 0
-    def __init__(self):
-        super().__init__()
+    def __init__(self,grid_position):
+        super().__init__(grid_position)
 

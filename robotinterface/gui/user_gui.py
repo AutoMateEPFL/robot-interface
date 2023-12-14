@@ -3,6 +3,7 @@ import numpy as np
 from logistics.grid import Grid, GridPosition
 from logistics.pickable import *
 from robotinterface.gui.experiment_tkinter import *
+from robotinterface.gui.tkinter_pile_object import *
 import logging
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
@@ -35,7 +36,7 @@ def generate_grid_image(grid: Grid, grid_resolution: int, line_thickness: int):
         
     return np.transpose(Imshow, (1, 0, 2))
 
-def draw_plateholder(grid_pos:GridPosition, imshow, grid_resolution, line_thickness):
+def draw_plateholder(grid,grid_pos:GridPosition, imshow, grid_resolution, line_thickness):
     """Draws a plateholder on the given grid position."""
     
     if grid_pos.y_id%2 == 0:
@@ -58,7 +59,13 @@ def draw_plateholder(grid_pos:GridPosition, imshow, grid_resolution, line_thickn
     x_end = x + width
     y_end = y + height
 
-    imshow[y:y_end, x:x_end] = model
+    if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id]) // 2 < 12:
+        if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id])>0 and grid.object_grid[grid_pos.y_id][grid_pos.x_id][0] == grid.cam:
+            logging.info("Cannot use photo spot")
+        elif len(grid.object_grid[grid_pos.y_id][grid_pos.x_id])>0 and grid.object_grid[grid_pos.y_id][grid_pos.x_id][0] in grid.stack_list:
+            logging.info("Cannot use stack spot")
+        else :
+            imshow[y:y_end, x:x_end] = model
 
 
 def draw_camera(grid: Grid, imshow, grid_resolution, line_thickness):
@@ -84,25 +91,24 @@ def draw_camera(grid: Grid, imshow, grid_resolution, line_thickness):
 
 def draw_storage(grid: Grid, imshow, grid_resolution, line_thickness):
     """Draws a storage spot  on the given grid position."""
+    for stack in grid.stack_list:
+        grid_pos = stack._grid_position
 
-    grid_pos = grid.find_object(grid.stack)
+        if platform.system() == 'Windows':
+            stack_image = cv2.imread("robotinterface\gui\stack.png")
+        else:
+            stack_image = cv2.imread("../robotinterface/gui/stack.png")
 
-    if platform.system() == 'Windows':
-        stack_image = cv2.imread("robotinterface\gui\stack.png")
-    else:
-        stack_image = cv2.imread("../robotinterface/gui/stack.png")
+        width, height = 90, 90
+        model = cv2.resize(stack_image, (width, height)) / 255
 
+        x = grid_pos.x_id * (grid_resolution + line_thickness) + grid_resolution // 2 - width // 2
+        y = grid_pos.y_id * (grid_resolution + line_thickness) + grid_resolution // 2 - height // 2
 
-    width, height = 90, 90
-    model = cv2.resize(stack_image, (width, height)) / 255
+        x_end = x + width
+        y_end = y + height
 
-    x = grid_pos.x_id * (grid_resolution + line_thickness) + grid_resolution // 2 - width // 2
-    y = grid_pos.y_id * (grid_resolution + line_thickness) + grid_resolution // 2 - height // 2
-
-    x_end = x + width
-    y_end = y + height
-
-    imshow[y:y_end, x:x_end] = model
+        imshow[y:y_end, x:x_end] = model
     
 def draw_petri(grid_pos:GridPosition, imshow, grid_resolution, line_thickness):
     """Draws a petri box  on the given grid position."""
@@ -131,9 +137,18 @@ def draw_petri(grid_pos:GridPosition, imshow, grid_resolution, line_thickness):
 def mark_H(grid_pos:GridPosition, imshow, grid_resolution, line_thickness):
     """Draws H for holder on the given grid position."""
     cv2.putText(imshow, "H", (grid_pos.x_id*(grid_resolution+line_thickness)+5, grid_pos.y_id*(grid_resolution+line_thickness)+17), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 0), 2)
-    
+
+
+def mark_E(grid_pos: GridPosition, imshow, grid_resolution, line_thickness, number ):
+    """Draws H for holder on the given grid position."""
+    cv2.putText(imshow, "E "+str(number), (
+    grid_pos.x_id * (grid_resolution + line_thickness) +5, grid_pos.y_id * (grid_resolution + line_thickness) +95),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
+
+
 def mark_P(grid_pos:GridPosition, num, imshow, grid_resolution, line_thickness):
-    cv2.putText(imshow, str(num), ((grid_pos.x_id+1)*(grid_resolution+line_thickness)-20, grid_pos.y_id*(grid_resolution+line_thickness)+17), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 0), 2)
+    cv2.putText(imshow, str(num), ((grid_pos.x_id+1)*(grid_resolution+line_thickness)-20, grid_pos.y_id*(grid_resolution+line_thickness)+17),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 0), 2)
     
 def draw_grid(grid: Grid, imshow, grid_resolution, line_thickness):
     """Draw the grid on the imshow"""
@@ -148,7 +163,8 @@ def draw_grid(grid: Grid, imshow, grid_resolution, line_thickness):
             for object in grid.object_grid[y][x]:
                 if object.name == "Plate Holder":
                     holder = True
-                    draw_plateholder(GridPosition(x, y), imshow, grid_resolution, line_thickness)
+                    draw_plateholder(grid,GridPosition(x, y), imshow, grid_resolution, line_thickness)
+                    mark_E(GridPosition(x, y), imshow, grid_resolution, line_thickness, number=object.num_experiments)
                 elif object.name == "Small Petri Top":
                     num_petri += 1
             if num_petri > 0:
@@ -157,13 +173,14 @@ def draw_grid(grid: Grid, imshow, grid_resolution, line_thickness):
             if holder:
                 mark_H(GridPosition(x, y), imshow, grid_resolution, line_thickness)
 
-def add_pertidish(grid: Grid, grid_pos:GridPosition, number= "", name="", associated_experiment=""):
+
+def add_petridish(grid: Grid, grid_pos:GridPosition, number= "", name="", associated_experiment=""):
     """Add a petri dish on the grid, number : position on the pile from the ground"""
     
-    if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id]) // 2 < 10:
+    if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id]) // 2 < 12:
         if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id])>0 and grid.object_grid[grid_pos.y_id][grid_pos.x_id][0] == grid.cam:
             logging.info("Cannot use photo spot")
-        elif len(grid.object_grid[grid_pos.y_id][grid_pos.x_id])>0 and grid.object_grid[grid_pos.y_id][grid_pos.x_id][0] == grid.stack:
+        elif len(grid.object_grid[grid_pos.y_id][grid_pos.x_id])>0 and grid.object_grid[grid_pos.y_id][grid_pos.x_id][0] in grid.stack_list:
             logging.info("Cannot use stack spot")
         else :
             grid.add_object([SmallPetriBottom(number=number,associated_name=name,associated_experiment=associated_experiment),
@@ -171,6 +188,40 @@ def add_pertidish(grid: Grid, grid_pos:GridPosition, number= "", name="", associ
     else:
         logging.info("Max number of petri dish reached")
 
+def add_pile(grid: Grid, grid_pos: GridPosition, tkinter_window):
+    if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id]) // 2 < 2:
+        if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id])>0 and grid.object_grid[grid_pos.y_id][grid_pos.x_id][0] == grid.cam:
+            logging.info("Cannot use photo spot")
+        elif len(grid.object_grid[grid_pos.y_id][grid_pos.x_id])>0 and grid.object_grid[grid_pos.y_id][grid_pos.x_id][0] in grid.stack_list:
+            logging.info("Cannot use stack spot")
+        else :
+            print("launching pile registration")
+            # create empty experiment
+            ThisExperiment = ExperimentInterface(tkinter_window)
+
+            ThisExperiment.root.mainloop()
+            #print("matrix_experiment_names",ThisExperiment.matrix_experiment_names)
+            #print("matrix_marker_names", ThisExperiment.matrix_marker_names)
+
+        for row in range(0,4):
+            for column in range(0,2):
+                grid_pos = GridPosition(column,row)
+                n_experiments = len(ThisExperiment.matrix_experiment_names[row][column])
+
+                if n_experiments >0:
+                    plate_holder = PlateHolder(ThisExperiment,num_experiments=n_experiments)
+                    grid.add_object([plate_holder], grid_pos)
+                    experiment_number = -1
+                    marker_number = 1
+                    for index in range(0,len(ThisExperiment.matrix_marker_names[row][column])) :
+                        #print('ThisExperiment.matrix_marker_names[row][column]',ThisExperiment.matrix_marker_names[row][column])
+                        #print("experiment",ThisExperiment.matrix_experiment_names[row][column],experiment_number)
+                        add_petridish(grid, grid_pos, number=marker_number, name=ThisExperiment.matrix_marker_names[row][column][index],
+                                     associated_experiment=ThisExperiment.matrix_experiment_names[row][column][experiment_number])
+                        marker_number += 1
+                        if ThisExperiment.matrix_marker_names[row][column][index] == 'original':
+                            experiment_number+=1
+                            marker_number = 0
 
 def add_experiment(grid: Grid, grid_pos: GridPosition, tkinter_window):
     """Add an experiment  on the grid"""
@@ -178,7 +229,7 @@ def add_experiment(grid: Grid, grid_pos: GridPosition, tkinter_window):
     if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id]) // 2 < 2:
         if len(grid.object_grid[grid_pos.y_id][grid_pos.x_id])>0 and grid.object_grid[grid_pos.y_id][grid_pos.x_id][0] == grid.cam:
             logging.info("Cannot use photo spot")
-        elif len(grid.object_grid[grid_pos.y_id][grid_pos.x_id])>0 and grid.object_grid[grid_pos.y_id][grid_pos.x_id][0] == grid.stack:
+        elif len(grid.object_grid[grid_pos.y_id][grid_pos.x_id])>0 and grid.object_grid[grid_pos.y_id][grid_pos.x_id][0] in grid.stack_list:
             logging.info("Cannot use stack spot")
         else :
             #create empty experiment
@@ -205,7 +256,7 @@ def add_experiment(grid: Grid, grid_pos: GridPosition, tkinter_window):
         # PlateHolder associated with the experiment
         for i in range(10):
             if ThisExperiment.marker_list[i] !='':
-                add_pertidish(grid, grid_pos,number=i,name=ThisExperiment.question_list[i].answer,
+                add_petridish(grid, grid_pos,number=i,name=ThisExperiment.question_list[i].answer,
                               associated_experiment=ExperimentNameQuestion.answer)
     else:
         logging.info("Max number of Experiment reached")
@@ -224,7 +275,7 @@ def add_plateholder(grid: Grid, grid_pos:GridPosition):
         0] == grid.cam:
         logging.info("Cannot use photo spot")
     elif len(grid.object_grid[grid_pos.y_id][grid_pos.x_id]) > 0 and grid.object_grid[grid_pos.y_id][grid_pos.x_id][
-        0] == grid.stack:
+        0] in grid.stack_list:
         logging.info("Cannot use stack spot")
     else:
         objects = grid.object_grid[grid_pos.y_id][grid_pos.x_id]
@@ -269,7 +320,7 @@ def load_csv_of_experiments(grid: Grid, path):
                 else:
                     if text != '':
                         print("add marker", text, " at ", i//7, j)
-                        add_pertidish(grid, GridPosition(j,i//7), number=i%7, name=text)
+                        add_petridish(grid, GridPosition(j,i//7), number=i%7, name=text)
 
 
 
@@ -310,17 +361,18 @@ def load_grid(grid: Grid, grid_resolution: int = 100, line_thickness: int = 2, t
                     
         if left_click:
             click_pos = GridPosition(mouseX//(grid_resolution+line_thickness), mouseY//(grid_resolution+line_thickness))
-            add_pertidish(grid, click_pos)
+            add_petridish(grid, click_pos)
             left_click = False
-        elif right_click:
-            click_pos = GridPosition(mouseX//(grid_resolution+line_thickness), mouseY//(grid_resolution+line_thickness))
-            remove_pertidish(grid, click_pos)
-            right_click = False
         elif middle_click:
             click_pos = GridPosition(mouseX//(grid_resolution+line_thickness), mouseY//(grid_resolution+line_thickness))
-            #add_plateholder(grid, click_pos)
-            add_experiment(grid, click_pos,tkinter_window)
+            remove_pertidish(grid, click_pos)
             middle_click = False
+        elif right_click:
+            click_pos = GridPosition(mouseX//(grid_resolution+line_thickness), mouseY//(grid_resolution+line_thickness))
+            #add_plateholder(grid, click_pos)
+            #add_experiment(grid, click_pos,tkinter_window)
+            add_pile(grid, click_pos, tkinter_window)
+            right_click = False
     
     
         cv2.imshow("AutoMate Interface", imshow)

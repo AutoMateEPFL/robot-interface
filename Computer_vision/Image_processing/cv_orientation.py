@@ -79,8 +79,37 @@ def fing_petri_angle(image: np.ndarray)->float:
     else:
         logging.info('No lines found')
         return None
-        
-        
+
+
+def detect_sticker(cropped_input):
+    row, col = cropped_input.shape[0:2]
+    center = tuple(np.array([col, row]) / 2)
+
+    bw: np.ndarray = cv2.cvtColor(cropped_input, cv2.COLOR_BGR2GRAY)
+    gray = cv2.adaptiveThreshold(bw, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 255, -10)
+    # Convert to grayscale.
+    # gray = cv2.cvtColor(cropped_input, cv2.COLOR_BGR2GRAY)
+    # Blur using 3 * 3 kernel.
+    gray_blurred = cv2.blur(gray, (3, 3))
+    # Apply Hough transform on the blurred image.
+    detected_circles = cv2.HoughCircles(gray_blurred,
+                                        cv2.HOUGH_GRADIENT, 1, 20, param1=50,
+                                        param2=28, minRadius=45, maxRadius=120)
+
+    for pt in detected_circles[0, :]:
+        a, b, r = pt[0], pt[1], pt[2]
+        print("a", a, "b", b, "r", r)
+        # Draw the circumference of the circle.
+        if r <= 57 and r >= 49:
+            cv2.circle(cropped_input, (int(a), int(b)), int(r), (0, 255, 0), 2)
+
+            # Draw a small circle (of radius 1) to show the center.
+            cv2.circle(cropped_input, (int(a), int(b)), 1, (0, 0, 255), 3)
+            angle = np.arctan2((b - center[1]), (a - center[0])) * 180 / np.pi
+
+    return 180 - angle
+
+
 if __name__ == '__main__':
     
     filename = '/Image_processing/Petri_1.jpeg'
