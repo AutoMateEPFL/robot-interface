@@ -95,7 +95,7 @@ def detect_sticker(cropped_input):
     detected_circles = cv2.HoughCircles(gray_blurred,
                                         cv2.HOUGH_GRADIENT, 1, 20, param1=50,
                                         param2=28, minRadius=45, maxRadius=120)
-
+    angle=0
     for pt in detected_circles[0, :]:
         a, b, r = pt[0], pt[1], pt[2]
         print("a", a, "b", b, "r", r)
@@ -106,8 +106,9 @@ def detect_sticker(cropped_input):
             # Draw a small circle (of radius 1) to show the center.
             cv2.circle(cropped_input, (int(a), int(b)), 1, (0, 0, 255), 3)
             angle = np.arctan2((b - center[1]), (a - center[0])) * 180 / np.pi
-
+    
     return 180 - angle
+    
 
 
 if __name__ == '__main__':

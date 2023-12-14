@@ -70,8 +70,8 @@ def analyse_each_image_separately(folder_name, method='sticker', auto_offset=Fal
         positions = [(240, 240), (880, 810)]
     elif num_cols == 9:
         positions_saarstedt = [(240, 245), (800, 830)]
-        positions_corning = [(305, 250), (820, 830)]
-        positions_corning = [(230, 250), (880, 810)]
+        positions_corning = [(300, 250), (820, 830)]
+        #positions_corning = [(230, 250), (880, 810)]
         positions = positions_corning
 
     matrix_list = []
@@ -87,7 +87,7 @@ def analyse_each_image_separately(folder_name, method='sticker', auto_offset=Fal
         #width =  input_image.shape[1]
         #cropped_input = input_image[:,(width-tall)//2:width-(width-tall)//2][:]
 
-        cropped_input = input_image[:, 450:1520][:]
+        cropped_input = input_image[:1050, 430:1490][:]
 
         # Correction for the rotation of the image
         if method=='sticker':
@@ -146,7 +146,7 @@ def summary_of_all_images(folder_name):
     width = cv2.imread(input_images[0]).shape[1]
 
     #input_summary = cv2.imread(input_images[0])[:, (width - tall) // 2:width - (width - tall) // 2][:]
-    input_summary = cv2.imread(input_images[0])[:, 450:1520][:]
+    input_summary = cv2.imread(input_images[0])[:1050, 430:1490][:]
     output_summary = cv2.imread(output_images[0])
     cv2.putText(output_summary, "Marker: " + str(input_images[0].split("_")[-1][:-4]), (320, 220),
                 cv2.FONT_HERSHEY_SIMPLEX, 1.7, (255, 0, 0), 2, cv2.LINE_AA)
@@ -154,7 +154,7 @@ def summary_of_all_images(folder_name):
     for i in range(1,len(input_images)) :
 
         #input_summary= np.concatenate((input_summary, cv2.imread(input_images[i])[:, (width - tall) // 2:width - (width - tall) // 2][:]), axis=0)
-        input_summary= np.concatenate((input_summary, cv2.imread(input_images[i])[:, 450:1520][:]), axis=1)
+        input_summary= np.concatenate((input_summary, cv2.imread(input_images[i])[:1050, 430:1490][:]), axis=1)
         output_to_aggregate = cv2.imread(output_images[i])
         cv2.putText(output_to_aggregate, "Marker: " + str(input_images[i].split("_")[-1][:-4]), (320, 220),
                     cv2.FONT_HERSHEY_SIMPLEX, 1.7, (255, 0, 0), 2, cv2.LINE_AA)

@@ -138,6 +138,6 @@ if __name__ == "__main__":
     #path = "../images/"+str(ExperimentNameQuestion._answer)
     print("path",path)
     analyse_each_image_separately(path, auto_offset=True, auto_rotate=False,
-                                   num_cols=int(NumberOfColsQuestion._answer),aggregation = to_aggregate)
+                                   num_cols=int(NumberOfColsQuestion._answer),aggregation = True)
 
     summary_of_all_images(path)

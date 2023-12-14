@@ -28,7 +28,8 @@ logging.basicConfig(
     level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S')
 
-is_it_first_picture = True
+
+
 async def main():
     grid = Grid(x_max=-800, x_dist=-199, y_max=-620, y_dist=-200)
 
@@ -49,6 +50,8 @@ async def main():
     list_of_experiments = find_all_PlateHolder(grid)
 
     reconstruct_pile = False
+    
+    is_it_first_picture = True
     # FOR EACH EXPERIMENT TAKE PICTURES AND DECONSTRUCT THE PILE
     for index, plate_holder in enumerate(list_of_experiments):
         stack_pos = grid.find_object(grid.stack_list[index])
@@ -69,9 +72,15 @@ async def main():
 
             await robot.pick_and_place(target, pic_pos)
             
+            if is_it_first_picture:
+                await robot.take_picture(target[0], obj_rem=target[1], folder_name=target[0]._associated_experiment,
+                                        prefix="marker_" + str(target[0].number) + "_",
+                                        suffix="_" + str(target[0].associated_name), to_save = False, pic_pos=pic_pos)
+                is_it_first_picture = False
+            
             await robot.take_picture(target[0], obj_rem=target[1], folder_name=target[0]._associated_experiment,
                                         prefix="marker_" + str(target[0].number) + "_",
-                                        suffix="_" + str(target[0].associated_name), to_save = True)
+                                        suffix="_" + str(target[0].associated_name), to_save = True, pic_pos=pic_pos)
 
             if num != n_petri - 1:
                 await robot.pick_and_place(target, stack_pos)
