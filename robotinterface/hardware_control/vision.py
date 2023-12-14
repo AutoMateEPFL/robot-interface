@@ -62,7 +62,8 @@ class Vision:
 
         # Get the current timestamp and convert it to a string
         timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-
+        #root_folder = "\\nasdcsr.unil.ch/RECHERCHE/FAC/FBM/CIG/avjestic/zygoticfate/D2c/Lab_AutoMate_results"
+        #root_folder = "nasdcsr.unil.ch\RECHERCHE\FAC\FBM\CIG\avjestic\zygoticfate\D2c\Lab_AutoMate_results"
         if folder_name == "" :
             # Ensure the images directory exists
             os.makedirs('images', exist_ok=True)
@@ -70,8 +71,9 @@ class Vision:
             filename = f'images/'+prefix+f'{timestamp}'+suffix+'.jpg'
         else :
             # Ensure the images directory exists
-            os.makedirs('images/'+folder_name, exist_ok=True)
-            filename = f'images/' + folder_name + '/'+prefix+f'{timestamp}'+suffix+'.jpg'
+            os.makedirs('/images/'+folder_name, exist_ok=True)
+            
+            filename =f'/images/' + folder_name + '/'+prefix+f'{timestamp}'+suffix+'.jpg'
 
         if to_save :
             # Save the frame to a file

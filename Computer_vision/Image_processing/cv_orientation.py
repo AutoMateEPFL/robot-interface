@@ -98,7 +98,7 @@ def detect_sticker(cropped_input):
     angle=0
     for pt in detected_circles[0, :]:
         a, b, r = pt[0], pt[1], pt[2]
-        print("a", a, "b", b, "r", r)
+        #print("a", a, "b", b, "r", r)
         # Draw the circumference of the circle.
         if r <= 57 and r >= 49:
             cv2.circle(cropped_input, (int(a), int(b)), int(r), (0, 255, 0), 2)

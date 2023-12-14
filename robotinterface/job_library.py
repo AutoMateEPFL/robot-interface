@@ -59,7 +59,7 @@ def rotation_correction(matrix,matrix_of_keypoints,positions, cropped_input, ang
     matrix, matrix_of_keypoints, new_offset = analyse_matrix(rotated_image, positions, draw_blob=False,
                                                              auto_offset=auto_offset, num_cols=num_cols)
 
-def analyse_each_image_separately(folder_name, method='sticker', auto_offset=False, auto_rotate=False,num_cols=10,aggregation = False):
+def analyse_each_image_separately(folder_name, method='sticker', auto_offset=False, auto_rotate=False,num_cols=10,aggregation = True):
     experiment_name = folder_name.split("/")[-1]
     path = os.path.join(folder_name,'*.jpg')
     #images = sorted(glob.glob(folder_name+'/*.jpg'))
@@ -103,7 +103,7 @@ def analyse_each_image_separately(folder_name, method='sticker', auto_offset=Fal
             angle = 0
 
         cv2.putText(rotated_image, str(round(angle, 2)), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
-        if image == images[0]:
+        if image == images[-1]:
             background = rotated_image.copy()
 
         # Analyse the results
@@ -116,23 +116,29 @@ def analyse_each_image_separately(folder_name, method='sticker', auto_offset=Fal
 
         new_positions = [(positions[0][0]+new_offset[0],positions[0][1]+new_offset[1]),
                          (positions[1][0]+new_offset[0],positions[1][1]+new_offset[1])]
-        if image == images[0]:
+        if image == images[-1]:
             new_positions_0 = new_positions
         output = draw_resutls(rotated_image, new_positions, matrix,num_cols=num_cols)
 
         cv2.imwrite(image.replace('.jpg','')+"_out.jpeg",output)
 
     if aggregation:
+        experiment_name=folder_name.split(splitter)[-1]
         aggregated_image = create_aggregated_matrix(matrix_list=matrix_list, marker_names_list=marker_names_list,
                                                     positions=new_positions_0, num_cols=num_cols,background=background,
-                                                    experiment_name=folder_name.split(splitter)[-1])
+                                                    experiment_name=experiment_name)
         path = os.path.join(folder_name, "aggregated_matrix_"+experiment_name+".jpeg")
+        
         #cv2.imwrite(folder_name + "/aggregated_matrix.jpeg", aggregated_image)
         cv2.imwrite(path, aggregated_image)
 
 def summary_of_all_images(folder_name):
-    experiment_name = folder_name.split("/")[-1]
-    path_input = os.path.join(folder_name, '*.jpg')
+    if platform.system() == 'Windows':
+        experiment_name = folder_name.split("\\")[-1]
+    else:
+        experiment_name = folder_name.split("/")[-1]
+    path_input = os.path.join("..","robot-interface",folder_name, '*.jpg')
+
     #input_images = sorted(glob.glob(folder_name + '/*.jpg'))
     input_images = sorted(glob.glob(path_input))
 
@@ -140,8 +146,8 @@ def summary_of_all_images(folder_name):
     #output_images = sorted(glob.glob(folder_name+'/*'+'_out.jpeg'))
     output_images = sorted(glob.glob(path_output))
 
-    print(input_images)
-    print(output_images)
+    print("input_images",input_images)
+    print("output_images",output_images)
     tall = cv2.imread(input_images[0]).shape[0]
     width = cv2.imread(input_images[0]).shape[1]
 
@@ -162,7 +168,8 @@ def summary_of_all_images(folder_name):
 
     image_summary = np.concatenate((input_summary, output_summary), axis=0)
 
-    path = os.path.join(folder_name, "image_summary_"+experiment_name+".jpeg")
+    path = os.path.join("..","robot-interface",folder_name, "image_summary_"+experiment_name+".jpeg")
+
     #cv2.imwrite( folder_name+"/image_summary.jpeg", image_summary)
     cv2.imwrite(path, image_summary)
 
@@ -200,19 +207,19 @@ def create_aggregated_matrix(matrix_list,marker_names_list,positions,num_cols,ba
                 #BGR
 
                 if j <= 4:
-                    if matrix_list[0][i, :4].all() == 1:
+                    if matrix_list[-1][i, :4].all() == 1:
                         draw = True
                     else :
                         draw =False
                 elif j >=5 :
-                    if matrix_list[0][i, 5:].all() == 1:
+                    if matrix_list[-1][i, 5:].all() == 1:
                         draw = True
                     else :
                         draw =False
                 else:
                     draw = False
 
-                if matrix_list[0][i, j] == 1 and draw:
+                if matrix_list[-1][i, j] == 1 and draw:
                     cv2.rectangle(image, pt1, pt2, (0, 255, 0), 2)
                 else :
                     cv2.rectangle(image, pt1, pt2, (0, 0, 255), 2)
