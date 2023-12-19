@@ -9,7 +9,7 @@ from job_library import *
 if platform.system() == 'Windows':
     sys.path.append(os.path.join(sys.path[0], '..'))
 else:
-    sys.path.append(r"/Users/Etienne/Documents/GitHub/robot-interface")
+    sys.path.append(r"/Users/AutoMate EPFL/Documents/GitHub/robot-interface")
 import logging
 import asyncio
 import cv2

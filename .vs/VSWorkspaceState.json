@@ -12,6 +12,6 @@
     "\\robotinterface\\hardware_control\\FirmwareSettings",
     "\\robotinterface\\logistics"
   ],
-  "SelectedNode": "\\robotinterface\\hardware_control\\drivers\\grbl\\communication.py",
+  "SelectedNode": "\\Computer_vision\\Image_processing\\cv_matrix.py",
   "PreviewInSolutionExplorer": false
 }
