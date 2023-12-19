@@ -1,17 +1,16 @@
 {
   "ExpandedNodes": [
     "",
-    "\\Computer_vision",
-    "\\Computer_vision\\Image_processing",
     "\\robotinterface",
     "\\robotinterface\\gui",
     "\\robotinterface\\hardware_control",
     "\\robotinterface\\hardware_control\\drivers",
+    "\\robotinterface\\hardware_control\\drivers\\camera",
     "\\robotinterface\\hardware_control\\drivers\\dynamixel",
     "\\robotinterface\\hardware_control\\drivers\\grbl",
     "\\robotinterface\\hardware_control\\FirmwareSettings",
     "\\robotinterface\\logistics"
   ],
-  "SelectedNode": "\\Computer_vision\\Image_processing\\cv_matrix.py",
+  "SelectedNode": "\\robotinterface\\hardware_control\\vision.py",
   "PreviewInSolutionExplorer": false
 }

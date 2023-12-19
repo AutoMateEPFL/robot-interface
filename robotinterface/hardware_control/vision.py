@@ -59,12 +59,12 @@ class Vision:
         """
         await asyncio.sleep(0.65)
         frame = await self.camera.capture_frame(focus=constants.FOCUS)
-        h,  w = frame.shape[:2]
-        ret = 0.16730785122255515
-        mtx= np.array([[164.20407435,0.0,951.70065218],[  0.0,164.81883753, 555.20676006],[  0.0,0.0,1.0]])
-        dist = np.array([[ 4.63814161e-03, -2.23604220e-04,  6.48638478e-04, -2.35846511e-04, 5.23452299e-06]])
-        newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1, (w,h))
-        frame = cv2.undistort(frame, mtx, dist, None, newcameramtx)
+        #h,  w = frame.shape[:2]
+        #ret = 0.16730785122255515
+        #mtx= np.array([[164.20407435,0.0,951.70065218],[  0.0,164.81883753, 555.20676006],[  0.0,0.0,1.0]])
+        #dist = np.array([[ 4.63814161e-03, -2.23604220e-04,  6.48638478e-04, -2.35846511e-04, 5.23452299e-06]])
+        #newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1, (w,h))
+        #frame = cv2.undistort(frame, mtx, dist, None, newcameramtx)
 
         # Get the current timestamp and convert it to a string
         timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
