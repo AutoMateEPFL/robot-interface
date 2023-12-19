@@ -103,6 +103,29 @@ class Question:
         self.button = tk.Button(self.labelframe, text="OK", command=self.tkinter_window.destroy)
         self.button.pack()
 
+    def update_folder_combobox(self):
+        # Get the list of folders in the initial path
+        folders = [f for f in os.listdir(self.initial_path) if os.path.isdir(os.path.join(self.initial_path, f))]
+        folders.sort(key=lambda f: os.path.getmtime(os.path.join(self.initial_path, f)), reverse=True)
+
+        # Set the Combobox values
+        self.folder_combobox["values"] = folders
+
+        # Set the default value
+        if folders:
+            self.folder_combobox.set(folders[0])
+        else:
+            self.folder_combobox.set("No folders")
+
+    def choose_folder(self):
+        selected_folder = self.folder_combobox.get()
+
+        # Update the selected folder variable and label
+        if selected_folder and selected_folder != "No folders":
+            folder_path = os.path.join(self.initial_path, selected_folder)
+            self.selected_folder.set(folder_path)
+        else:
+            self.selected_folder.set("No folder selected")
 
 if __name__ == "__main__":
     if platform.system() == 'Windows':
