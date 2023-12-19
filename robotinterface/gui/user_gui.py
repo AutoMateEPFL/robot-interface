@@ -363,16 +363,16 @@ def load_grid(grid: Grid, grid_resolution: int = 100, line_thickness: int = 2, t
             click_pos = GridPosition(mouseX//(grid_resolution+line_thickness), mouseY//(grid_resolution+line_thickness))
             add_petridish(grid, click_pos)
             left_click = False
-        elif middle_click:
+        elif right_click:
             click_pos = GridPosition(mouseX//(grid_resolution+line_thickness), mouseY//(grid_resolution+line_thickness))
             remove_pertidish(grid, click_pos)
-            middle_click = False
-        elif right_click:
+            right_click = False
+        elif middle_click:
             click_pos = GridPosition(mouseX//(grid_resolution+line_thickness), mouseY//(grid_resolution+line_thickness))
             #add_plateholder(grid, click_pos)
             #add_experiment(grid, click_pos,tkinter_window)
             add_pile(grid, click_pos, tkinter_window)
-            right_click = False
+            middle_click = False
     
     
         cv2.imshow("AutoMate Interface", imshow)

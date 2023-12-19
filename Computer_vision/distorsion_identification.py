@@ -56,7 +56,7 @@ imgpoints = []  # 2D points in image plane
 
 # Load images taken with the camera
 # Replace 'path/to/images/*.jpg' with the path to your images
-images = glob.glob('/Users/Etienne/Documents/GitHub/robot-interface/images/*.jpg')
+images = glob.glob("C:/Users/AutoMate EPFL/Documents/GitHub/robot-interface/images/*.jpg")
 print('images',images)
 for fname in images:
     img = cv2.imread(fname)
@@ -85,6 +85,9 @@ cv2.destroyAllWindows()
 
 # Calibrate the camera
 ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
+print("ret",ret)
+print("mtx",mtx)
+print("dist",dist)
 
 # Save the calibration parameters to a file (optional)
 np.savez('calibration.npz', mtx=mtx, dist=dist, rvecs=rvecs, tvecs=tvecs)

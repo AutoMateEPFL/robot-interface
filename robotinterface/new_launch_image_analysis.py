@@ -86,7 +86,10 @@ class FolderChooserApp:
         print("High Sensitivity:", self.high_sensitivity)
 
 if __name__ == "__main__":
-    path = "/Users/Etienne/Documents/GitHub/robot-interface/images"
+    if platform.system() == 'Windows':
+        path = "C:/Users/AutoMate EPFL/Documents/GitHub/robot-interface/images"
+    else:
+        path = "/Users/Etienne/Documents/GitHub/robot-interface/images"
     root = tk.Tk()
     app = FolderChooserApp(root,path)
     root.mainloop()
