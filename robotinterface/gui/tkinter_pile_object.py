@@ -51,6 +51,8 @@ class ExperimentInterface:
         self.checkbox_vars = []
         self.entry_vars = []
 
+        self.entries = []
+
         for i, frame in enumerate(self.frames, start=1):
             entry, checkboxes, checkbox_vars, entry_var = self.create_experiment_line(frame, i)
             self.entry_vars.append(entry_var)
@@ -82,10 +84,13 @@ class ExperimentInterface:
             checkboxes.append(checkbox)
             checkbox_vars.append(checkbox_var)
 
+            self.entries.append(entry)
+
+        self.checkboxes = checkboxes
         return entry, checkboxes, checkbox_vars, entry_var
 
     def create_and_place_indicator(self):
-        self.indicator = tk.Label(self.indicator_frame, text="Indicator", bg="green", width=20)
+        self.indicator = tk.Label(self.indicator_frame, text="Max number of Petri dishes", bg="green", width=20)
         self.indicator.pack(pady=10)
 
     def submit(self):
@@ -101,7 +106,7 @@ class ExperimentInterface:
         self.grid_cell_buttons[button_number - 1].config(bg="yellow")  # Change color to yellow
         print(f"Validator button {button_number} pressed.")
         grid_cell_buttons = self.grid_cell_buttons[button_number - 1]
-        grid_cell_buttons.config(text=grid_cell_buttons.cget('text') + ' FILLED',
+        grid_cell_buttons.config(text=grid_cell_buttons.cget('text') + ' USED',
                                 font='Helvetica 13 bold')  # Change color to yellow
 
         ## reset to prevent multiple click on same cell:
@@ -119,6 +124,11 @@ class ExperimentInterface:
         print("exp", self.matrix_experiment_names[row][col])
         print("markers", self.matrix_marker_names[row][col])
         
+        for entry in self.entries:
+            entry.delete(0, tk.END)  # Clear entry content
+        for checkbox_var in self.checkbox_vars:
+            checkbox_var.set(0)  # Deselect checkboxes
+
 
     def update_indicator(self, *args):
         # Function to update the indicator based on the checkbox states and non-empty entries

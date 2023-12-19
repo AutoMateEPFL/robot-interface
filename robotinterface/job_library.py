@@ -60,8 +60,12 @@ def rotation_correction(matrix,matrix_of_keypoints,positions, cropped_input, ang
                                                              auto_offset=auto_offset, num_cols=num_cols)
 
 def analyse_each_image_separately(folder_name, method='sticker', auto_offset=False, auto_rotate=False,num_cols=10,aggregation = True):
-    experiment_name = folder_name.split("/")[-1]
+    if platform.system() == 'Windows':
+        experiment_name = folder_name.split("\\")[-1]
+    else:
+        experiment_name = folder_name.split("/")[-1]
     path = os.path.join(folder_name,'*.jpg')
+    print("path",path)
     #images = sorted(glob.glob(folder_name+'/*.jpg'))
     images = sorted(glob.glob(path))
     num_cols = num_cols
@@ -76,7 +80,7 @@ def analyse_each_image_separately(folder_name, method='sticker', auto_offset=Fal
 
     matrix_list = []
     marker_names_list = []
-    print(images)
+    print("images",images)
 
     for image in images :
         marker_names_list.append(image.split("_")[-1][:-4])
@@ -135,9 +139,10 @@ def analyse_each_image_separately(folder_name, method='sticker', auto_offset=Fal
 def summary_of_all_images(folder_name):
     if platform.system() == 'Windows':
         experiment_name = folder_name.split("\\")[-1]
+        path_input = os.path.join("..", "robot-interface", folder_name, '*.jpg')
     else:
         experiment_name = folder_name.split("/")[-1]
-    path_input = os.path.join("..","robot-interface",folder_name, '*.jpg')
+        path_input = os.path.join(folder_name, '*.jpg')
 
     #input_images = sorted(glob.glob(folder_name + '/*.jpg'))
     input_images = sorted(glob.glob(path_input))
@@ -168,7 +173,10 @@ def summary_of_all_images(folder_name):
 
     image_summary = np.concatenate((input_summary, output_summary), axis=0)
 
-    path = os.path.join("..","robot-interface",folder_name, "image_summary_"+experiment_name+".jpeg")
+    if platform.system() == 'Windows':
+        path = os.path.join("..","robot-interface",folder_name, "image_summary_"+experiment_name+".jpeg")
+    else:
+        path = os.path.join(folder_name, "image_summary_"+experiment_name+".jpeg")
 
     #cv2.imwrite( folder_name+"/image_summary.jpeg", image_summary)
     cv2.imwrite(path, image_summary)

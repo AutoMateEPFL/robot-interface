@@ -105,7 +105,10 @@ class Question:
 
 
 if __name__ == "__main__":
-    path = os.path.join("..","robot-interface","images","*")
+    if platform.system() == 'Windows':
+        path = os.path.join("..","robot-interface","images","*")
+    else :
+        path = os.path.join("..","images", "*")
     print("PATH",path)
     #list_of_folders = glob.glob( "../images/*")
     list_of_folders=glob.glob(path)
@@ -134,14 +137,13 @@ if __name__ == "__main__":
 
     ThisExperiment.root.mainloop()
     if platform.system() == 'Windows':
-        path = os.path.join('images', ExperimentNameQuestion._answer)
-    else:
-        path = os.path.join('images',ExperimentNameQuestion._answer)
-        #"\\nasdcsr.unil.ch\RECHERCHE\FAC\FBM\CIG\avjestic\zygoticfate\D2c\Lab_AutoMate_results"
-        path = os.path.join('images',ExperimentNameQuestion._answer)
+        path = os.path.join("..","robot-interface","images", ExperimentNameQuestion._answer)
+    else :
+        path = os.path.join("..","images", ExperimentNameQuestion._answer)
+
     #path = "../images/"+str(ExperimentNameQuestion._answer)
     print("path",path)
     analyse_each_image_separately(path, auto_offset=True, auto_rotate=False,
                                    num_cols=int(NumberOfColsQuestion._answer),aggregation = True)
-    print("summary")
+
     summary_of_all_images(path)
