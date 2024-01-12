@@ -4,8 +4,6 @@ import glob
 import cv2
 import os
 
-## THIS CODE IS USED TO IDENTIFY THE DISTORSION OF THE CAMERA USING A CHESSBOARD, ONLY USE ONCE AND THEN COPY PASTE PAREMETERS
-
 if False:
     # Set the path to the folder where images will be saved
     save_folder = '/Users/Etienne/Documents/GitHub/robot-interface/images/'
@@ -44,6 +42,7 @@ if False:
     cap.release()
     cv2.destroyAllWindows()
 
+
 # Size of the chessboard
 chessboard_size = (3, 5)
 
@@ -58,7 +57,7 @@ imgpoints = []  # 2D points in image plane
 # Load images taken with the camera
 # Replace 'path/to/images/*.jpg' with the path to your images
 images = glob.glob("C:/Users/AutoMate EPFL/Documents/GitHub/robot-interface/images/*.jpg")
-print('images', images)
+print('images',images)
 for fname in images:
     img = cv2.imread(fname)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -86,9 +85,9 @@ cv2.destroyAllWindows()
 
 # Calibrate the camera
 ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
-print("ret", ret)
-print("mtx", mtx)
-print("dist", dist)
+print("ret",ret)
+print("mtx",mtx)
+print("dist",dist)
 
 # Save the calibration parameters to a file (optional)
 np.savez('calibration.npz', mtx=mtx, dist=dist, rvecs=rvecs, tvecs=tvecs)

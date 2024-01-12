@@ -17,10 +17,10 @@ params.minThreshold = 20
 # Filter by Area.
 params.filterByArea = True
 params.minArea = 100
-params.maxArea = 3000
+#params.maxArea = 6000
 
 # Filter by Circularity
-params.filterByCircularity = True
+params.filterByCircularity = False
 params.minCircularity = 0.01
 
 # Filter by Convexity
@@ -54,7 +54,6 @@ def draw_matrix(image: np.ndarray, positions: list,num_cols=10)->None:
         image (np.ndarray): image to draw on
         positions (list): list of the two corners of the matrix
     """
-
     if len(positions) >= 2:
         num_cols: int = num_cols
         num_rows: int = 9
@@ -86,8 +85,7 @@ def analyse_matrix(image: np.ndarray, positions: list,draw_blob=False, auto_offs
         matrix (np.ndarray): matrix of 1s and 0s
     """
     global colony_detector
-
-    positions_limits = [(200, 200), (900, 900)]
+    
     num_cols: int = num_cols
     num_rows: int = 9
     
@@ -97,21 +95,16 @@ def analyse_matrix(image: np.ndarray, positions: list,draw_blob=False, auto_offs
     pos0: tuple = positions[0]
     pos1: tuple = positions[1]
     offset: tuple = ((pos1[0]-pos0[0])/num_cols, (pos1[1]-pos0[1])/num_rows)
-
-    intermediate = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    bw: np.ndarray = cv2.cvtColor(intermediate, cv2.COLOR_BGR2GRAY)
+    
+    bw: np.ndarray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # old block value : 71
     # block value for 55
-    #tr: np.ndarray = cv2.adaptiveThreshold(bw,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 95, -10)
+    tr: np.ndarray = cv2.adaptiveThreshold(bw,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 95, -10)
 
-    # Threshold the grayscale image to create a binary image with only white regions
-    _, binary_image = cv2.threshold(bw, 170, 255, cv2.THRESH_BINARY)
+    #cv2.imshow('tr', tr)
+    cv2.imwrite("/Users/Etienne/Documents/GitHub/robot-interface/Computer_vision/Image_processing/matrix_gaussian.jpeg",tr)
 
-    edges = cv2.Canny(binary_image, 100, 255)
-
-    #cv2.imwrite("/Users/Etienne/Documents/GitHub/robot-interface/Computer_vision/Image_processing/matrix_gaussian.jpeg",tr)
-
-    keypoints: list(cv2.KeyPoint) = colony_detector.detect(edges)
+    keypoints: list(cv2.KeyPoint) = colony_detector.detect(tr)
 
     N_blob = len(keypoints)
     thickness: int = 2
@@ -120,19 +113,16 @@ def analyse_matrix(image: np.ndarray, positions: list,draw_blob=False, auto_offs
     # First use the position to fill the matrix
     for keypoint in keypoints:
         if draw_blob:
-            cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), int(keypoint.size), (255, 100, 0), 2)
-            cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), 2, (0, 0, 255), 2)
-
-        #if keypoint.pt[0] > pos0[0] and keypoint.pt[0] < pos1[0] and keypoint.pt[1] > pos0[1] and keypoint.pt[1] < pos1[1]:
+            cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), int(keypoint.size), (255, 0, 0), 2)
+            cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), 2, (255, 0, 0), 2)
         if keypoint.pt[0] > pos0[0] and keypoint.pt[0] < pos1[0] and keypoint.pt[1] > pos0[1] and keypoint.pt[1] < pos1[1]:
-            cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), int(keypoint.size), (255, 100, 0), 2)
-            cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), 2, (0, 0, 255), 2)
-
+            cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), int(keypoint.size), (255, 0, 0), 2)
+            cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), 2, (255, 0, 0), 2)
             i, j = (int((keypoint.pt[0] - pos0[0]) / offset[0]), int((keypoint.pt[1] - pos0[1]) / offset[1]))
             matrix[i, j] = 1
             matrix_of_keypoints[i][j] = keypoint
 
-            # cv2.putText(image, str(round(keypoint.size, 2)), (int(keypoint.pt[0]), int(keypoint.pt[1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2, cv2.LINE_AA)
+                # cv2.putText(image, str(round(keypoint.size, 2)), (int(keypoint.pt[0]), int(keypoint.pt[1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2, cv2.LINE_AA)
             # Compare the blob position with the center of the matrix:
             pt1: tuple = int(pos0[0] + i * offset[0]) + thickness, int(pos0[1] + j * offset[1]) + thickness
             pt2: tuple = int(pos0[0] + (i + 1) * offset[0]) - thickness, int(pos0[1] + (j + 1) * offset[1]) - thickness
@@ -155,8 +145,8 @@ def analyse_matrix(image: np.ndarray, positions: list,draw_blob=False, auto_offs
             if keypoint.pt[0] > pos0[0] and keypoint.pt[0] < pos1[0] and keypoint.pt[1] > pos0[1] and keypoint.pt[1] < pos1[1]:
                 matrix[int((keypoint.pt[0]-pos0[0])/offset[0]), int((keypoint.pt[1]-pos0[1])/offset[1])] = 1
                 if draw_blob:
-                    cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), int(keypoint.size), (100,100,255), 2)
-                    cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), 2, (0,0,255), 2)
+                    cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), int(keypoint.size), (255,0,0), 2)
+                    cv2.circle(image, (int(keypoint.pt[0]), int(keypoint.pt[1])), 2, (255,0,0), 2)
                     # cv2.putText(image, str(round(keypoint.size, 2)), (int(keypoint.pt[0]), int(keypoint.pt[1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2, cv2.LINE_AA)
 
     sum = matrix.sum()
@@ -226,3 +216,41 @@ def auto_rotate_number_of_blobs(cropped_input,reference,name="",angle_first_gues
             min = sum
     return min_angle
 
+    
+if __name__ == '__main__':
+        
+    filename = 'Computer_vision\Image_processing\Petri_2.jpeg'
+    image = cv2.imread(filename)
+    windowname = 'Image matrix'
+
+    cv2.namedWindow(windowname)
+    cv2.setMouseCallback(windowname, mouse_click)
+    positions = [(118, 92), (425, 404)]
+        
+    while True:
+        
+        imshow = image.copy()
+                    
+        if left_click:
+            print(mouseX, mouseY)
+            positions.append((mouseX, mouseY))
+            left_click = False
+
+        elif right_click:
+            positions = []
+            right_click = False
+            
+        if middle_click:
+            pass
+            middle_click = False
+            
+        # draw_clicks(imshow, positions)
+        matrix = analyse_matrix(imshow, positions)
+        imshow = draw_resutls(imshow, positions, matrix)
+        
+        #cv2.imshow(windowname, imshow)
+        
+        key = cv2.waitKey(5)
+        
+        if key == 27:
+            break

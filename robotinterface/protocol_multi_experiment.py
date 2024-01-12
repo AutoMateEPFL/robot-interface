@@ -5,47 +5,55 @@ import os
 import sys
 import platform
 from job_library import *
+
 if platform.system() == 'Windows':
     sys.path.append(os.path.join(sys.path[0], '..'))
 else:
-    #sys.path.append(r"/Users/AutoMate EPFL/Documents/GitHub/robot-interface")
-    sys.path.append(os.path.join(sys.path[0], '..'))
+    sys.path.append(r"/Users/AutoMate EPFL/Documents/GitHub/robot-interface")
 import logging
 import asyncio
+import cv2
+
 from robotinterface.hardware_control.robot import Robot
+
 from robotinterface.logistics.grid import Grid, GridPosition
+from robotinterface.logistics.pickable import *
+from robotinterface.gui.user_gui import load_csv_of_experiments
 from robotinterface.gui.user_gui import load_grid
 from concurrent.futures import ThreadPoolExecutor
+from functools import partial
 
 logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
     level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S')
 
+
+
 async def main():
-    # Def grid :
     grid = Grid(x_max=-800, x_dist=-199, y_max=-620, y_dist=-200)
 
     grid.set_camera_position(GridPosition(2, 1))
     grid.set_stack_positions([GridPosition(3, i) for i in range(0,4)]+[GridPosition(4, i) for i in range(0,4)])
-    # Camera position will be uesed as the ick and place position:
+
     pic_pos = grid.find_object(grid.cam)
 
-    # async loop:
     loop = asyncio.get_running_loop()
     executor = ThreadPoolExecutor(max_workers=2)
+
     if platform.system() == 'Windows':
         robot = await Robot.build(grid)
 
     #load_csv_of_experiments(grid,path="AutoMate_panel.csv")
     grid = load_grid(grid)
 
-    list_of_piles = find_all_PlateHolder(grid)
-    reconstruct_pile = False
-    is_it_first_picture = True
+    list_of_experiments = find_all_PlateHolder(grid)
 
+    reconstruct_pile = False
+    
+    is_it_first_picture = True
     # FOR EACH EXPERIMENT TAKE PICTURES AND DECONSTRUCT THE PILE
-    for index, plate_holder in enumerate(list_of_piles):
+    for index, plate_holder in enumerate(list_of_experiments):
         stack_pos = grid.find_object(grid.stack_list[index])
         #save_datalog_of_a_plateholder(plate_holder)
         pos_experiment = grid.find_object(plate_holder)
@@ -63,13 +71,12 @@ async def main():
                     target = [object]
 
             await robot.pick_and_place(target, pic_pos)
-
+            
+            
             await robot.take_picture(target[0], obj_rem=target[1], folder_name=target[0]._associated_experiment,
                                         prefix="marker_" + str(target[0].number) + "_",
                                         suffix="_" + str(target[0].associated_name), to_save = True, pic_pos=pic_pos)
 
-            # Place all petri dishes on the stack pos, except last one
-            #If the pile has to be reconstructed, directly put the last one on its initial pos
             if num != n_petri - 1:
                 await robot.pick_and_place(target, stack_pos)
             else:
