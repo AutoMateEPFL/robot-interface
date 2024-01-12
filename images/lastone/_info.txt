@@ -1,8 +1,0 @@
-EXPERIMENT LOG, date : 202311241135 , name : 
-LIST OF MARKER NAMES FROM GROUND TO TOP :
-Marker a : markera
-Marker b : markerb
-Marker c : markerc
-Marker d : markerd
-Marker e : 
-Marker f : 

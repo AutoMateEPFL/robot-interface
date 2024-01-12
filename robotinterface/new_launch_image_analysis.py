@@ -69,8 +69,6 @@ class FolderChooserApp:
             self.folder_combobox.set("No folders")
             self.selected_folder.set("No folder selected")
 
-
-
     def validate_selection(self):
         # Print all the selected values
         self.selected_folder = self.folder_combobox.get()
@@ -94,7 +92,7 @@ if __name__ == "__main__":
     app = FolderChooserApp(root,path)
     root.mainloop()
 
-    analyse_each_image_separately(os.path.join(path,app.selected_folder), auto_offset=True, auto_rotate=False,
+    analyse_each_image_separately(os.path.join(path,app.selected_folder), auto_offset=True, auto_rotate=True,
                                   num_cols=app.num_columns, aggregation=app.aggregate_results)
 
     summary_of_all_images(os.path.join(path,app.selected_folder))
