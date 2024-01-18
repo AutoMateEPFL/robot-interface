@@ -226,3 +226,4 @@ def auto_rotate_number_of_blobs(cropped_input,reference,name="",angle_first_gues
             min = sum
     return min_angle
 
+

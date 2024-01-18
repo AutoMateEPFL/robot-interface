@@ -18,7 +18,7 @@ else:
 
 from Computer_vision.Image_processing.cv_matrix import analyse_matrix, draw_resutls
 from Computer_vision.Image_processing.cv_orientation import rotateImage, find_petri_angle_using_line, detect_sticker, \
-    detect_orientation_using_number_of_blobs, detect_orientation_using_number_of_blobs
+    detect_orientation_using_convolution
 
 
 def undistort_image(input_image):
@@ -101,9 +101,9 @@ def analyse_each_image_separately(folder_name, method='sticker', auto_offset=Fal
 
         input_image = cv2.imread(image)
         undistorded_image = undistort_image(input_image)
-        cropped_input = undistorded_image[:1050, 430:1490][:]
+        #cropped_input = undistorded_image[:1050, 430:1480][:]
 
-        # cropped_input = undistorded_image[:1050, 390:1440][:]
+        cropped_input = undistorded_image[:1050, 380:1430][:]
 
         # Correction for the rotation of the image
         if method == 'sticker':
@@ -131,8 +131,11 @@ def analyse_each_image_separately(folder_name, method='sticker', auto_offset=Fal
                                                                  auto_offset=auto_offset, num_cols=num_cols)[0:3]
 
         if auto_rotate:
-            rotation_correction(matrix=matrix, matrix_of_keypoints=matrix_of_keypoints, positions=positions,
-                                cropped_input=cropped_input, angle=angle, auto_offset=auto_offset, num_cols=num_cols)
+            try:
+                rotation_correction(matrix=matrix, matrix_of_keypoints=matrix_of_keypoints, positions=positions,
+                                    cropped_input=cropped_input, angle=angle, auto_offset=auto_offset, num_cols=num_cols)
+            except:
+                pass
         matrix_list.append(matrix)
         # matrix_list = matrix_list +[matrix]
 
@@ -179,15 +182,15 @@ def summary_of_all_images(folder_name):
     width = cv2.imread(input_images[0]).shape[1]
 
     # first image :
-    input_summary = cv2.imread(input_images[0])[:1050, 430:1490][:]
-    # input_summary = cv2.imread(input_images[0])[:1050, 390:1440][:]
+    input_summary = cv2.imread(input_images[0])[:1050, 380:1430][:]
+    # input_summary = cv2.imread(input_images[0])[:1050, 380:1430][:]
     output_summary = cv2.imread(output_images[0])
     cv2.putText(output_summary, "Marker: " + str(input_images[0].split("_")[-1][:-4]), (320, 180),
                 cv2.FONT_HERSHEY_SIMPLEX, 1.7, (255, 0, 0), 2, cv2.LINE_AA)
 
     for i in range(1, len(input_images)):
-        input_summary = np.concatenate((cv2.imread(input_images[i])[:1050, 430:1490][:], input_summary), axis=1)
-        # input_summary= np.concatenate((cv2.imread(input_images[i])[:1050, 390:1440][:],input_summary), axis=1)
+        input_summary = np.concatenate((cv2.imread(input_images[i])[:1050, 380:1430][:], input_summary), axis=1)
+        # input_summary= np.concatenate((cv2.imread(input_images[i])[:1050, 380:1430][:],input_summary), axis=1)
         output_to_aggregate = cv2.imread(output_images[i])
 
         cv2.putText(output_to_aggregate, "Marker: " + str(input_images[i].split("_")[-1][:-4]), (320, 180),
@@ -271,6 +274,21 @@ def create_aggregated_matrix(matrix_list, marker_names_list, positions, num_cols
                                 (300, 850 + 40 * k),
                                 cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 20, 0), 2, cv2.LINE_AA)
         return image
+
+
+def detect_orientation_using_number_of_blobs(cropped_input,name="",angle_first_guess=0):
+
+    min = 0
+    for angle in (np.arange(0, 362, 1)):
+        rotated_image = rotateImage(cropped_input, -angle)
+        matrix, matrix_of_keypoints, new_offset, sum = analyse_matrix(rotated_image, [(285, 250), (850, 850)], draw_blob=False, auto_offset=False, num_cols=9)
+
+        if sum >= min:
+            print('angle', angle, 'norm', sum)
+            min_angle = angle
+
+            min = sum
+    return min_angle
 
 
 if __name__ == "__main__":

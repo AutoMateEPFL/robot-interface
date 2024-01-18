@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import logging
-from cv_matrix import analyse_matrix
 
 def rotateImage(image: np.ndarray, angle: float)->np.ndarray:
     """
@@ -124,28 +123,14 @@ def detect_sticker(cropped_input):
         pass
     if num_of_sticker == 0:
         print("NO STICKER DETECTED: use of convolution")
-        angle = detect_orientation_using_number_of_blobs(cropped_input)
+        angle = detect_orientation_using_convolution(cropped_input)
     elif num_of_sticker > 1:
         print(f"{num_of_sticker} STICKER DETECTED: best guess using convolution")
-        convolution_angle = detect_orientation_using_number_of_blobs(cropped_input)
+        convolution_angle = detect_orientation_using_convolution(cropped_input)
         angle = list_of_angles[np.argmin(np.abs(list_of_angles - convolution_angle))]
 
     return 180 - angle
 
-
-def detect_orientation_using_number_of_blobs(cropped_input,name="",angle_first_guess=0):
-
-    min = 0
-    for angle in (np.arange(0, 362, 1)):
-        rotated_image = rotateImage(cropped_input, -angle)
-        matrix, matrix_of_keypoints, new_offset, sum = analyse_matrix(rotated_image, [(285, 250), (850, 850)], draw_blob=False, auto_offset=False, num_cols=9)
-
-        if sum >= min:
-            print('angle', angle, 'norm', sum)
-            min_angle = angle
-
-            min = sum
-    return min_angle
 
 
 def detect_orientation_using_convolution(cropped_input):
@@ -153,7 +138,7 @@ def detect_orientation_using_convolution(cropped_input):
     bw: np.ndarray = cv2.cvtColor(cropped_input, cv2.COLOR_BGR2GRAY)
     tr = cv2.adaptiveThreshold(bw, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 71, -10)
 
-    reference = cv2.imread('reference.png')
+    reference = cv2.imread('C:/Users/AutoMate EPFL/Documents/GitHub/robot-interface/Computer_vision/Image_processing/reference.png')
     bw_ref: np.ndarray = cv2.cvtColor(reference, cv2.COLOR_BGR2GRAY)
     tr_ref = cv2.adaptiveThreshold(bw_ref, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 71, -10)
 
