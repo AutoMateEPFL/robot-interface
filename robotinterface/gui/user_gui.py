@@ -265,16 +265,16 @@ def load_grid(grid: Grid, grid_resolution: int = 100, line_thickness: int = 2, t
                                      mouseY // (grid_resolution + line_thickness))
             add_petridish(grid, click_pos)
             left_click = False
-        elif right_click:
-            click_pos = GridPosition(mouseX // (grid_resolution + line_thickness),
-                                     mouseY // (grid_resolution + line_thickness))
-            remove_petridish(grid, click_pos)
-            right_click = False
         elif middle_click:
             click_pos = GridPosition(mouseX // (grid_resolution + line_thickness),
                                      mouseY // (grid_resolution + line_thickness))
-            add_pile(grid, click_pos, tkinter_window)
+            remove_petridish(grid, click_pos)
             middle_click = False
+        elif right_click:
+            click_pos = GridPosition(mouseX // (grid_resolution + line_thickness),
+                                     mouseY // (grid_resolution + line_thickness))
+            add_pile(grid, click_pos, tkinter_window)
+            right_click = False
 
         cv2.imshow("AutoMate Interface", imshow)
         key = cv2.waitKey(5)
