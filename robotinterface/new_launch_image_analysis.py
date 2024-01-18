@@ -1,6 +1,6 @@
 import os
 import tkinter as tk
-from job_library import *
+from image_analysis_helper import *
 from tkinter import filedialog
 from tkinter import ttk
 

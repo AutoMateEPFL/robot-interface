@@ -1,6 +1,7 @@
 import tkinter as tk
-from job_library import *
+from image_analysis_helper import *
 import glob
+import os
 import platform
 # --- classes ---
 ## TODO ADD COMMENT
