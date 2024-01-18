@@ -11,6 +11,6 @@
     "\\robotinterface\\hardware_control\\FirmwareSettings",
     "\\robotinterface\\logistics"
   ],
-  "SelectedNode": "\\robotinterface\\hardware_control\\vision.py",
+  "SelectedNode": "\\robotinterface\\gui\\user_gui.py",
   "PreviewInSolutionExplorer": false
 }
