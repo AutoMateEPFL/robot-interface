@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import logging
+from cv_matrix import analyse_matrix
 
 def rotateImage(image: np.ndarray, angle: float)->np.ndarray:
     """
@@ -104,10 +105,11 @@ def detect_sticker(cropped_input):
     angle = 0
     num_of_sticker = 0
     list_of_angles = []
-    try :
+
+    try:
         for pt in detected_circles[0, :]:
             a, b, r = pt[0], pt[1], pt[2]
-            #print("a", a, "b", b, "r", r)
+            print("a", a, "b", b, "r", r)
             # Draw the circumference of the circle.
             if r <= 58.2 and r >= 47:
                 num_of_sticker += 1
@@ -119,8 +121,51 @@ def detect_sticker(cropped_input):
                 angle = np.arctan2((b - center[1]), (a - center[0])) * 180 / np.pi
                 list_of_angles.append(angle)
     except:
-        print("NO STICKER DETECTED, ANGLE=0")
         pass
+    if num_of_sticker == 0:
+        print("NO STICKER DETECTED: use of convolution")
+        angle = detect_orientation_using_number_of_blobs(cropped_input)
+    elif num_of_sticker > 1:
+        print(f"{num_of_sticker} STICKER DETECTED: best guess using convolution")
+        convolution_angle = detect_orientation_using_number_of_blobs(cropped_input)
+        angle = list_of_angles[np.argmin(np.abs(list_of_angles - convolution_angle))]
 
     return 180 - angle
-    
+
+
+def detect_orientation_using_number_of_blobs(cropped_input,name="",angle_first_guess=0):
+
+    min = 0
+    for angle in (np.arange(0, 362, 1)):
+        rotated_image = rotateImage(cropped_input, -angle)
+        matrix, matrix_of_keypoints, new_offset, sum = analyse_matrix(rotated_image, [(285, 250), (850, 850)], draw_blob=False, auto_offset=False, num_cols=9)
+
+        if sum >= min:
+            print('angle', angle, 'norm', sum)
+            min_angle = angle
+
+            min = sum
+    return min_angle
+
+
+def detect_orientation_using_convolution(cropped_input):
+    # cropped_input = my_image
+    bw: np.ndarray = cv2.cvtColor(cropped_input, cv2.COLOR_BGR2GRAY)
+    tr = cv2.adaptiveThreshold(bw, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 71, -10)
+
+    reference = cv2.imread('reference.png')
+    bw_ref: np.ndarray = cv2.cvtColor(reference, cv2.COLOR_BGR2GRAY)
+    tr_ref = cv2.adaptiveThreshold(bw_ref, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 71, -10)
+
+    min = 0
+    for angle in (np.arange(0, 361, 0.5)):
+        rotated_image = rotateImage(tr, -angle)
+        convolution = np.multiply(255 - rotated_image, 255 - tr_ref)
+        norm = np.linalg.norm(convolution)
+        # print('angle', angle, 'norm', norm)
+        if norm > min:
+            print('angle', angle, 'norm', norm)
+            min_angle = angle
+            min = norm
+
+    return 225 + min_angle
