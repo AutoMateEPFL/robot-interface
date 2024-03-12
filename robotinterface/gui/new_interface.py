@@ -134,11 +134,13 @@ class InteractiveWindow:
 
     def get_experiment_data(self):
         '''
-        Returns the experiments interactive window data in a list with the format : [('Name of experiment', [markers of experiment])]
+        Returns the experiments interactive window data in a list with the format : [(Experiment number, 'Name of experiment', [markers of experiment])]
         '''
-        # Remove the empty experiments
-        #data = [(self.experiment_data[i][0], self.experiment_data[i][1]) for i in range(len(self.experiment_data)) if self.experiment_data[i][0] != ""]
-        return self.experiment_data
+
+        # Add the number of the experiment and remove the empty experiments
+        data = [(number+1, experiment[0], experiment[1]) for number, experiment in enumerate(self.experiment_data)]
+        data = [data[i] for i in range(len(data)) if data[i][1] != '']
+        return data
 
 
 
@@ -152,7 +154,7 @@ if __name__ == "__main__":
     print('outside class', experiment_data)
     print(len(experiment_data))
     for number, experiment in  enumerate(experiment_data) :
-        print(f"Experiment {number+1} | Name : {experiment[0]} | Markers : {experiment[1]}")
+        print(f"Experiment {number+1} | Name : {experiment[1]} | Markers : {experiment[2]}")
 
 
 
