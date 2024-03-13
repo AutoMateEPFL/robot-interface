@@ -1,12 +1,21 @@
+if __name__ == "__main__":
+
+    import os
+    import sys
+    import platform
+    if platform.system() == 'Windows':
+        sys.path.append(os.path.join(sys.path[0], '..'))
+
 import tkinter as tk
 from tkinter import ttk  # Import ttk module for themed widgets
 from tkinter import messagebox
+from PIL import Image, ImageTk
 
 class InteractiveWindow:
     def __init__(self, title="Interactive Window"):
         self.root = tk.Tk()
         self.root.title(title)
-        self.root.geometry("900x400")  # Set the initial window size
+        self.root.geometry("900x600")  # Set the initial window size
 
         #Utils
         self.max_plate_number = 96
@@ -24,7 +33,7 @@ class InteractiveWindow:
 
         # Second tab (Description)
         self.tab2 = tk.Frame(self.notebook)
-        self.notebook.add(self.tab2, text="Description")
+        self.notebook.add(self.tab2, text="How to fill the plateholders")
         self.create_tab2_content()
 
         # Experiment data
@@ -76,9 +85,30 @@ class InteractiveWindow:
         self.checked_label = tk.Label(self.tab1, text="", fg="black")
         self.checked_label.pack()
 
+
     def create_tab2_content(self):
-        self.description_text = tk.Text(self.tab2, wrap="word")
-        self.description_text.pack(fill="both", expand=True)
+        # Predefined text
+        description_text = """Fill the plateholders from left to right, from front to back.
+        Start with the last marker of the last experiment and fill in order
+        Exemple with 3 experiments, 7 markers each : """
+
+        # Create label for predefined text
+        text_label = tk.Label(self.tab2, text=description_text)
+        text_label.pack(pady=10)
+
+        # Load and display image
+        image_path = "robotinterface\\gui\\exemple.png" 
+        image = Image.open(image_path)
+        image = image.resize((500, 500), Image.ANTIALIAS)  # Resize the image as needed
+
+        # Convert image to Tkinter PhotoImage
+        photo = ImageTk.PhotoImage(image)
+
+        # Create label to display image
+        image_label = tk.Label(self.tab2, image=photo)
+        image_label.image = photo  # Keep a reference to the image to prevent garbage collection
+        image_label.pack(pady=10)
+
 
     def add_line(self):
         self.line_count += 1
@@ -101,7 +131,7 @@ class InteractiveWindow:
         entry.grid(row=self.line_count, column=1, sticky="w")
 
         # Create checkboxes for markers
-        markers = ["ori", "ble", "bsd", "hyg", "kan", "nat", "pat"]
+        markers = ["original", "ble", "bsd", "hyg", "kan", "nat", "pat"]
         checkboxes = []
         for i, marker in enumerate(markers):
             checkbox_var = tk.IntVar()

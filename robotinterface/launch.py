@@ -60,15 +60,14 @@ async def main():
             petri_top = grid.object_grid[y_id][x_id][-1]
             petri_bottom = grid.object_grid[y_id][x_id][-2]
             target = [petri_bottom, petri_top]
-            # await robot.pick_and_place(target, pic_pos)
-            print('pick ', x_id, y_id, target[0]._associated_experiment, target[0].associated_name)
-            grid.remove_object(target)
-            # await robot.take_picture(obj=target[0], obj_rem=target[1], folder_name=target[0]._associated_experiment,
-            #                         prefix="marker_" + str(target[0].number) + "_",
-            #                         suffix="_" + str(target[0].associated_name), to_save = True, pic_pos=pic_pos)
-            # await robot.pick_and_place(target, stack_pos)
-            print('place ', target[0]._associated_experiment, target[0].associated_name,  'to ', stack_pos.x_id, stack_pos.y_id)
-    print(grid.height_grid)
+            await robot.pick_and_place(target, pic_pos)
+            # print('pick ', x_id, y_id, target[0]._associated_experiment, target[0].associated_name)
+            # grid.remove_object(target)
+            await robot.take_picture(obj=target[0], obj_rem=target[1], folder_name=target[0]._associated_experiment,
+                                    prefix="marker_" + str(target[0].number) + "_",
+                                    suffix="_" + str(target[0].associated_name), to_save = True, pic_pos=pic_pos)
+            await robot.pick_and_place(target, stack_pos)
+            # print('place ', target[0]._associated_experiment, target[0].associated_name,  'to ', stack_pos.x_id, stack_pos.y_id)
 
 
 
