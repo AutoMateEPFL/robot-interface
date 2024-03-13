@@ -10,7 +10,7 @@ import asyncio
 from robotinterface.hardware_control.robot import Robot
 from robotinterface.logistics.grid import Grid, GridPosition
 from robotinterface.logistics.grid_utils import fill_grid, get_plateholder_petri_pos
-from robotinterface.gui.new_interface import InteractiveWindow
+from robotinterface.gui.gui import InteractiveWindow
 from concurrent.futures import ThreadPoolExecutor
 
 logging.basicConfig(
