@@ -132,7 +132,7 @@ class InteractiveWindow:
             print("Experiment data:", self.experiment_data)
             self.root.destroy()  # Close the window
 
-    def get_experiment_data(self):
+    def get_experiment_data(self) -> list:
         '''
         Returns the experiments interactive window data in a list with the format : [(Experiment number, 'Name of experiment', [markers of experiment])]
         '''

@@ -14,7 +14,7 @@ import numpy as np
 
 
 
-def fill_grid(grid : Grid, experiment_data) :
+def fill_grid(grid : Grid, experiment_data : list) -> None :
     '''
     Fill a grid with plateholders and petri dishes at the correct place
     Args :
@@ -24,12 +24,11 @@ def fill_grid(grid : Grid, experiment_data) :
     # Compute number of plateholders and number of plates in the last stack
     max_plateholders = 8
     max_plates = 12
-    number_plates = sum(len(experiment_data[i][2]) for i in range(len(experiment_data)))
-    total_plateholders = int(np.ceil(number_plates/max_plates))
+    total_plates = sum(len(experiment_data[i][2]) for i in range(len(experiment_data)))
+    total_plateholders = int(np.ceil(total_plates/max_plates))
     if total_plateholders > max_plateholders :
         raise Exception('Problem with the program, too many plateholders')
-    number_plates_last_stack = number_plates % max_plates
-
+    
     #Fill the grid with plateholders and petri dishes
     for number_plateholder in range(total_plateholders) :
         # Compute position of plateholders
@@ -60,10 +59,28 @@ def fill_grid(grid : Grid, experiment_data) :
 
 
 # Add a petri dish (bottom and top) to a grid in a specified grid position
-def add_petridish(grid : Grid, grid_pos : GridPosition, number="", associated_name="", brand="SARSTEDT", associated_experiment="") :
+def add_petridish(grid : Grid, grid_pos : GridPosition, number="", associated_name="", brand="SARSTEDT", associated_experiment="") -> None :
     grid.add_object([SmallPetriBottom(number=number, associated_name=associated_name, brand=brand, associated_experiment=associated_experiment),
                      SmallPetriTop(number=number, associated_name=associated_name, brand=brand, associated_experiment=associated_experiment)],
                      grid_pos)
+    
+
+def get_plateholder_petri_pos(grid : Grid) -> list :
+    '''
+    Get the grid position of the plateholders and how many petri dishes they are holding
+    Returns a list in the format [(GridPosition, Number of petri dishes), ...]
+    '''
+    plateholder_petri_pos = []
+    for x in range(grid.x_num_interval) :
+        for y in range(grid.y_num_interval) :
+            if grid.object_grid[y][x] != [] :
+                if str(type(grid.object_grid[y][x][0])) == "<class 'logistics.non_pickable.PlateHolder'>":
+                    num_petri = int((len(grid.object_grid[y][x]) - 1) / 2)
+                    plateholder_petri_pos += [(GridPosition(x, y), num_petri)]
+    return plateholder_petri_pos
+
+
+
 
 
 if __name__ == "__main__":
@@ -85,3 +102,6 @@ if __name__ == "__main__":
     experiment_data = [(1, 'Oui', ['ori', 'ble', 'bsd', 'hyg', 'kan', 'nat', 'pat']), (2, 'Non', ['ori', 'ble', 'bsd', 'hyg', 'kan', 'nat', 'pat'])]
 
     fill_grid(grid, experiment_data)
+    # print(type(grid.object_grid[0][0][0]))
+    plateholder_petri_pos = get_plateholder_petri_pos(grid)
+    print(plateholder_petri_pos[0][0])
