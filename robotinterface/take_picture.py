@@ -10,7 +10,7 @@ import asyncio
 from robotinterface.hardware_control.robot import Robot
 from robotinterface.logistics.grid import Grid, GridPosition
 from robotinterface.logistics.grid_utils import fill_grid, get_plateholder_petri_pos
-from robotinterface.gui.gui import InteractiveWindow
+from logistics.pickable import *
 from concurrent.futures import ThreadPoolExecutor
 
 logging.basicConfig(
@@ -38,11 +38,11 @@ async def main():
     if platform.system() == 'Windows':
         robot = await Robot.build(grid)
 
+    grid.add_object([SmallPetriBottom(),
+                     SmallPetriTop()],
+                     GridPosition(2,1))
 
-
-    await robot.take_picture(obj=target[0], obj_rem=target[1], folder_name=target[0]._associated_experiment,
-                            prefix="marker_" + str(target[0].number) + "_",
-                            suffix="_" + str(target[0].associated_name), to_save = True, pic_pos=pic_pos)
+    await robot.take_picture(obj=grid.object_grid[1][2][-1],  folder_name='take_picture', to_save = True)
     # print('place ', target[0]._associated_experiment, target[0].associated_name,  'to ', stack_pos.x_id, stack_pos.y_id)
     
     # shutdown the robot

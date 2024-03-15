@@ -23,7 +23,7 @@ def fill_grid(grid : Grid, experiment_data : list) -> None :
     '''
     # Compute number of plateholders and number of plates in the last stack
     max_plateholders = 8
-    max_plates = 12
+    max_plates = 4
     total_plates = sum(len(experiment_data[i][2]) for i in range(len(experiment_data)))
     total_plateholders = int(np.ceil(total_plates/max_plates))
     if total_plateholders > max_plateholders :
