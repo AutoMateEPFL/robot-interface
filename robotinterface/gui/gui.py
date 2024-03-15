@@ -9,7 +9,7 @@ if __name__ == "__main__":
 import tkinter as tk
 from tkinter import ttk  # Import ttk module for themed widgets
 from tkinter import messagebox
-from PIL import Image, ImageTk
+# from PIL import Image, ImageTk
 
 class InteractiveWindow:
     def __init__(self, title="Interactive Window"):
@@ -98,16 +98,16 @@ class InteractiveWindow:
 
         # Load and display image
         image_path = "robotinterface\\gui\\exemple.png" 
-        image = Image.open(image_path)
-        image = image.resize((500, 500), Image.ANTIALIAS)  # Resize the image as needed
+        # image = Image.open(image_path)
+        # image = image.resize((500, 500), Image.ANTIALIAS)  # Resize the image as needed
 
         # Convert image to Tkinter PhotoImage
-        photo = ImageTk.PhotoImage(image)
+        # photo = ImageTk.PhotoImage(image)
 
         # Create label to display image
-        image_label = tk.Label(self.tab2, image=photo)
-        image_label.image = photo  # Keep a reference to the image to prevent garbage collection
-        image_label.pack(pady=10)
+        # image_label = tk.Label(self.tab2, image=photo)
+        # image_label.image = photo  # Keep a reference to the image to prevent garbage collection
+        # image_label.pack(pady=10)
 
 
     def add_line(self):

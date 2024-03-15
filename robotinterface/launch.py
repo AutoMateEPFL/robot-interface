@@ -35,8 +35,8 @@ async def main():
     executor = ThreadPoolExecutor(max_workers=2)
 
     # Robot build
-    # if platform.system() == 'Windows':
-    #     robot = await Robot.build(grid)
+    if platform.system() == 'Windows':
+        robot = await Robot.build(grid)
 
     # Launch the gui and get the data
     experiment_window = InteractiveWindow(title = 'Experiment Window')
@@ -68,6 +68,9 @@ async def main():
                                     suffix="_" + str(target[0].associated_name), to_save = True, pic_pos=pic_pos)
             await robot.pick_and_place(target, stack_pos)
             # print('place ', target[0]._associated_experiment, target[0].associated_name,  'to ', stack_pos.x_id, stack_pos.y_id)
+    
+    # shutdown the robot
+    await robot.shutdown()
 
 
 
