@@ -54,7 +54,7 @@ def fill_grid(grid : Grid, experiment_data : list) -> None :
                     y_id += 1
             grid_pos = GridPosition(x_id, y_id)
             marker_name = experiment[2][plate]
-            add_petridish(grid, grid_pos, number=plate, associated_name=marker_name, brand = "Corning", associated_experiment=experiment_name)
+            add_petridish(grid, grid_pos, number=plate, associated_name=marker_name, brand = "", associated_experiment=experiment_name)
             plates_in_plate_holder += 1
 
 
