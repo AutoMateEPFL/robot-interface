@@ -21,10 +21,16 @@ def fill_grid(grid : Grid, experiment_data : list) -> None :
         experiment_data : list of experiments and markers returned by using the interactive user interface
         grid
     '''
-    # Compute number of plateholders and number of plates in the last stack
     max_plateholders = 8
     max_plates = 12
-    total_plates = sum(len(experiment_data[i][2]) for i in range(len(experiment_data)))
+
+    # Get total plates number
+    if experiment_data[-1] == 'WITHOUT EXPERIMENT' :
+        total_plates = experiment_data[0]
+    else :
+        total_plates = sum(len(experiment_data[i][2]) for i in range(len(experiment_data)))
+
+    # Get total plateholders
     total_plateholders = int(np.ceil(total_plates/max_plates))
     if total_plateholders > max_plateholders :
         raise Exception('Problem with the program, too many plateholders')
@@ -41,10 +47,9 @@ def fill_grid(grid : Grid, experiment_data : list) -> None :
     x_id = 0
     y_id = 0
     plates_in_plate_holder = 0
-    for experiment in reversed(experiment_data) :
-        experiment_name = experiment[1]
-        plates_in_experiment = len(experiment[2])
-        for plate in range(plates_in_experiment-1, -1, -1) :
+
+    if experiment_data[-1] == "WITHOUT EXPERIMENT" :
+        for i in range(total_plates) :
             if plates_in_plate_holder >= max_plates :
                 plates_in_plate_holder = 0
                 if y_id == 3:
@@ -53,9 +58,24 @@ def fill_grid(grid : Grid, experiment_data : list) -> None :
                 else :
                     y_id += 1
             grid_pos = GridPosition(x_id, y_id)
-            marker_name = experiment[2][plate]
-            add_petridish(grid, grid_pos, number=plate, associated_name=marker_name, brand="SARSTEDT", associated_experiment=experiment_name)
+            add_petridish(grid, grid_pos, number=i, associated_experiment="WITHOUT EXPERIMENT NAMES")
             plates_in_plate_holder += 1
+    else :
+        for experiment in reversed(experiment_data) :
+            experiment_name = experiment[1]
+            plates_in_experiment = len(experiment[2])
+            for plate in range(plates_in_experiment-1, -1, -1) :
+                if plates_in_plate_holder >= max_plates :
+                    plates_in_plate_holder = 0
+                    if y_id == 3:
+                        x_id = 1
+                        y_id = 0
+                    else :
+                        y_id += 1
+                grid_pos = GridPosition(x_id, y_id)
+                marker_name = experiment[2][plate]
+                add_petridish(grid, grid_pos, number=plate, associated_name=marker_name, brand="SARSTEDT", associated_experiment=experiment_name)
+                plates_in_plate_holder += 1
 
 
 # Add a petri dish (bottom and top) to a grid in a specified grid position
@@ -99,9 +119,11 @@ if __name__ == "__main__":
     #                    (3, 'e', ['ori', 'ble', 'bsd', 'hyg', 'kan', 'nat', 'pat']), (4, 'r', ['ori', 'ble', 'bsd', 'hyg', 'kan', 'nat', 'pat']), 
     #                    (5, 't', ['ori', 'ble', 'bsd', 'hyg', 'kan', 'nat', 'pat']), (6, 'y', ['ori', 'ble', 'bsd', 'hyg', 'kan', 'nat', 'pat'])]
     
-    experiment_data = [(1, 'Oui', ['ori', 'ble', 'bsd', 'hyg', 'kan', 'nat', 'pat']), (2, 'Non', ['ori', 'ble', 'bsd', 'hyg', 'kan', 'nat', 'pat'])]
+    # experiment_data = [(1, 'Oui', ['ori', 'ble', 'bsd', 'hyg', 'kan', 'nat', 'pat']), (2, 'Non', ['ori', 'ble', 'bsd', 'hyg', 'kan', 'nat', 'pat'])]
+
+    experiment_data = [14, "WITHOUT EXPERIMENT"]
 
     fill_grid(grid, experiment_data)
     # print(type(grid.object_grid[0][0][0]))
     plateholder_petri_pos = get_plateholder_petri_pos(grid)
-    print(plateholder_petri_pos[0][0])
+    print(plateholder_petri_pos)

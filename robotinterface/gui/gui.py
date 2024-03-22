@@ -33,7 +33,7 @@ class InteractiveWindow:
 
         # Second tab (Description)
         self.tab2 = tk.Frame(self.notebook)
-        self.notebook.add(self.tab2, text="How to fill the plateholders")
+        self.notebook.add(self.tab2, text="Take multiple pictures")
         self.create_tab2_content()
 
         # Experiment data
@@ -87,27 +87,38 @@ class InteractiveWindow:
 
 
     def create_tab2_content(self):
-        # Predefined text
-        description_text = """Fill the plateholders from left to right, from front to back.
-        Start with the last marker of the last experiment and fill in order
-        Exemple with 3 experiments, 7 markers each : """
+        # Create a frame to hold the content
+        frame = tk.Frame(self.tab2)
+        frame.pack(padx=10, pady=10)
 
-        # Create label for predefined text
-        text_label = tk.Label(self.tab2, text=description_text)
-        text_label.pack(pady=10)
+        # Create label and entry widget for number input
+        number_label = tk.Label(frame, text="Enter a number:")
+        number_label.grid(row=0, column=0, padx=5, pady=5)
 
-        # Load and display image
-        image_path = "robotinterface\\gui\\exemple.png" 
-        # image = Image.open(image_path)
-        # image = image.resize((500, 500), Image.ANTIALIAS)  # Resize the image as needed
+        self.number_entry = tk.Entry(frame)
+        self.number_entry.grid(row=0, column=1, padx=5, pady=5)
 
-        # Convert image to Tkinter PhotoImage
-        # photo = ImageTk.PhotoImage(image)
+        # Create start button
+        start_button = tk.Button(frame, text="Start", command=self.start_without_experiments)
+        start_button.grid(row=1, columnspan=2, padx=5, pady=5)
 
-        # Create label to display image
-        # image_label = tk.Label(self.tab2, image=photo)
-        # image_label.image = photo  # Keep a reference to the image to prevent garbage collection
-        # image_label.pack(pady=10)
+    def start_without_experiments(self):
+        number = self.number_entry.get()
+        try:
+            number = int(number)
+            # Call your function with the entered number
+            print("Starting function with number:", number)
+            # Replace the print statement with your desired function logic
+            if number > self.max_plate_number :
+                messagebox.showerror("Error", "Too many plates")
+            else :
+                self.experiment_data.append((number))
+                self.experiment_data.append(('WITHOUT EXPERIMENT'))
+                self.root.destroy()  # Close the window
+        except ValueError:
+            messagebox.showerror("Error", "Please enter a valid number.")
+        
+            
 
 
     def add_line(self):
@@ -166,11 +177,13 @@ class InteractiveWindow:
         '''
         Returns the experiments interactive window data in a list with the format : [(Experiment number, 'Name of experiment', [markers of experiment])]
         '''
-
+        if self.experiment_data[-1] == 'WITHOUT EXPERIMENT' :
+            return self.experiment_data
         # Add the number of the experiment and remove the empty experiments
-        data = [(number+1, experiment[0], experiment[1]) for number, experiment in enumerate(self.experiment_data)]
-        data = [data[i] for i in range(len(data)) if data[i][1] != '']
-        return data
+        else :
+            data = [(number+1, experiment[0], experiment[1]) for number, experiment in enumerate(self.experiment_data)]
+            data = [data[i] for i in range(len(data)) if data[i][1] != '']
+            return data
 
 
 
@@ -183,8 +196,11 @@ if __name__ == "__main__":
 
     print('outside class', experiment_data)
     print(len(experiment_data))
-    for number, experiment in  enumerate(experiment_data) :
-        print(f"Experiment {number+1} | Name : {experiment[1]} | Markers : {experiment[2]}")
+    if experiment_data[-1] == 'WITHOUT EXPERIMENT' :
+        print(f'Without experiments, number of plates : {experiment_data[0]}')
+    else :
+        for number, experiment in  enumerate(experiment_data) :
+            print(f"Experiment {number+1} | Name : {experiment[1]} | Markers : {experiment[2]}")
 
 
 
