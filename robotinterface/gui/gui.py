@@ -142,7 +142,7 @@ class InteractiveWindow:
         entry.grid(row=self.line_count, column=1, sticky="w")
 
         # Create checkboxes for markers
-        markers = ["original", "ble", "bsd", "hyg", "kan", "nat", "pat"]
+        markers = ["ble", "bsd", "hyg", "kan", "nat", "pat"]
         checkboxes = []
         for i, marker in enumerate(markers):
             checkbox_var = tk.IntVar()
@@ -154,7 +154,12 @@ class InteractiveWindow:
         self.lines.append((label, entry, checkboxes))
 
     def check_checkboxes(self):
+
         total_checked = sum(checkbox_var.get() for _, _, checkboxes in self.lines for checkbox_var in checkboxes)
+        for i in range(len(self.lines)) :
+            checkboxes = self.lines[i][2]
+            if sum(checkbox_var.get() for checkbox_var in checkboxes) :
+                total_checked += 1
         if total_checked > self.max_plate_number:
             self.checked_label.config(text=f"Too many plates ({total_checked}/{self.max_plate_number})", fg="red")
         else:
@@ -167,7 +172,8 @@ class InteractiveWindow:
         else:
             for label, entry, checkboxes in self.lines:
                 experiment_name = entry.get()
-                markers = [marker for marker, checkbox_var in zip(["ori", "ble", "bsd", "hyg", "kan", "nat", "pat"], checkboxes) if checkbox_var.get() == 1]
+                markers = ["ori"]
+                markers += [marker for marker, checkbox_var in zip(["ble", "bsd", "hyg", "kan", "nat", "pat"], checkboxes) if checkbox_var.get() == 1]
                 self.experiment_data.append((experiment_name, markers))
 
             print("Experiment data:", self.experiment_data)
@@ -201,6 +207,8 @@ if __name__ == "__main__":
     else :
         for number, experiment in  enumerate(experiment_data) :
             print(f"Experiment {number+1} | Name : {experiment[1]} | Markers : {experiment[2]}")
+
+    print(experiment_interface.lines[0])
 
 
 
