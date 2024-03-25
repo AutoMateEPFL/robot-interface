@@ -208,8 +208,6 @@ if __name__ == "__main__":
         for number, experiment in  enumerate(experiment_data) :
             print(f"Experiment {number+1} | Name : {experiment[1]} | Markers : {experiment[2]}")
 
-    print(experiment_interface.lines[0])
-
 
 
 
