@@ -14,7 +14,7 @@ import numpy as np
 
 
 
-def fill_grid(grid : Grid, experiment_data : list) -> None :
+def fill_grid(grid : Grid, experiment_data : list, brand="SARSTEDT") -> None :
     '''
     Fill a grid with plateholders and petri dishes at the correct place
     Args :
@@ -58,7 +58,7 @@ def fill_grid(grid : Grid, experiment_data : list) -> None :
                 else :
                     y_id += 1
             grid_pos = GridPosition(x_id, y_id)
-            add_petridish(grid, grid_pos, number=i, associated_experiment="WITHOUT EXPERIMENT NAMES")
+            add_petridish(grid, grid_pos, number=i, brand=brand, associated_experiment="WITHOUT EXPERIMENT NAMES")
             plates_in_plate_holder += 1
     else :
         for experiment in reversed(experiment_data) :
@@ -74,12 +74,12 @@ def fill_grid(grid : Grid, experiment_data : list) -> None :
                         y_id += 1
                 grid_pos = GridPosition(x_id, y_id)
                 marker_name = experiment[2][plate]
-                add_petridish(grid, grid_pos, number=plate, associated_name=marker_name, brand="SARSTEDT", associated_experiment=experiment_name)
+                add_petridish(grid, grid_pos, number=plate, associated_name=marker_name, brand=brand, associated_experiment=experiment_name)
                 plates_in_plate_holder += 1
 
 
 # Add a petri dish (bottom and top) to a grid in a specified grid position
-def add_petridish(grid : Grid, grid_pos : GridPosition, number="", associated_name="", brand="SARSTEDT", associated_experiment="") -> None :
+def add_petridish(grid : Grid, grid_pos : GridPosition, number="", associated_name="",brand="SARSTEDT", associated_experiment="") -> None :
     grid.add_object([SmallPetriBottom(number=number, associated_name=associated_name, brand=brand, associated_experiment=associated_experiment),
                      SmallPetriTop(number=number, associated_name=associated_name, brand=brand, associated_experiment=associated_experiment)],
                      grid_pos)
@@ -99,7 +99,14 @@ def get_plateholder_petri_pos(grid : Grid) -> list :
                     plateholder_petri_pos += [(GridPosition(x, y), num_petri)]
     return plateholder_petri_pos
 
-
+def fill_all(grid : Grid, number_plateholder=8, max_plate=12) -> None :
+    for i in range(number_plateholder) :
+        x_id = 0 if i in [0, 1, 2, 3] else 1
+        y_id = i if i in [0, 1, 2, 3] else i - 4
+        grid_pos = GridPosition(x_id, y_id)
+        grid.add_object([PlateHolder()], grid_pos)
+        for j in range(max_plate) :
+            add_petridish(grid, grid_pos, number=j, brand="Corning")
 
 
 
@@ -121,9 +128,10 @@ if __name__ == "__main__":
     
     # experiment_data = [(1, 'Oui', ['ori', 'ble', 'bsd', 'hyg', 'kan', 'nat', 'pat']), (2, 'Non', ['ori', 'ble', 'bsd', 'hyg', 'kan', 'nat', 'pat'])]
 
-    experiment_data = [14, "WITHOUT EXPERIMENT"]
+    experiment_data = [6, "WITHOUT EXPERIMENT"]
 
-    fill_grid(grid, experiment_data)
+    # fill_grid(grid, experiment_data)
+    fill_all(grid)
     # print(type(grid.object_grid[0][0][0]))
     plateholder_petri_pos = get_plateholder_petri_pos(grid)
     print(plateholder_petri_pos)

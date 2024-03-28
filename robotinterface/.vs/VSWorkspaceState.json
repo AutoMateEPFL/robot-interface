@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\gui"
+    "\\gui",
+    "\\logistics"
   ],
-  "SelectedNode": "\\gui\\holder_dark.png",
+  "SelectedNode": "\\logistics\\pickable.py",
   "PreviewInSolutionExplorer": false
 }

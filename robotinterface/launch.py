@@ -7,10 +7,10 @@ if platform.system() == 'Windows':
 
 import logging
 import asyncio
-from robotinterface.hardware_control.robot import Robot
-from robotinterface.logistics.grid import Grid, GridPosition
-from robotinterface.logistics.grid_utils import fill_grid, get_plateholder_petri_pos
-from robotinterface.gui.gui import InteractiveWindow
+from hardware_control.robot import Robot
+from logistics.grid import Grid, GridPosition
+from logistics.grid_utils import fill_grid, get_plateholder_petri_pos
+from gui.gui import InteractiveWindow
 from concurrent.futures import ThreadPoolExecutor
 
 logging.basicConfig(
@@ -43,7 +43,7 @@ async def main():
     experiment_data = experiment_window.get_experiment_data()
 
     # Fill the grid according to the data
-    fill_grid(grid, experiment_data)
+    fill_grid(grid, experiment_data, brand="Corning")
 
     # Get the plateholder positions and number of petri dishes
     plateholder_petri_pos = get_plateholder_petri_pos(grid)
