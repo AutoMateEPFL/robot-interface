@@ -17,7 +17,7 @@ async def take_picture_of_all_postitions(grid : Grid, robot : Robot, number_plat
         print(x_id, y_id)
         grid_pos = GridPosition(x_id, y_id)
         x, y = grid.get_coordinates_from_grid(grid_pos)
-        await robot.platform.move(x, y, constants.CLERANCE, constants.FEEDRATE)
+        await robot.platform.move(x, y, constants.HOVER_CLERANCE, constants.FEEDRATE)
         await robot.save_picture(folder_name="CV_take_pic_of_all_pos" ,to_save=True)
 
     await robot.gripper.rotate(0)

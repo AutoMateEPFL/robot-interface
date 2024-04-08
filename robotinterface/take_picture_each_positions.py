@@ -32,7 +32,7 @@ async def main() :
 
     # fill_all(grid)
     #  take picture of all positions
-    await take_picture_of_all_postitions(grid, robot, number_plateholder=8)
+    await take_picture_of_all_postitions(grid, robot, number_plateholder=1)
 
     await robot.shutdown()
 

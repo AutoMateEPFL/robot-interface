@@ -27,8 +27,11 @@ ratio = 4095 / 360
 FEEDRATE = 15000
 
 # clerance while moving
+# max clerance camera tool : 378
+# max clerance gripper tool : 286
 CLERANCE = 205
 PETRI_CLERANCE = 25
 PICTURE_HEIGHT = 115
 FOCUS = 35
+HOVER_CLERANCE = 378
 
