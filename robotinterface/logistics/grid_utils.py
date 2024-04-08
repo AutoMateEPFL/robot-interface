@@ -11,6 +11,7 @@ from logistics.positions import GridPosition
 from logistics.non_pickable import PlateHolder
 from logistics.pickable import *
 import numpy as np
+import datetime
 
 
 
@@ -49,6 +50,8 @@ def fill_grid(grid : Grid, experiment_data : list, brand="SARSTEDT") -> None :
     plates_in_plate_holder = 0
 
     if experiment_data[-1] == "WITHOUT EXPERIMENT" :
+        timestamp_ymd = datetime.datetime.now().strftime("%Y_%m_%d")
+        timestamp_hms = datetime.datetime.now().strftime("%H_%M_%S")
         for i in range(total_plates) :
             if plates_in_plate_holder >= max_plates :
                 plates_in_plate_holder = 0
@@ -58,7 +61,7 @@ def fill_grid(grid : Grid, experiment_data : list, brand="SARSTEDT") -> None :
                 else :
                     y_id += 1
             grid_pos = GridPosition(x_id, y_id)
-            add_petridish(grid, grid_pos, number=i, brand=brand, associated_experiment="WITHOUT EXPERIMENT NAMES")
+            add_petridish(grid, grid_pos, number=i, brand=brand, associated_experiment=timestamp_ymd+f"_{total_plates}_plates_"+timestamp_hms)
             plates_in_plate_holder += 1
     else :
         for experiment in reversed(experiment_data) :
