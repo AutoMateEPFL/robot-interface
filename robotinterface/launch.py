@@ -43,7 +43,7 @@ async def main():
     experiment_data = experiment_window.get_experiment_data()
 
     # Fill the grid according to the data
-    fill_grid(grid, experiment_data, brand="Corning")
+    fill_grid(grid, experiment_data, brand="VWR")
 
     # Get the plateholder positions and number of petri dishes
     plateholder_petri_pos = get_plateholder_petri_pos(grid)
