@@ -41,9 +41,12 @@ async def main():
     # Launch the gui and get the data
     experiment_window = InteractiveWindow(title = 'Experiment Window')
     experiment_data = experiment_window.get_experiment_data()
+    # Extract brand
+    brand = experiment_data[0]
+    experiment_data.pop(0)
 
     # Fill the grid according to the data
-    fill_grid(grid, experiment_data, brand="Corning")
+    fill_grid(grid, experiment_data, brand=brand)
 
     # Get the plateholder positions and number of petri dishes
     plateholder_petri_pos = get_plateholder_petri_pos(grid)

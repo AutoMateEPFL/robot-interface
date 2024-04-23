@@ -85,22 +85,59 @@ class InteractiveWindow:
         self.checked_label = tk.Label(self.tab1, text="", fg="black")
         self.checked_label.pack()
 
+        # Add scroll menu for selecting manufacturer
+        options_label = tk.Label(self.tab1, text="Select Manufacturer:")
+        options_label.pack(pady=(20, 5))  # Add padding to separate from other widgets
+
+        options = ["Corning", "SARSTEDT", "VWR"]
+        self.selected_option_tab1 = tk.StringVar()
+        self.selected_option_tab1.set(options[0])  # Set default value
+        combobox_tab1 = ttk.Combobox(self.tab1, textvariable=self.selected_option_tab1, values=options, state="readonly")
+        combobox_tab1.pack()
+
+
+    # def create_tab2_content(self):
+    #     # Create a frame to hold the content
+    #     frame = tk.Frame(self.tab2)
+    #     frame.pack(padx=10, pady=10)
+
+    #     # Create label and entry widget for number input
+    #     number_label = tk.Label(frame, text="Enter a number:")
+    #     number_label.grid(row=0, column=0, padx=5, pady=5)
+
+    #     self.number_entry = tk.Entry(frame)
+    #     self.number_entry.grid(row=0, column=1, padx=5, pady=5)
+
+    #     # Create start button
+    #     start_button = tk.Button(frame, text="Start", command=self.start_without_experiments)
+    #     start_button.grid(row=1, columnspan=2, padx=5, pady=5)
 
     def create_tab2_content(self):
         # Create a frame to hold the content
         frame = tk.Frame(self.tab2)
         frame.pack(padx=10, pady=10)
 
-        # Create label and entry widget for number input
+        # Create label for number input
         number_label = tk.Label(frame, text="Enter a number:")
         number_label.grid(row=0, column=0, padx=5, pady=5)
 
+        # Entry widget for number input
         self.number_entry = tk.Entry(frame)
         self.number_entry.grid(row=0, column=1, padx=5, pady=5)
 
+        # Combobox for selecting options
+        options_label = tk.Label(frame, text="Select Manufacturer:")
+        options_label.grid(row=1, column=0, padx=5, pady=5)
+
+        options = ["Corning", "SARSTEDT", "VWR"]
+        self.selected_option_tab2 = tk.StringVar()
+        self.selected_option_tab2.set(options[0])  # Set default value
+        combobox = ttk.Combobox(frame, textvariable=self.selected_option_tab2, values=options, state="readonly")
+        combobox.grid(row=1, column=1, padx=5, pady=5)
+
         # Create start button
         start_button = tk.Button(frame, text="Start", command=self.start_without_experiments)
-        start_button.grid(row=1, columnspan=2, padx=5, pady=5)
+        start_button.grid(row=2, columnspan=2, padx=5, pady=5)
 
     def start_without_experiments(self):
         number = self.number_entry.get()
@@ -112,6 +149,7 @@ class InteractiveWindow:
             if number > self.max_plate_number :
                 messagebox.showerror("Error", "Too many plates")
             else :
+                self.experiment_data.append((self.selected_option_tab2.get()))
                 self.experiment_data.append((number))
                 self.experiment_data.append(('WITHOUT EXPERIMENT'))
                 self.root.destroy()  # Close the window
@@ -166,6 +204,7 @@ class InteractiveWindow:
             self.checked_label.config(text=f"{total_checked}/{self.max_plate_number} plates", fg="black")
 
     def start(self, event=None):
+        self.experiment_data.append((self.selected_option_tab1.get()))
         total_checked = sum(checkbox_var.get() for _, _, checkboxes in self.lines for checkbox_var in checkboxes)
         if total_checked > self.max_plate_number:
             messagebox.showerror("Error", "Maximum number of plates reached ({max})".format(max = self.max_plate_number))
@@ -187,7 +226,8 @@ class InteractiveWindow:
             return self.experiment_data
         # Add the number of the experiment and remove the empty experiments
         else :
-            data = [(number+1, experiment[0], experiment[1]) for number, experiment in enumerate(self.experiment_data)]
+            data = [self.experiment_data[0]]
+            data += [(number+1, experiment[0], experiment[1]) for number, experiment in enumerate(self.experiment_data[1:])]
             data = [data[i] for i in range(len(data)) if data[i][1] != '']
             return data
 
@@ -203,8 +243,12 @@ if __name__ == "__main__":
     print('outside class', experiment_data)
     print(len(experiment_data))
     if experiment_data[-1] == 'WITHOUT EXPERIMENT' :
+        print("Manufacturer : ", experiment_data[0])
+        experiment_data.pop(0)
         print(f'Without experiments, number of plates : {experiment_data[0]}')
     else :
+        print("Manufacturer : ", experiment_data[0])
+        experiment_data.pop(0)
         for number, experiment in  enumerate(experiment_data) :
             print(f"Experiment {number+1} | Name : {experiment[1]} | Markers : {experiment[2]}")
 
