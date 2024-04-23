@@ -26,14 +26,14 @@ async def main() :
 
     #first fill plateholder
     brand = 'VWR'
-    number_pictures = 1
+    number_plates = 9
     grid_pos = GridPosition(0, 0)
     grid.add_object([PlateHolder()], grid_pos)
-    for _ in range(number_pictures) :
+    for _ in range(number_plates) :
         grid.add_object([SmallPetriBottom(brand=brand), SmallPetriTop(brand=brand)], grid_pos)
 
     #Take pictures and move plates
-    await take_n_pictures_of_one_pos(grid, robot, number_pictures=number_pictures, grid_pos=grid_pos)
+    await take_n_pictures_of_one_pos(grid, robot, number_plates=number_plates, grid_pos=grid_pos)
 
     await robot.shutdown()
 

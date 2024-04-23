@@ -25,10 +25,10 @@ async def take_picture_of_all_postitions(grid : Grid, robot : Robot, number_plat
     await robot.gripper.rotate(0)
     await robot.change_tool("gripper")
 
-async def take_n_pictures_of_one_pos(grid : Grid, robot : Robot, number_pictures, grid_pos : GridPosition) :
+async def take_n_pictures_of_one_pos(grid : Grid, robot : Robot, number_plates, grid_pos : GridPosition) :
     x_id = grid_pos.x_id
     y_id = grid_pos.y_id
-    for _ in range(number_pictures) :
+    for _ in range(number_plates) :
 
         await robot.change_tool("camera")
         petri_top = grid.object_grid[y_id][x_id][-1]
