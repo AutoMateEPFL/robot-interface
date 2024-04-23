@@ -19,15 +19,15 @@ logging.basicConfig(
     level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S')
 
+
 def mouse_callback(event, x, y, flags, param) :
-    if event == cv2.EVENT_MOUSEMOVE :
+    if event == cv2.EVENT_LBUTTONDBLCLK :
+        combined_images = param
         pixel_value = combined_images[y, x]
-        cv2.putText(combined_images, str(pixel_value), (50, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
-
-
-
+        print(x, y)
+        print(pixel_value)
+        
 async def main():
-    global combined_images
     # Def grid :
     grid = Grid(x_max=-800, x_dist=-199, y_max=-620, y_dist=-200)
 
@@ -90,7 +90,7 @@ async def main():
 
         lower_s = 190
         higher_s = 255
-        lower_v = 145
+        lower_v = 50
         higher_v = 255
         hsv_lower1 = np.array([lower_h1, lower_s, lower_v])
         hsv_higher1 = np.array([higher_h1, higher_s, higher_v])
@@ -113,10 +113,10 @@ async def main():
 
         cv2.putText(combined_images, str(nb_pixel) + " red pixels detected", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)    
         cv2.imshow('frame', cv2.resize(combined_images, size))
+
+        cv2.setMouseCallback('frame', mouse_callback, param=cv2.resize(combined_images, size))
         # cv2.imshow('detection', cv2.resize(im_cropped, size))
         # Break the loop if 'q' is pressed
-
-        cv2.setMouseCallback('frame', mouse_callback, param=combined_images)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
