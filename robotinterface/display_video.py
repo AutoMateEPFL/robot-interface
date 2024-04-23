@@ -58,6 +58,8 @@ async def main():
     # Show video
     # await robot.camera.show_video()
     size = (1280, 360)
+    middle_values = [80718, 66168, 59409, 53988, 48250, 41469, 34268, 24209, 9716]
+    number_plates = 0
     while True:
         frame = await robot.camera.camera.capture_frame()
 
@@ -111,7 +113,21 @@ async def main():
 
         combined_images = cv2.hconcat([frame, hsv_frame])
 
-        cv2.putText(combined_images, str(nb_pixel) + " red pixels detected", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)    
+        if nb_pixel > np.max(middle_values) :
+            number_plates = 0
+        elif nb_pixel < np.min(middle_values) :
+            number_plates = 9
+        else :
+            positions = [i for i in range(len(middle_values)-1) if middle_values[i] >= nb_pixel >= middle_values[i+1]]
+            if len(positions) > 1 :
+                number_plates = -1
+                cv2.putText(combined_images, "multiple number of plates possible", (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 4)
+            else :
+                number_plates = positions[0] + 1
+        
+        cv2.putText(combined_images, str(number_plates) + " plates detected", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 4)
+
+        cv2.putText(combined_images, str(nb_pixel) + " red pixels detected", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 4)    
         cv2.imshow('frame', cv2.resize(combined_images, size))
 
         cv2.setMouseCallback('frame', mouse_callback, param=cv2.resize(combined_images, size))
