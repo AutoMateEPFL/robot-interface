@@ -26,7 +26,7 @@ async def main() :
 
     #first fill plateholder
     brand = 'VWR'
-    number_pictures = 9
+    number_pictures = 1
     grid_pos = GridPosition(0, 0)
     grid.add_object([PlateHolder()], grid_pos)
     for _ in range(number_pictures) :
