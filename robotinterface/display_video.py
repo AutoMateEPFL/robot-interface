@@ -136,8 +136,10 @@ async def main():
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-    
-
+        
+    await robot.gripper.rotate(0)
+    await robot.change_tool("gripper")
+    await robot.gripper.rotate(0)
     # shutdown the robot
     await robot.shutdown()
 
