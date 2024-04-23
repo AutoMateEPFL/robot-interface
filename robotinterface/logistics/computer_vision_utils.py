@@ -5,6 +5,8 @@ from logistics.grid_utils import fill_all
 from hardware_control.robot import Robot
 import numpy as np
 from hardware_control import constants
+from logistics.non_pickable import PlateHolder
+from logistics.pickable import *
 
 
 
@@ -23,5 +25,26 @@ async def take_picture_of_all_postitions(grid : Grid, robot : Robot, number_plat
     await robot.gripper.rotate(0)
     await robot.change_tool("gripper")
 
-        
+async def take_n_pictures_of_one_pos(grid : Grid, robot : Robot, number_pictures, grid_pos : GridPosition) :
+    x_id = grid_pos.x_id
+    y_id = grid_pos.y_id
+    for _ in range(number_pictures) :
 
+        await robot.change_tool("camera")
+        petri_top = grid.object_grid[y_id][x_id][-1]
+        petri_bottom = grid.object_grid[y_id][x_id][-2]
+        target = [petri_bottom, petri_top]
+        await robot.gripper.rotate(90)
+        await robot.platform.move(x_id, y_id, constants.HOVER_CLERANCE, constants.FEEDRATE)
+        await robot.save_picture(folder_name="CV_take_n_pic_of_one_pos" ,to_save=True)
+        await robot.gripper.rotate(0)
+        await robot.change_tool("gripper")
+        await robot.pick_and_place(target, GridPosition(2, 0))
+
+    #pic of empty plateholder
+    await robot.change_tool("camera")
+    await robot.gripper.rotate(90)
+    await robot.platform.move(x_id, y_id, constants.HOVER_CLERANCE, constants.FEEDRATE)
+    await robot.save_picture(folder_name="CV_take_n_pic_of_one_pos" ,to_save=True)
+    await robot.gripper.rotate(0)
+    await robot.change_tool("gripper")
