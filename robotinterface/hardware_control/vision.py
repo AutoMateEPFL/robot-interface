@@ -88,6 +88,12 @@ class Vision:
         else :
             logging.info("Photo taken but not saved")
 
+    async def show_video(self) :
+        """
+        Show the camera feed
+        """
+        logging.info("Showing video")
+        await self.camera.show_video()
 
     async def shutdown(self):
         """

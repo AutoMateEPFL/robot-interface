@@ -66,13 +66,13 @@ class CameraInterface:
             logging.info(f"focus {self.focus}")
         return frame
 
-    async def show_video(self):
+    async def show_video(self, size=(1280, 720)):
         """
         Continuously get frames and display them.
         """
         while True:
             frame = await self.capture_frame()
-            cv2.imshow('frame', frame)
+            cv2.imshow('frame', cv2.resize(frame, size))
 
             # Break the loop if 'q' is pressed
             if cv2.waitKey(1) & 0xFF == ord('q'):
