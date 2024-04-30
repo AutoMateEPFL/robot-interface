@@ -237,8 +237,7 @@ class Robot:
         Save a picture.
         
         """
-        await self.camera.save_picture(folder_name=folder_name, prefix=prefix, suffix=suffix, to_save=to_save)
-        
+        await self.camera.save_picture(folder_name=folder_name, prefix=prefix, suffix=suffix, to_save=to_save)      
         
     async def take_picture(self, obj: Pickable, obj_rem: Pickable = None, folder_name="", prefix="", suffix="",to_save=True, pic_pos=""):
         """

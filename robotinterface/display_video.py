@@ -111,6 +111,9 @@ async def main():
         hsv_frame = frame.copy()
         hsv_frame = cv2.cvtColor(hsv_frame, cv2.COLOR_BGR2HSV)
 
+        # draw detection zone of the red square 
+        cv2.rectangle(hsv_frame, (540,25), (700,170), color=(0,0,0), thickness=3)
+
         combined_images = cv2.hconcat([frame, hsv_frame])
 
         if nb_pixel > np.max(middle_values) :
@@ -127,7 +130,7 @@ async def main():
         
         cv2.putText(combined_images, str(number_plates) + " plates detected", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 4)
 
-        cv2.putText(combined_images, str(nb_pixel) + " red pixels detected", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 4)    
+        cv2.putText(combined_images, str(nb_pixel) + " red pixels detected", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 4) 
         cv2.imshow('frame', cv2.resize(combined_images, size))
 
         cv2.setMouseCallback('frame', mouse_callback, param=cv2.resize(combined_images, size))

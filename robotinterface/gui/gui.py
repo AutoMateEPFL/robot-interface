@@ -11,6 +11,16 @@ from tkinter import ttk  # Import ttk module for themed widgets
 from tkinter import messagebox
 # from PIL import Image, ImageTk
 
+def show_popup(number_plates) :
+    message = "something" + str(number_plates) + "\n do you want to continue?"
+    response = messagebox.askyesno("Warning", message)
+    if response :
+        return True
+    else :
+        return False
+
+
+
 class InteractiveWindow:
     def __init__(self, title="Interactive Window"):
         self.root = tk.Tk()
