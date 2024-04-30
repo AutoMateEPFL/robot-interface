@@ -12,7 +12,13 @@ from tkinter import messagebox
 # from PIL import Image, ImageTk
 
 def show_popup(number_plates) :
-    message = "something" + str(number_plates) + "\n do you want to continue?"
+
+    message = "Number of detected plates : \n"
+    message += f"[{number_plates[0][0]}]   [{number_plates[1][0]}]\n"
+    message += f"[{number_plates[0][1]}]   [{number_plates[1][1]}]\n"
+    message += f"[{number_plates[0][2]}]   [{number_plates[1][2]}]\n"
+    message += f"[{number_plates[0][3]}]   [{number_plates[1][3]}]\n"
+    message += f"Do you want to continue"
     response = messagebox.askyesno("Warning", message)
     if response :
         return True
@@ -106,22 +112,6 @@ class InteractiveWindow:
         combobox_tab1.pack()
 
 
-    # def create_tab2_content(self):
-    #     # Create a frame to hold the content
-    #     frame = tk.Frame(self.tab2)
-    #     frame.pack(padx=10, pady=10)
-
-    #     # Create label and entry widget for number input
-    #     number_label = tk.Label(frame, text="Enter a number:")
-    #     number_label.grid(row=0, column=0, padx=5, pady=5)
-
-    #     self.number_entry = tk.Entry(frame)
-    #     self.number_entry.grid(row=0, column=1, padx=5, pady=5)
-
-    #     # Create start button
-    #     start_button = tk.Button(frame, text="Start", command=self.start_without_experiments)
-    #     start_button.grid(row=1, columnspan=2, padx=5, pady=5)
-
     def create_tab2_content(self):
         # Create a frame to hold the content
         frame = tk.Frame(self.tab2)
@@ -149,13 +139,31 @@ class InteractiveWindow:
         start_button = tk.Button(frame, text="Start", command=self.start_without_experiments)
         start_button.grid(row=2, columnspan=2, padx=5, pady=5)
 
+    # def start_without_experiments(self):
+    #     number = self.number_entry.get()
+    #     try:
+    #         number = int(number)
+    #         # Call your function with the entered number
+    #         print("Starting function with number:", number)
+    #         # Replace the print statement with your desired function logic
+    #         if number > self.max_plate_number :
+    #             messagebox.showerror("Error", "Too many plates")
+    #         else :
+    #             self.experiment_data.append((self.selected_option_tab2.get()))
+    #             self.experiment_data.append((number))
+    #             self.experiment_data.append(('WITHOUT EXPERIMENT'))
+    #             self.root.destroy()  # Close the window
+    #     except ValueError:
+    #         messagebox.showerror("Error", "Please enter a valid number.")
+
     def start_without_experiments(self):
         number = self.number_entry.get()
-        try:
+        if number == '' :
+            self.experiment_data.append((self.selected_option_tab2.get()))
+            self.experiment_data.append(('DETECTION'))
+            self.root.destroy()  # Close the window
+        else :
             number = int(number)
-            # Call your function with the entered number
-            print("Starting function with number:", number)
-            # Replace the print statement with your desired function logic
             if number > self.max_plate_number :
                 messagebox.showerror("Error", "Too many plates")
             else :
@@ -163,8 +171,7 @@ class InteractiveWindow:
                 self.experiment_data.append((number))
                 self.experiment_data.append(('WITHOUT EXPERIMENT'))
                 self.root.destroy()  # Close the window
-        except ValueError:
-            messagebox.showerror("Error", "Please enter a valid number.")
+            
         
             
 
@@ -234,6 +241,8 @@ class InteractiveWindow:
         '''
         if self.experiment_data[-1] == 'WITHOUT EXPERIMENT' :
             return self.experiment_data
+        elif self.experiment_data[-1] == 'DETECTION' :
+            return self.experiment_data
         # Add the number of the experiment and remove the empty experiments
         else :
             data = [self.experiment_data[0]]
@@ -251,11 +260,14 @@ if __name__ == "__main__":
     experiment_data = experiment_interface.get_experiment_data()
 
     print('outside class', experiment_data)
-    print(len(experiment_data))
+
     if experiment_data[-1] == 'WITHOUT EXPERIMENT' :
         print("Manufacturer : ", experiment_data[0])
         experiment_data.pop(0)
         print(f'Without experiments, number of plates : {experiment_data[0]}')
+    elif experiment_data[-1] == 'DETECTION' :
+        print('Manufacturer : ', experiment_data[0])
+        print('Start with plates detection')
     else :
         print("Manufacturer : ", experiment_data[0])
         experiment_data.pop(0)

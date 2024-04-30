@@ -10,7 +10,7 @@ from logistics.computer_vision_utils import compute_number_plates
 
 
 async def detect_plates(grid : Grid, robot : Robot, number_plateholder=8) :
-    n_plates = np.zeros((4, 2))
+    n_plates = np.zeros((2, 4))
     await robot.change_tool("camera")
     await robot.gripper.rotate(90)
     for i in range(number_plateholder) :
@@ -24,9 +24,9 @@ async def detect_plates(grid : Grid, robot : Robot, number_plateholder=8) :
         await asyncio.sleep(0.65)
         frame = await robot.camera.camera.capture_frame()
 
-        n_plates[y_id][x_id] = compute_number_plates(frame)
+        n_plates[x_id][y_id] = compute_number_plates(frame)
 
     await robot.gripper.rotate(0)
     await robot.change_tool("gripper")
 
-    return n_plates
+    return np.int32(n_plates)

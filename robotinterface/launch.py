@@ -9,9 +9,12 @@ import logging
 import asyncio
 from hardware_control.robot import Robot
 from logistics.grid import Grid, GridPosition
-from logistics.grid_utils import fill_grid, get_plateholder_petri_pos
-from gui.gui import InteractiveWindow
+from logistics.grid_utils import *
+from gui.gui import InteractiveWindow, show_popup
 from concurrent.futures import ThreadPoolExecutor
+from logistics.detection import *
+import tkinter as tk
+from tkinter import messagebox
 
 logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
@@ -45,8 +48,27 @@ async def main():
     brand = experiment_data[0]
     experiment_data.pop(0)
 
-    # Fill the grid according to the data
-    fill_grid(grid, experiment_data, brand=brand)
+    print(brand)
+
+    #Extract experiment type
+    if experiment_data[-1] == 'WITHOUT EXPERIMENT' :
+        total_plates = experiment_data[0]
+        fill_grid_number_plates(grid, total_plates, brand=brand)
+    elif experiment_data[-1] == 'DETECTION' :
+        number_plates = await detect_plates(grid, robot, number_plateholder=1)
+        root = tk.Tk()
+        root.withdraw()
+        CONTINUE = show_popup(number_plates)
+        if CONTINUE :
+            fill_grid_number_plates_pos(grid, number_plates, brand=brand)
+        else :
+            await robot.shutdown()
+            return None
+    else :
+        fill_grid_experiment(grid, experiment_data, brand=brand)
+
+    # # Fill the grid according to the data
+    # fill_grid(grid, experiment_data, brand=brand)
 
     # Get the plateholder positions and number of petri dishes
     plateholder_petri_pos = get_plateholder_petri_pos(grid)

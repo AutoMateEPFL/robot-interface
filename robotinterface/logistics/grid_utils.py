@@ -13,6 +13,116 @@ from logistics.pickable import *
 import numpy as np
 import datetime
 
+def fill_grid_experiment(grid : Grid, experiment_data, brand="SARSTEDT") -> None :
+    '''
+    Fill a grid with plateholders and petri dishes at the correct place
+    Args :
+        experiment_data : list of experiments and markers returned by using the interactive user interface
+        grid
+    '''
+        
+    max_plateholders = 8
+    max_plates = 12
+
+    total_plates = sum(len(experiment_data[i][2]) for i in range(len(experiment_data)))
+
+    # Get total plateholders
+    total_plateholders = int(np.ceil(total_plates/max_plates))
+    if total_plateholders > max_plateholders :
+        raise Exception('Problem with fill_experiment function, too many plateholders')
+    
+    #Fill the grid with plateholders and petri dishes
+    for number_plateholder in range(total_plateholders) :
+        # Compute position of plateholders
+        x_id = 0 if number_plateholder in [0, 1, 2, 3] else 1
+        y_id = number_plateholder if number_plateholder in [0, 1, 2, 3] else number_plateholder - 4
+        grid_pos = GridPosition(x_id, y_id)
+        # Add plateholders
+        grid.add_object([PlateHolder()], grid_pos)
+    # Add petri dishes, Start with the last experiment
+    x_id = 0
+    y_id = 0
+    plates_in_plate_holder = 0
+
+    for experiment in reversed(experiment_data) :
+        experiment_name = experiment[1]
+        plates_in_experiment = len(experiment[2])
+        for plate in range(plates_in_experiment-1, -1, -1) :
+            if plates_in_plate_holder >= max_plates :
+                plates_in_plate_holder = 0
+                if y_id == 3:
+                    x_id = 1
+                    y_id = 0
+                else :
+                    y_id += 1
+            grid_pos = GridPosition(x_id, y_id)
+            marker_name = experiment[2][plate]
+            add_petridish(grid, grid_pos, number=plate, associated_name=marker_name, brand=brand, 
+                          associated_experiment=experiment_name)
+            plates_in_plate_holder += 1
+
+def fill_grid_number_plates(grid : Grid, total_plates, brand="SARSTEDT") -> None :
+    '''
+    Fill a grid with plateholders and petri dishes at the correct place
+    '''
+
+    max_plateholders = 8
+    max_plates = 12
+
+    # Get total plateholders
+    total_plateholders = int(np.ceil(total_plates/max_plates))
+    if total_plateholders > max_plateholders :
+        raise Exception('Problem with the program, too many plateholders')
+    
+    #Fill the grid with plateholders and petri dishes
+    for number_plateholder in range(total_plateholders) :
+        # Compute position of plateholders
+        x_id = 0 if number_plateholder in [0, 1, 2, 3] else 1
+        y_id = number_plateholder if number_plateholder in [0, 1, 2, 3] else number_plateholder - 4
+        grid_pos = GridPosition(x_id, y_id)
+        # Add plateholders
+        grid.add_object([PlateHolder()], grid_pos)
+    # Add petri dishes, Start with the last experiment
+    x_id = 0
+    y_id = 0
+    plates_in_plate_holder = 0
+
+    timestamp_ymd = datetime.datetime.now().strftime("%Y_%m_%d")
+    timestamp_hms = datetime.datetime.now().strftime("%H_%M_%S")
+    for i in range(total_plates) :
+        if plates_in_plate_holder >= max_plates :
+            plates_in_plate_holder = 0
+            if y_id == 3:
+                x_id = 1
+                y_id = 0
+            else :
+                y_id += 1
+        grid_pos = GridPosition(x_id, y_id)
+        add_petridish(grid, grid_pos, number=i, brand=brand, 
+                      associated_experiment=timestamp_ymd+f"_{total_plates}_plates_"+timestamp_hms)
+        plates_in_plate_holder += 1
+
+def fill_grid_number_plates_pos(grid : Grid, number_plates, brand="SARSTEDT") :
+    """
+    Fill a grid with number of plates and positions
+    Args : number plates : numpy array with number of plates in each xy position of the grid
+    """
+    timestamp_ymd = datetime.datetime.now().strftime("%Y_%m_%d")
+    timestamp_hms = datetime.datetime.now().strftime("%H_%M_%S")
+    total_plates = np.sum(number_plates)
+    i = 0
+    for x in range(2) :
+        for y in range(4) :
+            n = number_plates[x][y]
+            if n != 0 :
+                grid_pos = GridPosition(x, y)
+                grid.add_object([PlateHolder()], grid_pos)
+                for _ in range(n) :
+                    add_petridish(grid, grid_pos, number=i, brand=brand, 
+                                associated_experiment=timestamp_ymd+f"_{total_plates}_plates_"+timestamp_hms)
+                i += 1
+                
+
 
 
 def fill_grid(grid : Grid, experiment_data : list, brand="SARSTEDT") -> None :
@@ -129,12 +239,17 @@ if __name__ == "__main__":
     #                    (3, 'e', ['ori', 'ble', 'bsd', 'hyg', 'kan', 'nat', 'pat']), (4, 'r', ['ori', 'ble', 'bsd', 'hyg', 'kan', 'nat', 'pat']), 
     #                    (5, 't', ['ori', 'ble', 'bsd', 'hyg', 'kan', 'nat', 'pat']), (6, 'y', ['ori', 'ble', 'bsd', 'hyg', 'kan', 'nat', 'pat'])]
     
-    # experiment_data = [(1, 'Oui', ['ori', 'ble', 'bsd', 'hyg', 'kan', 'nat', 'pat']), (2, 'Non', ['ori', 'ble', 'bsd', 'hyg', 'kan', 'nat', 'pat'])]
+    experiment_data = [(1, 'Oui', ['ori', 'ble', 'bsd', 'hyg', 'kan', 'nat', 'pat']), (2, 'Non', ['ori', 'ble', 'bsd', 'hyg', 'kan', 'nat', 'pat'])]
 
-    experiment_data = [6, "WITHOUT EXPERIMENT"]
+    # experiment_data = [6, "WITHOUT EXPERIMENT"]
 
-    # fill_grid(grid, experiment_data)
-    fill_all(grid)
+    number_plates = np.array([[3, 5, 8, 7], [6, 5, 8, 9]])
+    print(number_plates)
+
+    # fill_grid_experiment(grid, experiment_data)
+    # fill_grid_number_plates(grid, 14)
+    fill_grid_number_plates_pos(grid, number_plates)
+    # fill_all(grid)
     # print(type(grid.object_grid[0][0][0]))
     plateholder_petri_pos = get_plateholder_petri_pos(grid)
     print(plateholder_petri_pos)
