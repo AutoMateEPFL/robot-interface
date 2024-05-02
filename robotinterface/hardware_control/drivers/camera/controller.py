@@ -20,6 +20,7 @@ class CameraInterface:
         """
         self = cls()
         self.focus = 30
+        
         self.executor = ThreadPoolExecutor(max_workers=2)
         self.loop = asyncio.get_running_loop()
         if my_platform == 'Windows':
@@ -49,7 +50,7 @@ class CameraInterface:
 
         return self
 
-    async def capture_frame(self, focus=None, discarded_frames=2):
+    async def capture_frame(self, focus, discarded_frames=2):
         """
         Capture a frame from the camera asynchronously.
 
@@ -59,11 +60,11 @@ class CameraInterface:
         """
         logging.debug("Camera capturing frame")
         if focus is not None:
-            self.cap.set(cv2.CAP_PROP_FOCUS, self.focus)
+            self.cap.set(cv2.CAP_PROP_FOCUS, focus)
         for _ in range(discarded_frames):
             ret, frame = await self.loop.run_in_executor(self.executor, self.cap.read)
-            # self.focus += 5
-            logging.info(f"focus {self.focus}")
+            #self.focus += 5
+            #logging.info(f"focus {self.focus}")
         return frame
 
     async def show_video(self, size=(1280, 720)):
