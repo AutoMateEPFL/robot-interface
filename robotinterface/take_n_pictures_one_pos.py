@@ -2,6 +2,7 @@ import os
 import sys
 import platform
 import asyncio
+import cv2
 from logistics.grid import Grid, GridPosition
 from hardware_control.robot import Robot
 import numpy as np
@@ -23,6 +24,11 @@ async def main() :
     executor = ThreadPoolExecutor(max_workers=2)
 
     robot = await Robot.build(grid)
+
+    # set auto white balance true == 1 / false == 0, auto white exposure true == 1 / false == 0
+
+    robot.camera.camera.cap.set(cv2.CAP_PROP_AUTO_WB, 1)
+    robot.camera.camera.cap.set(cv2.CAP_PROP_AUTO_EXPOSURE, 1)
 
     #first fill plateholder
     brand = 'VWR'

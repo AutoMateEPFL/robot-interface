@@ -63,7 +63,7 @@ class CameraInterface:
         for _ in range(discarded_frames):
             ret, frame = await self.loop.run_in_executor(self.executor, self.cap.read)
             # self.focus += 5
-            logging.info(f"focus {self.focus}")
+            # logging.info(f"focus {self.focus}")
         return frame
 
     async def show_video(self, size=(1280, 720)):

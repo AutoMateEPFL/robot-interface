@@ -13,6 +13,7 @@ from logistics.grid_utils import fill_grid, get_plateholder_petri_pos
 from gui.gui import InteractiveWindow
 from concurrent.futures import ThreadPoolExecutor
 from hardware_control import constants
+from logistics.computer_vision_utils import *
 
 logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
@@ -22,10 +23,12 @@ logging.basicConfig(
 
 def mouse_callback(event, x, y, flags, param) :
     if event == cv2.EVENT_LBUTTONDBLCLK :
-        combined_images = param
-        pixel_value = combined_images[y, x]
+        image = param
+        pixel_value = image[y, x]
+        pixel_value_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)[y, x]
         print(x, y)
-        print(pixel_value)
+        print('bgr : ', pixel_value)
+        print('hsv : ', pixel_value_hsv)
         
 async def main():
     # Def grid :
@@ -60,85 +63,111 @@ async def main():
     size = (1280, 360)
     middle_values = [80718, 66168, 59409, 53988, 48250, 41469, 34268, 24209, 9716]
     number_plates = 0
+    MODE = 1
+    robot.camera.camera.cap.set(cv2.CAP_PROP_AUTO_WB, 1)
+    robot.camera.camera.cap.set(cv2.CAP_PROP_AUTO_EXPOSURE, 1)
     while True:
-        frame = await robot.camera.camera.capture_frame()
+        if MODE == 0 :
+            frame = await robot.camera.camera.capture_frame()
 
-        left_side = 290
-        right_side = 780
-        upper_side = 420
-        bottom_side = 1420
+            left_side = 290
+            right_side = 780
+            upper_side = 420
+            bottom_side = 1420
 
-        im_cropped = frame[left_side:right_side, upper_side:bottom_side]
+            im_cropped = frame[left_side:right_side, upper_side:bottom_side]
 
-        red_square = frame[25:170, 540:700]
-        y_square = 82
-        x_square = 68
-        hsv_ref = cv2.cvtColor(red_square, cv2.COLOR_BGR2HSV)[y_square, x_square]
-        h = hsv_ref[0]
-        margin = 3
+            red_square = frame[25:170, 540:700]
+            y_square = 82
+            x_square = 68
+            hsv_ref = cv2.cvtColor(red_square, cv2.COLOR_BGR2HSV)[y_square, x_square]
+            h = hsv_ref[0]
+            margin = 3
 
-        # Threshold the HSV image to get only red colors
-        if abs(h - 0) < abs(h - 180) :
-            lower_h1 = (h-margin)%180
-            higher_h1 = 180 if h-margin < 0 else h+margin
-            lower_h2 = max(h-margin, 0)
-            higher_h2 = h+margin
+            # Threshold the HSV image to get only red colors
+            if abs(h - 0) < abs(h - 180) :
+                lower_h1 = (h-margin)%180
+                higher_h1 = 180 if h-margin < 0 else h+margin
+                lower_h2 = max(h-margin, 0)
+                higher_h2 = h+margin
 
-        else :
-            lower_h1 = h-margin
-            higher_h1 = min(h+margin, 180)
-            lower_h2 = 0 if h+margin > 180 else h-margin
-            higher_h2 = (h+margin)%180 if (h+margin)%180 != 0 else 180
-
-        lower_s = 190
-        higher_s = 255
-        lower_v = 50
-        higher_v = 255
-        hsv_lower1 = np.array([lower_h1, lower_s, lower_v])
-        hsv_higher1 = np.array([higher_h1, higher_s, higher_v])
-        hsv_lower2 = np.array([lower_h2, lower_s, lower_v])
-        hsv_higher2 = np.array([higher_h2, higher_s, higher_v])
-
-        mask1 = cv2.inRange(cv2.cvtColor(im_cropped, cv2.COLOR_BGR2HSV), hsv_lower1, hsv_higher1)
-        mask2 = cv2.inRange(cv2.cvtColor(im_cropped, cv2.COLOR_BGR2HSV), hsv_lower2, hsv_higher2)
-        mask = cv2.bitwise_or(mask1, mask2)
-
-        nb_pixel = np.count_nonzero(mask)
-
-        blue_color = (255, 0, 0) # BGR format
-        im_cropped[np.where(mask != 0)] = blue_color
-
-        hsv_frame = frame.copy()
-        hsv_frame = cv2.cvtColor(hsv_frame, cv2.COLOR_BGR2HSV)
-
-        # draw detection zone of the red square 
-        cv2.rectangle(hsv_frame, (540,25), (700,170), color=(0,0,0), thickness=3)
-
-        combined_images = cv2.hconcat([frame, hsv_frame])
-
-        if nb_pixel > np.max(middle_values) :
-            number_plates = 0
-        elif nb_pixel < np.min(middle_values) :
-            number_plates = 9
-        else :
-            positions = [i for i in range(len(middle_values)-1) if middle_values[i] >= nb_pixel >= middle_values[i+1]]
-            if len(positions) > 1 :
-                number_plates = -1
-                cv2.putText(combined_images, "multiple number of plates possible", (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 4)
             else :
-                number_plates = positions[0] + 1
+                lower_h1 = h-margin
+                higher_h1 = min(h+margin, 180)
+                lower_h2 = 0 if h+margin > 180 else h-margin
+                higher_h2 = (h+margin)%180 if (h+margin)%180 != 0 else 180
+
+            lower_s = 190
+            higher_s = 255
+            lower_v = 50
+            higher_v = 255
+            hsv_lower1 = np.array([lower_h1, lower_s, lower_v])
+            hsv_higher1 = np.array([higher_h1, higher_s, higher_v])
+            hsv_lower2 = np.array([lower_h2, lower_s, lower_v])
+            hsv_higher2 = np.array([higher_h2, higher_s, higher_v])
+
+            mask1 = cv2.inRange(cv2.cvtColor(im_cropped, cv2.COLOR_BGR2HSV), hsv_lower1, hsv_higher1)
+            mask2 = cv2.inRange(cv2.cvtColor(im_cropped, cv2.COLOR_BGR2HSV), hsv_lower2, hsv_higher2)
+            mask = cv2.bitwise_or(mask1, mask2)
+
+            nb_pixel = np.count_nonzero(mask)
+
+            blue_color = (255, 0, 0) # BGR format
+            im_cropped[np.where(mask != 0)] = blue_color
+
+            hsv_frame = frame.copy()
+            hsv_frame = cv2.cvtColor(hsv_frame, cv2.COLOR_BGR2HSV)
+
+            # draw detection zone of the red square 
+            cv2.rectangle(hsv_frame, (540,25), (700,170), color=(0,0,0), thickness=3)
+
+            combined_images = cv2.hconcat([frame, hsv_frame])
+
+            if nb_pixel > np.max(middle_values) :
+                number_plates = 0
+            elif nb_pixel < np.min(middle_values) :
+                number_plates = 9
+            else :
+                positions = [i for i in range(len(middle_values)-1) if middle_values[i] >= nb_pixel >= middle_values[i+1]]
+                if len(positions) > 1 :
+                    number_plates = -1
+                    cv2.putText(combined_images, "multiple number of plates possible", (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 4)
+                else :
+                    number_plates = positions[0] + 1
+            
+            cv2.putText(combined_images, str(number_plates) + " plates detected", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 4)
+
+            cv2.putText(combined_images, str(nb_pixel) + " red pixels detected", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 4) 
+            cv2.imshow('frame', cv2.resize(combined_images, size))
+
+            cv2.setMouseCallback('frame', mouse_callback, param=cv2.resize(combined_images, size))
+            # cv2.imshow('detection', cv2.resize(im_cropped, size))
+            # Break the loop if 'q' is pressed
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+             break
+
+        elif MODE == 1 :
+            size = (1280, 720)
+            frame = await robot.camera.camera.capture_frame()
+
+            number_plates = compute_number_plates(frame)
+
+            image_displayed = cv2.resize(frame, size)
+            
+            cv2.putText(image_displayed, str(number_plates) + " plates detected", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 4)
+
+            cv2.imshow('image_displayed', image_displayed)
+
+            cv2.setMouseCallback('image_displayed', mouse_callback, param=image_displayed)
+            # cv2.imshow('detection', cv2.resize(im_cropped, size))
+            # Break the loop if 'q' is pressed
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
         
-        cv2.putText(combined_images, str(number_plates) + " plates detected", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 4)
 
-        cv2.putText(combined_images, str(nb_pixel) + " red pixels detected", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 4) 
-        cv2.imshow('frame', cv2.resize(combined_images, size))
 
-        cv2.setMouseCallback('frame', mouse_callback, param=cv2.resize(combined_images, size))
-        # cv2.imshow('detection', cv2.resize(im_cropped, size))
-        # Break the loop if 'q' is pressed
-
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
         
     await robot.gripper.rotate(0)
     await robot.change_tool("gripper")
