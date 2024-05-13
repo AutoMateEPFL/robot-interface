@@ -246,16 +246,16 @@ class Robot:
         Save a picture.
         
         """
-        await self.camera.save_picture(folder_name=folder_name, prefix=prefix, suffix=suffix, to_save=to_save) 
-
+        filename_top=await self.camera.save_picture(folder_name=folder_name, prefix=prefix, suffix=suffix, to_save=to_save) 
+        return(filename_top)
     async def bottom_save_picture(self,folder_name="", prefix="",suffix="",to_save=True):
         """
         Save a picture.
         
         """
         
-        await self.bottom_camera.save_picture(folder_name=folder_name, prefix=prefix, suffix=suffix, to_save=to_save)           
-        
+        filename_bot=await self.bottom_camera.save_picture(folder_name=folder_name, prefix=prefix, suffix=suffix, to_save=to_save)           
+        return(filename_bot)
     async def take_picture(self, obj: Pickable, obj_rem: Pickable = None, folder_name="", prefix="", suffix="",to_save=True, pic_pos=""):
         """
         Takes a picture of a specified object.
@@ -271,7 +271,7 @@ class Robot:
         await self.change_tool("camera")
         await self.gripper.rotate(90)
         await self.platform.move(coordinates.x, coordinates.y, constants.PICTURE_HEIGHT, constants.FEEDRATE)
-        await self.save_picture(folder_name=folder_name,prefix=prefix, suffix=suffix,to_save=to_save)
+        filename1=await self.save_picture(folder_name=folder_name,prefix=prefix, suffix=suffix,to_save=to_save)
         await self.change_tool("gripper")
         await self.platform.move(coordinates.x, coordinates.y,  constants.PETRI_CLERANCE, constants.FEEDRATE)
         await self.change_tool("camera")
@@ -282,6 +282,8 @@ class Robot:
         
         if obj_rem is not None:
             await self.place([obj_rem], self.robot_position)
+
+        return(filename1)
 
     async def take_bottom_picture(self, obj: Pickable, obj_rem: Pickable = None, folder_name="", prefix="", suffix="",to_save=True, pic_pos=""):
         """
@@ -294,12 +296,17 @@ class Robot:
         await self.platform.move(coordinates.x, coordinates.y+100, constants.CLERANCE, constants.FEEDRATE)
         await self.change_tool("bottom_camera")    
        
-        await self.bottom_save_picture(folder_name=folder_name,prefix=prefix, suffix=suffix,to_save=to_save)
+        filename_bot = await self.bottom_save_picture(folder_name=folder_name,prefix=prefix, suffix=suffix,to_save=to_save)
        
         await self.change_tool("gripper")
         await self.platform.move(coordinates.x, coordinates.y, constants.CLERANCE, constants.FEEDRATE)
 
+        return(filename_bot)
         
+
+    async def combine_photo(self, filename_top, filename_bot):
+        await self.camera.combine(filename_top,filename_bot)
+
        
 
     async def shutdown(self):

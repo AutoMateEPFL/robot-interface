@@ -87,7 +87,7 @@ class Bottom_Vision:
             logging.info(f"Saved image to {filename}")
         else :
             logging.info("Photo taken but not saved")
-
+        return(filename)
 
     async def show_video(self) :
         """

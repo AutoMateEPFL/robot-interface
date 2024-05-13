@@ -79,12 +79,15 @@ async def main():
 
     # Move to camera pos, take picture and move to stack pos
     for i in range(total_plateholders) :
+        
         stack_pos = grid.find_object(grid.stack_list[total_plateholders - i - 1])
         grid_pos = plateholder_petri_pos[-1-i][0]
         x_id = grid_pos.x_id
         y_id = grid_pos.y_id
         total_petri = plateholder_petri_pos[-1-i][1]
         for n in range(total_petri) :
+            filename_top=""
+            filename_bot=""
             petri_top = grid.object_grid[y_id][x_id][-1]
             petri_bottom = grid.object_grid[y_id][x_id][-2]
             target = [petri_bottom, petri_top]
@@ -93,20 +96,23 @@ async def main():
             
             # print('pick ', x_id, y_id, target[0]._associated_experiment, target[0].associated_name)
             # grid.remove_object(target)
-            await robot.take_picture(obj=target[0], obj_rem=target[1], folder_name=target[0]._associated_experiment,
+            
+            filename_top= await robot.take_picture(obj=target[0], obj_rem=target[1], folder_name=target[0]._associated_experiment,
                                     prefix=str(target[0].number) + "_",
                                     suffix="_" + str(target[0].associated_name), to_save = True, pic_pos=pic_pos)
             
             
             #go to the bottom camera spot 
             await robot.pick_and_place(target, bottom_pic_pos)
-            await robot.take_bottom_picture(obj=target[0], obj_rem=target[1], folder_name=target[0]._associated_experiment,
+            filename_bot= await robot.take_bottom_picture(obj=target[0], obj_rem=target[1], folder_name=target[0]._associated_experiment,
                                     prefix=str(target[0].number) + "_",
                                     suffix="_" + str(target[0].associated_name), to_save = True, pic_pos=bottom_pic_pos)
 
             await robot.pick_and_place(target, stack_pos)
             # print('place ', target[0]._associated_experiment, target[0].associated_name,  'to ', stack_pos.x_id, stack_pos.y_id)
-    
+            await robot.combine_photo(filename_top,filename_bot)
+            print(filename_top)
+            print(filename_bot)
     # shutdown the robot
     await robot.shutdown()
 

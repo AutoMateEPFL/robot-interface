@@ -12,6 +12,7 @@ import datetime
 import os
 import logging
 import numpy as np
+from PIL import Image
 log = logging.getLogger(__name__)
 
 class Vision:
@@ -87,6 +88,27 @@ class Vision:
             logging.info(f"Saved image to {filename}")
         else :
             logging.info("Photo taken but not saved")
+        
+        return(filename)
+    
+    async def combine(self, filename_top, filename_bot):
+        #combine the top and bottom photos and rename the combined photo with name of top photo +"combined"
+        image1 = Image.open(filename_top)
+        #image1.show()
+        image2 = Image.open(filename_bot)
+        #image2.show()
+
+        image1=image1.resize((1920,1080))
+        image1_size=image1.size
+        image2_size=image2.size
+        new_image = Image.new('RGB',(2*image1_size[0],image1_size[1]),(250,250,250))
+        new_image.paste(image1,(0,0))
+        new_image.paste(image2,(image1_size[0],0))
+        print(filename_top)
+        path= filename_top.replace(".jpg",'')
+
+        new_image.save(path+"combined.jpg","JPEG")
+        #new_image.show()
 
 
     async def show_video(self) :
