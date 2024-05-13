@@ -89,13 +89,13 @@ class Vision:
         else :
             logging.info("Photo taken but not saved")
         
-        return(filename)
+        return(timestamp)
     
-    async def combine(self, filename_top, filename_bot):
+    async def combine(self, filename_top, filename_bot,folder_name,prefix,suffix):
         #combine the top and bottom photos and rename the combined photo with name of top photo +"combined"
-        image1 = Image.open(filename_top)
+        image1 = Image.open(f"C:/Users/AutoMate EPFL/Documents/GitHub/robot-interface/images/"+folder_name+'/'+prefix+f'{filename_top}'+suffix+'.jpg')
         #image1.show()
-        image2 = Image.open(filename_bot)
+        image2 = Image.open(f"C:/Users/AutoMate EPFL/Documents/GitHub/robot-interface/images/"+folder_name+'/'+prefix+f'{filename_bot}'+suffix+'.jpg')
         #image2.show()
 
         image1=image1.resize((1920,1080))
@@ -104,10 +104,10 @@ class Vision:
         new_image = Image.new('RGB',(2*image1_size[0],image1_size[1]),(250,250,250))
         new_image.paste(image1,(0,0))
         new_image.paste(image2,(image1_size[0],0))
-        print(filename_top)
-        path= filename_top.replace(".jpg",'')
 
-        new_image.save(path+"combined.jpg","JPEG")
+        os.makedirs("C:/Users/AutoMate EPFL/Documents/GitHub/robot-interface/images/"+folder_name+"/combined", exist_ok=True)
+     
+        new_image.save("C:/Users/AutoMate EPFL/Documents/GitHub/robot-interface/images/"+folder_name+"/combined/"+filename_top+".jpg","JPEG")
         #new_image.show()
 
 

@@ -304,8 +304,8 @@ class Robot:
         return(filename_bot)
         
 
-    async def combine_photo(self, filename_top, filename_bot):
-        await self.camera.combine(filename_top,filename_bot)
+    async def combine_photo(self, filename_top, filename_bot,folder_name,prefix,suffix):
+        await self.camera.combine(filename_top,filename_bot,folder_name,prefix,suffix)
 
        
 
