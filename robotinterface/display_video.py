@@ -26,9 +26,11 @@ def mouse_callback(event, x, y, flags, param) :
         image = param
         pixel_value = image[y, x]
         pixel_value_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)[y, x]
+        pixel_value_lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)[y, x]
         print(x, y)
         print('bgr : ', pixel_value)
         print('hsv : ', pixel_value_hsv)
+        print('lab : ', pixel_value_lab)
         
 async def main():
     # Def grid :
@@ -149,17 +151,30 @@ async def main():
 
         elif MODE == 1 :
             size = (1280, 720)
+            holder_ul = (390,290)
+            holder_br = (1380,780)
+            reference_ul = (540,50) # x y format
+            reference_br = (640,140)
+
             frame = await robot.camera.camera.capture_frame()
 
-            number_plates = compute_number_plates(frame)
+            number_plates, mask = compute_number_plates_lab(frame, reference_ul, reference_br, holder_ul, holder_br)
 
-            image_displayed = cv2.resize(frame, size)
+            im_displayed = frame.copy()
+            im_cropped = frame[holder_ul[1]:holder_br[1], holder_ul[0]:holder_br[0]]
+            # add blue color
+            im_cropped[np.where(mask != 0)] = (255, 0, 0)
+            im_displayed[holder_ul[1]:holder_br[1], holder_ul[0]:holder_br[0]] = im_cropped
+            cv2.rectangle(im_displayed, reference_ul, reference_br, (0,0,0), 4)
+            cv2.rectangle(im_displayed, holder_ul, holder_br, (0,0,0), 4)
+
+            im_displayed = cv2.resize(im_displayed, size)
             
-            cv2.putText(image_displayed, str(number_plates) + " plates detected", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 4)
+            cv2.putText(im_displayed, str(number_plates) + " plates detected", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 3)
 
-            cv2.imshow('image_displayed', image_displayed)
+            cv2.imshow('image_displayed', im_displayed)
 
-            cv2.setMouseCallback('image_displayed', mouse_callback, param=image_displayed)
+            cv2.setMouseCallback('image_displayed', mouse_callback, param=im_displayed)
             # cv2.imshow('detection', cv2.resize(im_cropped, size))
             # Break the loop if 'q' is pressed
 

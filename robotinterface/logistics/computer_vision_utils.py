@@ -109,3 +109,43 @@ def compute_number_plates(frame) :
     # number plates = -1 if nb_pixels falls exactly in a middle value
     return number_plates
 
+def get_lab_reference(im_lab, ref_ul, ref_br) :
+    reference = im_lab[ref_ul[1]:ref_br[1], ref_ul[0]:ref_br[0], :]
+    ref_l, ref_a, ref_b = cv2.split(reference)
+    a = np.mean(ref_a)
+    b = np.mean(ref_b)
+    lab_reference = [0, a, b]
+    return lab_reference
+
+def create_lab_mask(im_lab, lab_value, a_margin, b_margin) :
+    a = lab_value[1]
+    b = lab_value[2]
+    lower_bound = np.array([0, a-a_margin, b-b_margin])
+    upper_bound = np.array([255, a+a_margin, b+b_margin])
+    mask = cv2.inRange(im_lab, lower_bound, upper_bound)
+    return mask
+
+def compute_number_plates_lab(im, ref_ul, ref_br, region_ul, region_br) :
+    im_lab = cv2.cvtColor(im, cv2.COLOR_BGR2LAB)
+    middle_values = [80718, 66168, 59409, 53988, 48250, 41469, 34268, 24209, 9716]
+    lab_reference = get_lab_reference(im_lab, ref_ul, ref_br)
+    im_cropped = im_lab[region_ul[1]:region_br[1], region_ul[0]:region_br[0]]
+    a_margin = 17
+    b_margin = 17
+    mask = create_lab_mask(im_cropped, lab_reference, a_margin, b_margin)
+
+    nb_pixel = np.count_nonzero(mask)
+
+    if nb_pixel > np.max(middle_values) :
+        number_plates = 0
+    elif nb_pixel < np.min(middle_values) :
+        number_plates = 9
+    else :
+        positions = [i for i in range(len(middle_values)-1) if middle_values[i] >= nb_pixel >= middle_values[i+1]]
+        if len(positions) > 1 :
+            number_plates = -1
+        else :
+            number_plates = positions[0] + 1
+
+    # number plates = -1 if nb_pixels falls exactly in a middle value
+    return number_plates, mask

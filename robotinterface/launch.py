@@ -54,8 +54,9 @@ async def main():
     if experiment_data[-1] == 'WITHOUT EXPERIMENT' :
         total_plates = experiment_data[0]
         fill_grid_number_plates(grid, total_plates, brand=brand)
+
     elif experiment_data[-1] == 'DETECTION' :
-        number_plates = await detect_plates(grid, robot, number_plateholder=1)
+        number_plates = await detect_plates(grid, robot, number_plateholder=8)
         root = tk.Tk()
         root.withdraw()
         CONTINUE = show_popup(number_plates)
@@ -64,6 +65,7 @@ async def main():
         else :
             await robot.shutdown()
             return None
+        
     else :
         fill_grid_experiment(grid, experiment_data, brand=brand)
 
