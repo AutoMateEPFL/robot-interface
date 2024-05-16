@@ -47,9 +47,13 @@ async def main():
     # Launch the gui and get the data
     experiment_window = InteractiveWindow(title = 'Experiment Window')
     experiment_data = experiment_window.get_experiment_data()
+    # Extract take bottom
+    take_bottom_photo = experiment_data[0]
+    experiment_data.pop(0)
     # Extract brand
     brand = experiment_data[0]
     experiment_data.pop(0)
+
 
     print(brand)
     take_bottom_photo = True
