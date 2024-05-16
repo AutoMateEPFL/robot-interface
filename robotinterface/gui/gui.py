@@ -111,6 +111,11 @@ class InteractiveWindow:
         combobox_tab1 = ttk.Combobox(self.tab1, textvariable=self.selected_option_tab1, values=options, state="readonly")
         combobox_tab1.pack()
 
+        # Checkbox for bottom picture
+        self.take_bottom_picture_var = tk.IntVar()
+        take_bottom_picture_checkbox = tk.Checkbutton(self.tab1, text="Take bottom picture", variable=self.take_bottom_picture_var)
+        take_bottom_picture_checkbox.pack(pady=(10, 0))
+
 
     def create_tab2_content(self):
         # Create a frame to hold the content
@@ -137,27 +142,16 @@ class InteractiveWindow:
 
         # Create start button
         start_button = tk.Button(frame, text="Start", command=self.start_without_experiments)
-        start_button.grid(row=2, columnspan=2, padx=5, pady=5)
+        start_button.grid(row=3, columnspan=2, padx=5, pady=5)
 
-    # def start_without_experiments(self):
-    #     number = self.number_entry.get()
-    #     try:
-    #         number = int(number)
-    #         # Call your function with the entered number
-    #         print("Starting function with number:", number)
-    #         # Replace the print statement with your desired function logic
-    #         if number > self.max_plate_number :
-    #             messagebox.showerror("Error", "Too many plates")
-    #         else :
-    #             self.experiment_data.append((self.selected_option_tab2.get()))
-    #             self.experiment_data.append((number))
-    #             self.experiment_data.append(('WITHOUT EXPERIMENT'))
-    #             self.root.destroy()  # Close the window
-    #     except ValueError:
-    #         messagebox.showerror("Error", "Please enter a valid number.")
+        # Checkbox for bottom picture
+        self.take_bottom_picture_var_tab2 = tk.IntVar()
+        take_bottom_picture_checkbox_tab2 = tk.Checkbutton(frame, text="Take bottom picture", variable=self.take_bottom_picture_var_tab2)
+        take_bottom_picture_checkbox_tab2.grid(row=2, columnspan=2, padx=5, pady=5)
 
     def start_without_experiments(self):
         number = self.number_entry.get()
+        self.experiment_data.append(self.take_bottom_picture_var_tab2.get())
         if number == '' :
             self.experiment_data.append((self.selected_option_tab2.get()))
             self.experiment_data.append(('DETECTION'))
@@ -221,6 +215,7 @@ class InteractiveWindow:
             self.checked_label.config(text=f"{total_checked}/{self.max_plate_number} plates", fg="black")
 
     def start(self, event=None):
+        self.experiment_data.append(self.take_bottom_picture_var.get())
         self.experiment_data.append((self.selected_option_tab1.get()))
         total_checked = sum(checkbox_var.get() for _, _, checkboxes in self.lines for checkbox_var in checkboxes)
         if total_checked > self.max_plate_number:
@@ -245,9 +240,17 @@ class InteractiveWindow:
             return self.experiment_data
         # Add the number of the experiment and remove the empty experiments
         else :
-            data = [self.experiment_data[0]]
-            data += [(number+1, experiment[0], experiment[1]) for number, experiment in enumerate(self.experiment_data[1:])]
+            data = []
+            bottom = self.experiment_data[0]
+            manufacturer = self.experiment_data[1]
+            self.experiment_data.pop(0)
+            self.experiment_data.pop(0)
+            data += [(number+1, experiment[0], experiment[1]) for number, experiment in enumerate(self.experiment_data[:])]
+            print(data)
+            print(data[1][1])
             data = [data[i] for i in range(len(data)) if data[i][1] != '']
+            data.insert(0, manufacturer)
+            data.insert(0, bottom)
             return data
 
 
