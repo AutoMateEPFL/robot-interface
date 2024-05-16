@@ -15,6 +15,7 @@ else :
 from hardware_control.gripper import Gripper
 from hardware_control.platform_robot import Platform
 from hardware_control.vision import Vision
+from hardware_control.bottom_vision import Bottom_Vision
 import logging
 import platform
 
@@ -77,6 +78,7 @@ class Robot:
         gripper_task = None
         platform_task = None
         camera_connection_task = None
+        bottom_camera_connection_task = None
         for setting in data["ComSettings"]:
             if setting["name"] == "dyna":
                 gripper_task = asyncio.create_task(Gripper.build(setting))
@@ -84,14 +86,17 @@ class Robot:
                 platform_task = asyncio.create_task(Platform.build(setting, tools_settings["Tools"]))
             elif setting["name"] == "camera":
                 camera_connection_task = asyncio.create_task(Vision.build(setting))
+            elif setting["name"] == "bottom_camera":
+                bottom_camera_connection_task = asyncio.create_task(Bottom_Vision.build(setting))
 
         # Initialize the tasks to None
-        gripper, platform, camera = None, None, None
+        gripper, platform, camera, bottom_camera = None, None, None, None
 
         # Collect all available tasks
         tasks = [(task, name) for task, name in ((gripper_task, 'gripper'),
                                                  (platform_task, 'platform'),
-                                                 (camera_connection_task, 'camera')) if task]
+                                                 (camera_connection_task, 'camera'),
+                                                 (bottom_camera_connection_task, 'bottom_camera')) if task]
 
         # If there are tasks to perform
         if tasks:
@@ -106,10 +111,12 @@ class Robot:
                     platform = result
                 elif name == 'camera':
                     camera = result
+                elif name == 'bottom_camera':
+                    bottom_camera = result
 
-        return cls(platform, gripper, camera, grid, tools_list)
+        return cls(platform, gripper, camera,bottom_camera, grid, tools_list)
 
-    def __init__(self, platform: Platform, gripper: Gripper, camera: Vision, grid: Grid, tools_list: dict[str, int]):
+    def __init__(self, platform: Platform, gripper: Gripper, camera: Vision, bottom_camera: Bottom_Vision, grid: Grid, tools_list: dict[str, int]):
         """
         Initializes a new instance of the Robot class.
 
@@ -123,6 +130,7 @@ class Robot:
         self.gripper = gripper
         self.platform = platform
         self.camera = camera
+        self.bottom_camera = bottom_camera
         self.grid = grid
         self.tools_list = tools_list
         self.robot_position = None
@@ -217,6 +225,7 @@ class Robot:
         else:
             need_clearance = False
             
+
         coordinates = self.grid.add_object(objects, position)
         await self._move_and_act_fast(coordinates, self.gripper.open, need_clearance)
         self.robot_position = position
@@ -237,8 +246,16 @@ class Robot:
         Save a picture.
         
         """
-        await self.camera.save_picture(folder_name=folder_name, prefix=prefix, suffix=suffix, to_save=to_save)      
+        filename_top=await self.camera.save_picture(folder_name=folder_name, prefix=prefix, suffix=suffix, to_save=to_save) 
+        return(filename_top)
+    async def bottom_save_picture(self,folder_name="", prefix="",suffix="",to_save=True):
+        """
+        Save a picture.
         
+        """
+        
+        filename_bot=await self.bottom_camera.save_picture(folder_name=folder_name, prefix=prefix, suffix=suffix, to_save=to_save)           
+        return(filename_bot)
     async def take_picture(self, obj: Pickable, obj_rem: Pickable = None, folder_name="", prefix="", suffix="",to_save=True, pic_pos=""):
         """
         Takes a picture of a specified object.
@@ -254,7 +271,7 @@ class Robot:
         await self.change_tool("camera")
         await self.gripper.rotate(90)
         await self.platform.move(coordinates.x, coordinates.y, constants.PICTURE_HEIGHT, constants.FEEDRATE)
-        await self.save_picture(folder_name=folder_name,prefix=prefix, suffix=suffix,to_save=to_save)
+        filename1=await self.save_picture(folder_name=folder_name,prefix=prefix, suffix=suffix,to_save=to_save)
         await self.change_tool("gripper")
         await self.platform.move(coordinates.x, coordinates.y,  constants.PETRI_CLERANCE, constants.FEEDRATE)
         await self.change_tool("camera")
@@ -265,6 +282,32 @@ class Robot:
         
         if obj_rem is not None:
             await self.place([obj_rem], self.robot_position)
+
+        return(filename1)
+
+    async def take_bottom_picture(self, obj: Pickable, obj_rem: Pickable = None, folder_name="", prefix="", suffix="",to_save=True, pic_pos=""):
+        """
+        Takes a picture of a specified object from the bottom.
+
+        Args:
+            obj: The object to take a picture of.
+        """
+        coordinates = self.grid.get_coordinates(obj_rem)
+        await self.platform.move(coordinates.x, coordinates.y+100, constants.CLERANCE, constants.FEEDRATE)
+        await self.change_tool("bottom_camera")    
+       
+        filename_bot = await self.bottom_save_picture(folder_name=folder_name,prefix=prefix, suffix=suffix,to_save=to_save)
+       
+        await self.change_tool("gripper")
+        await self.platform.move(coordinates.x, coordinates.y, constants.CLERANCE, constants.FEEDRATE)
+
+        return(filename_bot)
+        
+
+    async def combine_photo(self, filename_top, filename_bot,folder_name,prefix,suffix):
+        await self.camera.combine(filename_top,filename_bot,folder_name,prefix,suffix)
+
+       
 
     async def shutdown(self):
         """

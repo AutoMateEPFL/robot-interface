@@ -146,6 +146,14 @@ class Grid:
         self.cam = CameraSpot(grid_position=GridPosition)
         self.add_object([self.cam], position_camera)
 
+    def set_bottom_camera_position(self, position_camera: GridPosition):
+        """
+        Adds a bottom camera spot to the grid
+        """
+        self.cam = BottomCameraSpot(grid_position=GridPosition)
+        self.add_object([self.cam], position_camera)
+
+
     def set_stack_positions(self, position_stack):
         """
         Adds a set of stack positions to the grid, not usable by operator

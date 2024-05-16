@@ -37,6 +37,17 @@ class CameraSpot(NonPickable):
         super().__init__()
         self._grid_position = grid_position
 
+class BottomCameraSpot(NonPickable):    
+    """
+    This class represents the bottom camera spot
+    """
+    height = 145.0 # Possible offset to adjust for the grip thickness
+    name = "BottomCamera"
+    def __init__(self,grid_position):
+        super().__init__()
+        self._grid_position = grid_position
+
+
 class StackSpot(NonPickable):
     """
     This class defines a stack spot

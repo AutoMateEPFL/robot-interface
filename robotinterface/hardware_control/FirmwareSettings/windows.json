@@ -24,6 +24,10 @@
     {
       "name": "camera",
       "index": "auto"
+    },
+    {
+      "name": "bottom_camera",
+      "index": "auto"
     }
   ]
 }
