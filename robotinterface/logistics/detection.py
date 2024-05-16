@@ -7,6 +7,7 @@ from hardware_control import constants
 from logistics.non_pickable import PlateHolder
 from logistics.pickable import *
 from logistics.computer_vision_utils import compute_number_plates_lab
+from hardware_control import constants
 
 
 async def detect_plates(grid : Grid, robot : Robot, number_plateholder=8) :
@@ -25,7 +26,7 @@ async def detect_plates(grid : Grid, robot : Robot, number_plateholder=8) :
         await robot.platform.move(x, y, constants.HOVER_CLERANCE, constants.FEEDRATE)
 
         await asyncio.sleep(0.65)
-        frame = await robot.camera.camera.capture_frame()
+        frame = await robot.camera.camera.capture_frame(focus=constants.FOCUS)
 
         n_plates[x_id][y_id], _ = compute_number_plates_lab(frame, reference_ul, reference_br, holder_ul, holder_br)
 
