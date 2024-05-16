@@ -6,17 +6,20 @@ import numpy as np
 from hardware_control import constants
 from logistics.non_pickable import PlateHolder
 from logistics.pickable import *
-from logistics.computer_vision_utils import compute_number_plates
+from logistics.computer_vision_utils import compute_number_plates_lab
 
 
 async def detect_plates(grid : Grid, robot : Robot, number_plateholder=8) :
+    holder_ul = (390,290)
+    holder_br = (1380,780)
+    reference_ul = (540,50) # x y format
+    reference_br = (640,140)
     n_plates = np.zeros((2, 4))
     await robot.change_tool("camera")
     await robot.gripper.rotate(90)
     for i in range(number_plateholder) :
         x_id = 0 if i in [0, 1, 2, 3] else 1
         y_id = i if i in [0, 1, 2, 3] else i - 4
-        print(x_id, y_id)
         grid_pos = GridPosition(x_id, y_id)
         x, y = grid.get_coordinates_from_grid(grid_pos)
         await robot.platform.move(x, y, constants.HOVER_CLERANCE, constants.FEEDRATE)
@@ -24,7 +27,7 @@ async def detect_plates(grid : Grid, robot : Robot, number_plateholder=8) :
         await asyncio.sleep(0.65)
         frame = await robot.camera.camera.capture_frame()
 
-        n_plates[x_id][y_id] = compute_number_plates(frame)
+        n_plates[x_id][y_id], _ = compute_number_plates_lab(frame, reference_ul, reference_br, holder_ul, holder_br)
 
     await robot.gripper.rotate(0)
     await robot.change_tool("gripper")
