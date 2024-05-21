@@ -292,7 +292,13 @@ class Robot:
         Args:
             obj: The object to take a picture of.
         """
-        coordinates = self.grid.get_coordinates(obj_rem)
+
+        """remove these 2 lines if you don't want to open the top of petri dish"""
+        if obj_rem is not None:
+            await self.pick([obj_rem])
+
+        coordinates = self.grid.get_coordinates(obj)
+        await self.platform.vertical_move(constants.CLERANCE, constants.FEEDRATE)
         await self.platform.move(coordinates.x, coordinates.y+100, constants.CLERANCE, constants.FEEDRATE)
         await self.change_tool("bottom_camera")    
        
@@ -300,6 +306,12 @@ class Robot:
        
         await self.change_tool("gripper")
         await self.platform.move(coordinates.x, coordinates.y, constants.CLERANCE, constants.FEEDRATE)
+
+
+        """remove these 2 lines if you don't want to open the top of petri dish"""
+        if obj_rem is not None:
+            await self.place([obj_rem], self.robot_position)
+
 
         return(filename_bot)
         
