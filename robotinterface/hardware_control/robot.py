@@ -299,7 +299,7 @@ class Robot:
 
         coordinates = self.grid.get_coordinates(obj)
         await self.platform.vertical_move(constants.CLERANCE, constants.FEEDRATE)
-        await self.platform.move(coordinates.x, coordinates.y+100, constants.CLERANCE, constants.FEEDRATE)
+        await self.platform.move(coordinates.x, coordinates.y+150, constants.CLERANCE, constants.FEEDRATE)
         await self.change_tool("bottom_camera")    
        
         filename_bot = await self.bottom_save_picture(folder_name=folder_name,prefix=prefix, suffix=suffix,to_save=to_save)

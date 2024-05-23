@@ -22,7 +22,7 @@ def fill_grid_experiment(grid : Grid, experiment_data, brand="SARSTEDT") -> None
     '''
         
     max_plateholders = 8
-    max_plates = 12
+    max_plates = 9
 
     total_plates = sum(len(experiment_data[i][2]) for i in range(len(experiment_data)))
 
@@ -67,10 +67,11 @@ def fill_grid_number_plates(grid : Grid, total_plates, brand="SARSTEDT") -> None
     '''
 
     max_plateholders = 8
-    max_plates = 12
+    max_plates = 9
 
     # Get total plateholders
     total_plateholders = int(np.ceil(total_plates/max_plates))
+    print(total_plateholders)
     if total_plateholders > max_plateholders :
         raise Exception('Problem with the program, too many plateholders')
     
