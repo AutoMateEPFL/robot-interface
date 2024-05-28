@@ -54,8 +54,8 @@ async def main():
     # Go to a position
     await robot.change_tool("camera")
     await robot.gripper.rotate(90)
-    x_id = 0 
-    y_id = 0
+    x_id = 1 
+    y_id = 3
     grid_pos = GridPosition(x_id, y_id)
     x, y = grid.get_coordinates_from_grid(grid_pos)
     await robot.platform.move(x, y, constants.HOVER_CLERANCE, constants.FEEDRATE)
@@ -156,7 +156,7 @@ async def main():
             reference_ul = (540,50) # x y format
             reference_br = (640,140)
 
-            frame = await robot.camera.camera.capture_frame()
+            frame = await robot.camera.camera.capture_frame(focus=constants.FOCUS)
 
             number_plates, mask = compute_number_plates_lab(frame, reference_ul, reference_br, holder_ul, holder_br)
 
@@ -171,6 +171,8 @@ async def main():
             im_displayed = cv2.resize(im_displayed, size)
             
             cv2.putText(im_displayed, str(number_plates) + " plates detected", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 3)
+            number_pixels = np.count_nonzero(mask)
+            cv2.putText(im_displayed, str(number_pixels) + " pixels detected", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0), 3)
 
             cv2.imshow('image_displayed', im_displayed)
 

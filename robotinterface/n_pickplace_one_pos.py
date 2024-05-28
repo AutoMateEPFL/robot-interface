@@ -1,0 +1,52 @@
+import os
+import sys
+import platform
+import asyncio
+import cv2
+from logistics.grid import Grid, GridPosition
+from hardware_control.robot import Robot
+import numpy as np
+from hardware_control import constants
+from logistics.non_pickable import PlateHolder
+from logistics.pickable import *
+import logging
+from logistics.computer_vision_utils import take_n_pictures_of_one_pos
+from concurrent.futures import ThreadPoolExecutor
+
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
+
+async def main() :
+    grid = Grid(x_max=-800, x_dist=-199, y_max=-620, y_dist=-200)
+    loop = asyncio.get_running_loop()
+    executor = ThreadPoolExecutor(max_workers=2)
+
+    robot = await Robot.build(grid)
+
+    # set auto white balance true == 1 / false == 0, auto white exposure true == 1 / false == 0
+
+    robot.camera.camera.cap.set(cv2.CAP_PROP_AUTO_WB, 1)
+    robot.camera.camera.cap.set(cv2.CAP_PROP_AUTO_EXPOSURE, 1)
+
+    #first fill plateholder
+    brand = 'VWR'
+    number_plates = 2
+    grid_pos = GridPosition(1, 3)
+    grid.add_object([PlateHolder()], grid_pos)
+    for _ in range(number_plates) :
+        grid.add_object([SmallPetriBottom(brand=brand), SmallPetriTop(brand=brand)], grid_pos)
+
+    #Move plates
+    x_id = grid_pos.x_id
+    y_id = grid_pos.y_id
+    for _ in range(number_plates) :
+        petri_top = grid.object_grid[y_id][x_id][-1]
+        petri_bottom = grid.object_grid[y_id][x_id][-2]
+        target = [petri_bottom, petri_top]
+        await robot.pick_and_place(target, GridPosition(2, 0))
+
+    await robot.shutdown()
+
+asyncio.run(main())
