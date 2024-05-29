@@ -29,7 +29,7 @@ async def detect_plates(grid : Grid, robot : Robot, number_plateholder=8) :
         await asyncio.sleep(0.65)
         frame = await robot.camera.camera.capture_frame(focus=constants.FOCUS)
 
-        n_plates[x_id][y_id], _, reference = compute_number_plates_lab(frame, reference_ul, reference_br, holder_ul, holder_br, reference)
+        n_plates[x_id][y_id], _, reference = compute_number_plates_lab(frame, reference_ul, reference_br, holder_ul, holder_br, reference=None)
 
     await robot.gripper.rotate(0)
     await robot.change_tool("gripper")
