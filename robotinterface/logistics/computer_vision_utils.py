@@ -131,9 +131,10 @@ def create_lab_mask(im_lab, lab_value, a_margin, b_margin) :
 
 def compute_number_plates_lab(im, ref_ul, ref_br, region_ul, region_br) :
     im_lab = cv2.cvtColor(im, cv2.COLOR_BGR2LAB)
-    # middle_values = [80718, 66168, 59409, 53988, 48250, 41469, 34268, 24209, 9716]
-    # middle_values = [78946, 65497, 59481, 54604, 48136, 40231, 32417, 21347, 10108]
-    middle_values = [78765, 65292, 58747, 53995, 47716, 41096, 31770, 19532, 6850]
+    # Thresholds computed for the (0,0) position specifically
+    middle_values = [78946, 65497, 59481, 54604, 48136, 40231, 32417, 21347, 10108]
+    # Thresholds computed based on all positions, less precise depending on position
+    # middle_values = [75080, 60451, 55730, 50327, 45612, 37902, 29470, 17665, 6011]
     lab_reference = get_lab_reference(im_lab, ref_ul, ref_br)
     im_cropped = im_lab[region_ul[1]:region_br[1], region_ul[0]:region_br[0]]
     a_margin = 17
