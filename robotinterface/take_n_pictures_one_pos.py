@@ -33,7 +33,7 @@ async def main() :
     #first fill plateholder
     brand = 'VWR'
     number_plates = 9
-    grid_pos = GridPosition(0, 0)
+    grid_pos = GridPosition(1, 3)
     grid.add_object([PlateHolder()], grid_pos)
     for _ in range(number_plates) :
         grid.add_object([SmallPetriBottom(brand=brand), SmallPetriTop(brand=brand)], grid_pos)

@@ -54,8 +54,8 @@ async def main():
     # Go to a position
     await robot.change_tool("camera")
     await robot.gripper.rotate(90)
-    x_id = 1 
-    y_id = 3
+    x_id = 0
+    y_id = 0
     grid_pos = GridPosition(x_id, y_id)
     x, y = grid.get_coordinates_from_grid(grid_pos)
     await robot.platform.move(x, y, constants.HOVER_CLERANCE, constants.FEEDRATE)

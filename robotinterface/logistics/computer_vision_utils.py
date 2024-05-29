@@ -36,7 +36,9 @@ async def take_n_pictures_of_one_pos(grid : Grid, robot : Robot, number_plates, 
         petri_bottom = grid.object_grid[y_id][x_id][-2]
         target = [petri_bottom, petri_top]
         await robot.gripper.rotate(90)
-        await robot.platform.move(x_id, y_id, constants.HOVER_CLERANCE, constants.FEEDRATE)
+        grid_pos = GridPosition(x_id, y_id)
+        x, y = grid.get_coordinates_from_grid(grid_pos)
+        await robot.platform.move(x, y, constants.HOVER_CLERANCE, constants.FEEDRATE)
         await robot.save_picture(folder_name="CV_take_n_pic_of_one_pos" ,to_save=True)
         await robot.gripper.rotate(0)
         await robot.change_tool("gripper")
@@ -45,7 +47,9 @@ async def take_n_pictures_of_one_pos(grid : Grid, robot : Robot, number_plates, 
     #pic of empty plateholder
     await robot.change_tool("camera")
     await robot.gripper.rotate(90)
-    await robot.platform.move(x_id, y_id, constants.HOVER_CLERANCE, constants.FEEDRATE)
+    grid_pos = GridPosition(x_id, y_id)
+    x, y = grid.get_coordinates_from_grid(grid_pos)
+    await robot.platform.move(x, y, constants.HOVER_CLERANCE, constants.FEEDRATE)
     await robot.save_picture(folder_name="CV_take_n_pic_of_one_pos" ,to_save=True)
     await robot.gripper.rotate(0)
     await robot.change_tool("gripper")
@@ -128,7 +132,8 @@ def create_lab_mask(im_lab, lab_value, a_margin, b_margin) :
 def compute_number_plates_lab(im, ref_ul, ref_br, region_ul, region_br) :
     im_lab = cv2.cvtColor(im, cv2.COLOR_BGR2LAB)
     # middle_values = [80718, 66168, 59409, 53988, 48250, 41469, 34268, 24209, 9716]
-    middle_values = [78946, 65497, 59481, 54604, 48136, 40231, 32417, 21347, 10108]
+    # middle_values = [78946, 65497, 59481, 54604, 48136, 40231, 32417, 21347, 10108]
+    middle_values = [78765, 65292, 58747, 53995, 47716, 41096, 31770, 19532, 6850]
     lab_reference = get_lab_reference(im_lab, ref_ul, ref_br)
     im_cropped = im_lab[region_ul[1]:region_br[1], region_ul[0]:region_br[0]]
     a_margin = 17
