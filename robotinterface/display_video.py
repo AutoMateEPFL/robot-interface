@@ -63,7 +63,7 @@ async def main():
     # Show video
     # await robot.camera.show_video()
     size = (1280, 360)
-    middle_values = [80718, 66168, 59409, 53988, 48250, 41469, 34268, 24209, 9716]
+    middle_values = [78946, 65497, 59481, 54604, 48136, 40231, 32417, 21347, 10108]
     number_plates = 0
     MODE = 1
     robot.camera.camera.cap.set(cv2.CAP_PROP_AUTO_WB, 1)
