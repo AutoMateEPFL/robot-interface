@@ -129,13 +129,16 @@ def create_lab_mask(im_lab, lab_value, a_margin, b_margin) :
     mask = cv2.inRange(im_lab, lower_bound, upper_bound)
     return mask
 
-def compute_number_plates_lab(im, ref_ul, ref_br, region_ul, region_br) :
+def compute_number_plates_lab(im, ref_ul, ref_br, region_ul, region_br, reference=None) :
     im_lab = cv2.cvtColor(im, cv2.COLOR_BGR2LAB)
     # Thresholds computed for the (0,0) position specifically
     middle_values = [78946, 65497, 59481, 54604, 48136, 40231, 32417, 21347, 10108]
     # Thresholds computed based on all positions, less precise depending on position
     # middle_values = [75080, 60451, 55730, 50327, 45612, 37902, 29470, 17665, 6011]
-    lab_reference = get_lab_reference(im_lab, ref_ul, ref_br)
+    if reference == None :
+        lab_reference = get_lab_reference(im_lab, ref_ul, ref_br)
+    else :
+        lab_reference = reference
     im_cropped = im_lab[region_ul[1]:region_br[1], region_ul[0]:region_br[0]]
     a_margin = 17
     b_margin = 17
@@ -155,4 +158,4 @@ def compute_number_plates_lab(im, ref_ul, ref_br, region_ul, region_br) :
             number_plates = positions[0] + 1
 
     # number plates = -1 if nb_pixels falls exactly in a middle value
-    return number_plates, mask
+    return number_plates, mask, lab_reference
